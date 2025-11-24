@@ -1,0 +1,58 @@
+import type React from "react"
+import type { Metadata, Viewport } from "next"
+import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+import "./globals.css"
+import { Navbar } from "@/components/template/layout/navbar"
+import { Footer } from "@/components/template/layout/footer"
+
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const _inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "Emobo - Premium Laptop Store",
+  description: "Discover premium laptops from top brands with the best prices and specifications.",
+  generator: "v0.app",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+      },
+    ],
+  },
+  openGraph: {
+    title: "Emobo - Premium Laptop Store",
+    description: "Discover premium laptops from top brands with the best prices and specifications.",
+    images: ["/og-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Emobo - Premium Laptop Store",
+    description: "Discover premium laptops from top brands with the best prices and specifications.",
+  },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#1D4ED8",
+  userScalable: true,
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${_inter.className} font-sans antialiased`}>
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
+}
