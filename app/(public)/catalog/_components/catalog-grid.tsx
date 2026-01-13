@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { ProductCard } from "../../_components/product-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutGrid, LayoutList } from "lucide-react";
@@ -9,7 +10,8 @@ const allLaptops = [
   {
     id: 1,
     name: "Lenovo ThinkPad X1 Carbon Gen 11",
-    price: "$1,299",
+    brand: "Lenovo",
+    price: "19500000",
     image: "/lenovo-thinkpad-laptop.jpg",
     rating: 4.8,
     reviews: 234,
@@ -19,7 +21,8 @@ const allLaptops = [
   {
     id: 2,
     name: "ASUS Vivobook Pro 15 OLED",
-    price: "$899",
+    brand: "ASUS",
+    price: "13500000",
     image: "/asus-vivobook-laptop.jpg",
     rating: 4.6,
     reviews: 189,
@@ -29,7 +32,8 @@ const allLaptops = [
   {
     id: 3,
     name: "HP Pavilion 15 Touch Screen",
-    price: "$749",
+    brand: "HP",
+    price: "11250000",
     image: "/hp-pavilion-laptop.jpg",
     rating: 4.5,
     reviews: 156,
@@ -39,7 +43,8 @@ const allLaptops = [
   {
     id: 4,
     name: "Acer Swift 3 Thin & Light",
-    price: "$649",
+    brand: "Acer",
+    price: "9750000",
     image: "/acer-swift-laptop.jpg",
     rating: 4.7,
     reviews: 201,
@@ -49,7 +54,8 @@ const allLaptops = [
   {
     id: 5,
     name: "Lenovo ThinkPad X1 Carbon",
-    price: "$1,199",
+    brand: "Lenovo",
+    price: "17990000",
     image: "/lenovo-thinkpad-laptop.jpg",
     rating: 4.8,
     reviews: 178,
@@ -58,7 +64,8 @@ const allLaptops = [
   {
     id: 6,
     name: "ASUS ROG Strix Gaming",
-    price: "$1,499",
+    brand: "ASUS",
+    price: "22500000",
     image: "/asus-vivobook-laptop.jpg",
     rating: 4.9,
     reviews: 312,
@@ -68,7 +75,8 @@ const allLaptops = [
   {
     id: 7,
     name: "HP Envy x360 2-in-1",
-    price: "$899",
+    brand: "HP",
+    price: "13500000",
     image: "/hp-pavilion-laptop.jpg",
     rating: 4.6,
     reviews: 145,
@@ -77,7 +85,8 @@ const allLaptops = [
   {
     id: 8,
     name: "Acer Predator Helios 300",
-    price: "$1,299",
+    brand: "Acer",
+    price: "19500000",
     image: "/acer-swift-laptop.jpg",
     rating: 4.7,
     reviews: 267,
@@ -87,13 +96,25 @@ const allLaptops = [
 ];
 
 export function CatalogGrid() {
+  const searchParams = useSearchParams();
+  const brandFilter = searchParams.get("brand");
+
+  const filteredLaptops = brandFilter
+    ? allLaptops.filter(laptop => laptop.brand.toLowerCase() === brandFilter.toLowerCase())
+    : allLaptops;
+
   return (
     <div className="space-y-6">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          Showing <span className="font-medium text-foreground">{allLaptops.length}</span> products
-        </p>
+        <div>
+          <h2 className="text-xl font-bold">
+            {brandFilter ? `${brandFilter.toUpperCase()} Laptops` : "All Products"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Showing <span className="font-medium text-foreground">{filteredLaptops.length}</span> products
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Sort by:</span>
@@ -122,11 +143,17 @@ export function CatalogGrid() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        {allLaptops.map((laptop) => (
-          <ProductCard key={laptop.id} {...laptop} />
-        ))}
-      </div>
+      {filteredLaptops.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          {filteredLaptops.map((laptop) => (
+            <ProductCard key={laptop.id} {...laptop} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-20 text-center">
+          <p className="text-muted-foreground">No laptops found for "{brandFilter}".</p>
+        </div>
+      )}
 
       {/* Pagination could go here */}
     </div>

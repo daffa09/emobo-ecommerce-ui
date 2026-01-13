@@ -1,23 +1,29 @@
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
-const brands = ["Lenovo", "ASUS", "HP", "Acer", "Dell", "MSI"];
+const brands = [
+  { name: "Lenovo", logoText: "LENOVO" },
+  { name: "ASUS", logoText: "ASUS" },
+  { name: "HP", logoText: "HP" },
+  { name: "Acer", logoText: "ACER" },
+  { name: "Dell", logoText: "DELL" },
+  { name: "MSI", logoText: "MSI" }
+];
 
 export function BrandsSection() {
   return (
-    <section className="py-12 lg:py-16 bg-muted/30">
+    <section className="py-24 bg-slate-50 border-y border-border">
       <div className="container-emobo">
-        <h2 className="text-2xl lg:text-3xl font-bold text-center mb-8">
-          Top Laptop Brands
-        </h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        <p className="text-center text-sm font-bold text-slate-400 tracking-[0.3em] uppercase mb-12">
+          Authorized Premium Partners
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
           {brands.map((brand, index) => (
-            <Link key={index} href={`/catalog?brand=${brand.toLowerCase()}`}>
-              <Card className="hover:shadow-lg transition-all hover:border-primary cursor-pointer">
-                <CardContent className="p-6 flex items-center justify-center">
-                  <span className="font-bold text-lg">{brand}</span>
-                </CardContent>
-              </Card>
+            <Link key={index} href={`/catalog?brand=${brand.name.toLowerCase()}`}>
+              <div className="group flex items-center justify-center grayscale hover:grayscale-0 opacity-40 hover:opacity-100 transition-smooth">
+                <span className="text-2xl font-black italic tracking-tighter text-slate-900 group-hover:text-primary transition-smooth">
+                  {brand.logoText}
+                </span>
+              </div>
             </Link>
           ))}
         </div>

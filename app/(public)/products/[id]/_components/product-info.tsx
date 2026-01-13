@@ -8,6 +8,7 @@ import { Star, ShoppingCart, Heart, Share2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
+import { formatIDR } from "@/lib/utils";
 
 export function ProductInfo() {
   const [quantity, setQuantity] = useState(1);
@@ -19,7 +20,7 @@ export function ProductInfo() {
       id: 1,
       sku: "LENOVO-X1-CARBON-11",
       name: "Lenovo ThinkPad X1 Carbon Gen 11",
-      price: 1299,
+      price: 19500000,
       image: "/placeholder.svg",
     }, quantity);
 
@@ -59,8 +60,8 @@ export function ProductInfo() {
       {/* Price */}
       <div className="space-y-2">
         <div className="flex items-baseline gap-3">
-          <span className="text-4xl font-bold text-primary">$1,299</span>
-          <span className="text-2xl text-muted-foreground line-through">$1,732</span>
+          <span className="text-4xl font-bold text-primary">{formatIDR(19500000)}</span>
+          <span className="text-2xl text-muted-foreground line-through">{formatIDR(25990000)}</span>
           <Badge className="bg-red-500">25% OFF</Badge>
         </div>
         <p className="text-sm text-muted-foreground">

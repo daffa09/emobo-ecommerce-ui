@@ -1,43 +1,41 @@
-import { Cpu, Battery, Monitor } from "lucide-react";
+import { Zap, ShieldCheck, Headset } from "lucide-react";
+
+const features = [
+  {
+    icon: <Zap className="w-8 h-8" />,
+    title: "Cutting-Edge Technology",
+    description: "Stay ahead with the latest processors and hardware engineered for peak performance."
+  },
+  {
+    icon: <ShieldCheck className="w-8 h-8" />,
+    title: "Guaranteed Authenticity",
+    description: "Every product is 100% original and comes with a full manufacturer's official warranty."
+  },
+  {
+    icon: <Headset className="w-8 h-8" />,
+    title: "Expert Assistance",
+    description: "Our dedicated technical team is available 24/7 to ensure your workflow never stops."
+  }
+];
 
 export function FeaturesSection() {
   return (
-    <section className="py-12 lg:py-16">
+    <section className="py-24 bg-white">
       <div className="container-emobo">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Cpu className="h-6 w-6 text-primary" />
+        <div className="grid md:grid-cols-3 gap-12">
+          {features.map((feature, index) => (
+            <div key={index} className="flex flex-col items-center text-center space-y-6 group">
+              <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center text-primary transition-smooth group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3">
+                {feature.icon}
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold tracking-tight">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold mb-2">Latest Technology</h3>
-              <p className="text-sm text-muted-foreground">
-                All laptops feature the newest processors and hardware
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Battery className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-bold mb-2">Official Warranty</h3>
-              <p className="text-sm text-muted-foreground">
-                Guaranteed authentic products with manufacturer warranty
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Monitor className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-bold mb-2">Expert Support</h3>
-              <p className="text-sm text-muted-foreground">
-                Professional technical support and after-sales service
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

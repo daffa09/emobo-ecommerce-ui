@@ -25,13 +25,13 @@ export function RegisterForm() {
       <div>
         <label className="text-sm font-medium text-foreground block mb-2">Full Name</label>
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="John Doe"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11"
             required
           />
         </div>
@@ -40,13 +40,13 @@ export function RegisterForm() {
       <div>
         <label className="text-sm font-medium text-foreground block mb-2">Email Address</label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="email"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11"
             required
           />
         </div>
@@ -55,13 +55,13 @@ export function RegisterForm() {
       <div>
         <label className="text-sm font-medium text-foreground block mb-2">Password</label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11"
             required
           />
         </div>
@@ -70,13 +70,13 @@ export function RegisterForm() {
       <div>
         <label className="text-sm font-medium text-foreground block mb-2">Confirm Password</label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="password"
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-11"
             required
           />
         </div>
@@ -100,9 +100,9 @@ export function RegisterForm() {
         Create Account
       </Button>
 
-      <p className="text-center text-sm text-muted">
+      <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="text-primary hover:text-primary-dark font-semibold">
+        <Link href="/login" className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline">
           Sign in
         </Link>
       </p>

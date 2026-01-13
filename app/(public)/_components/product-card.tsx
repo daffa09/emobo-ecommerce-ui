@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Star, ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
+import { formatIDR } from "@/lib/utils";
 
 interface ProductCardProps {
   id: number;
@@ -82,7 +83,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
           ))}
         </div>
         <div className="flex items-center justify-between pt-2">
-          <span className="text-2xl font-bold text-primary">{price}</span>
+          <span className="text-2xl font-bold text-primary">{formatIDR(Number(price))}</span>
           <Button size="sm" className="gap-2" onClick={handleAddToCart}>
             <ShoppingCart className="h-4 w-4" />
             Add
