@@ -25,7 +25,7 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
     <Card>
       <CardContent className="p-4">
         <div className="flex gap-4">
-          <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted flex-shrink-0">
+          <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted shrink-0">
             <Image
               src={item.image}
               alt={item.name}

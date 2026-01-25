@@ -56,7 +56,7 @@ export function HeroSection() {
 
           <div className="relative animate-in fade-in slide-in-from-right duration-1000 delay-200">
             <div className="relative aspect-4/3 rounded-lg overflow-hidden glass-card p-4 border-white/5 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-tr from-primary/10 to-transparent pointer-events-none" />
               <div className="relative h-full w-full rounded-lg overflow-hidden">
                 <Image
                   src="/lenovo-thinkpad-laptop.jpg"

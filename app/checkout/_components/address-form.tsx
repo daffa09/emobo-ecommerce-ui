@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
-import { API_URL } from "@/lib/auth-service"
+import { fetchProvinces, fetchCities, calculateShippingCost, type ShippingProvince, type ShippingCity, type ShippingCost } from "@/lib/api-service"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 export interface AddressFormData {
   fullName: string
@@ -21,10 +23,11 @@ interface AddressFormProps {
 }
 
 export function AddressForm({ onSubmit }: AddressFormProps) {
-  const [provinces, setProvinces] = useState<any[]>([])
-  const [cities, setCities] = useState<any[]>([])
-  const [shippingOptions, setShippingOptions] = useState<any[]>([])
+  const [provinces, setProvinces] = useState<ShippingProvince[]>([])
+  const [cities, setCities] = useState<ShippingCity[]>([])
+  const [shippingOptions, setShippingOptions] = useState<ShippingCost[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadingCost, setLoadingCost] = useState(false)
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AddressFormData>({
     defaultValues: {
@@ -43,52 +46,81 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
   const courier = watch("courier")
 
   useEffect(() => {
-    fetch(`${API_URL}/shipping/provinces`)
-      .then(res => res.json())
-      .then(res => setProvinces(res.data))
+    async function loadProvinces() {
+      try {
+        setLoading(true)
+        const data = await fetchProvinces()
+        setProvinces(data)
+      } catch (error) {
+        console.error("Failed to fetch provinces:", error)
+        toast.error("Failed to load provinces")
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProvinces()
   }, [])
 
   useEffect(() => {
-    if (provinceId) {
-      fetch(`${API_URL}/shipping/cities?provinceId=${provinceId}`)
-        .then(res => res.json())
-        .then(res => setCities(res.data))
-    } else {
-      setCities([])
+    async function loadCities() {
+      if (!provinceId) {
+        setCities([])
+        return
+      }
+
+      try {
+        setLoading(true)
+        const data = await fetchCities(provinceId)
+        setCities(data)
+      } catch (error) {
+        console.error("Failed to fetch cities:", error)
+        toast.error("Failed to load cities")
+      } finally {
+        setLoading(false)
+      }
     }
+    loadCities()
   }, [provinceId])
 
   useEffect(() => {
-    if (cityId && courier) {
-      setLoading(true)
-      fetch(`${API_URL}/shipping/cost`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+    async function loadShippingCost() {
+      if (!cityId || !courier) {
+        setShippingOptions([])
+        return
+      }
+
+      try {
+        setLoadingCost(true)
+        const data = await calculateShippingCost({
+          origin: "501", // Jakarta - should be configurable
           destination: cityId,
-          weight: 1000, // sample 1kg
+          weight: 1000, // 1kg default - should calculate from cart
           courier: courier
         })
-      })
-        .then(res => res.json())
-        .then(res => {
-          if (res.data && res.data[0]) {
-            setShippingOptions(res.data[0].costs)
-          }
-          setLoading(false)
-        })
+        setShippingOptions(data)
+      } catch (error) {
+        console.error("Failed to calculate shipping cost:", error)
+        toast.error("Failed to calculate shipping cost")
+        setShippingOptions([])
+      } finally {
+        setLoadingCost(false)
+      }
     }
+    loadShippingCost()
   }, [cityId, courier])
 
   const [selectedService, setSelectedService] = useState("")
   const [selectedCost, setSelectedCost] = useState(0)
 
   const handleFormSubmit = (data: AddressFormData) => {
-    if (!selectedService) return alert("Pilih layanan pengiriman")
+    if (!selectedService || selectedCost === 0) {
+      toast.error("Pilih layanan pengiriman terlebih dahulu")
+      return
+    }
     onSubmit({
       ...data,
       shippingCost: selectedCost,
-      shippingService: selectedService
+      shippingService: `${courier.toUpperCase()} - ${selectedService}`
     })
   }
 
@@ -159,27 +191,43 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
         </div>
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">Layanan Pengiriman</label>
-          <Select onValueChange={(val) => {
-            const opt = shippingOptions.find(o => o.service === val);
-            setSelectedService(val);
-            setSelectedCost(opt.cost[0].value);
-          }} disabled={loading || shippingOptions.length === 0}>
+          <Select
+            onValueChange={(val) => {
+              const opt = shippingOptions.find(o => o.service === val);
+              if (opt) {
+                setSelectedService(val);
+                setSelectedCost(opt.cost[0].value);
+              }
+            }}
+            disabled={loadingCost || shippingOptions.length === 0}
+          >
             <SelectTrigger>
-              <SelectValue placeholder={loading ? "Memuat..." : "Pilih Layanan"} />
+              <SelectValue placeholder={loadingCost ? "Memuat biaya pengiriman..." : shippingOptions.length === 0 ? "Pilih kota & kurir dulu" : "Pilih Layanan"} />
             </SelectTrigger>
             <SelectContent>
               {shippingOptions.map((opt) => (
                 <SelectItem key={opt.service} value={opt.service}>
-                  {opt.service} ({opt.description}) - Rp {opt.cost[0].value.toLocaleString()}
+                  {opt.service} ({opt.description}) - Rp {opt.cost[0].value.toLocaleString('id-ID')}
+                  {opt.cost[0].etd && ` - ${opt.cost[0].etd} hari`}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {loadingCost && (
+            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Menghitung biaya pengiriman...
+            </div>
+          )}
         </div>
       </div>
 
-      <Button type="submit" className="w-full bg-primary hover:bg-primary-dark mt-6" disabled={loading}>
-        Lanjut ke Pembayaran
+      <Button
+        type="submit"
+        className="w-full bg-primary hover:bg-primary-dark mt-6"
+        disabled={loading || loadingCost || !selectedService}
+      >
+        {loadingCost ? "Menghitung biaya..." : "Lanjut ke Pembayaran"}
       </Button>
     </form>
   )

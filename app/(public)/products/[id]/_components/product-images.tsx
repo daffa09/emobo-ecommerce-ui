@@ -3,15 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import type { Product } from "@/lib/api-service";
 
-const images = [
-  "/lenovo-thinkpad-laptop.jpg",
-  "/lenovo-thinkpad-laptop.jpg",
-  "/lenovo-thinkpad-laptop.jpg",
-  "/lenovo-thinkpad-laptop.jpg",
-];
+interface ProductImagesProps {
+  product: Product;
+}
 
-export function ProductImages() {
+export function ProductImages({ product }: ProductImagesProps) {
+  const images = product.images.length > 0 ? product.images : ["/placeholder-laptop.jpg"];
   const [selectedImage, setSelectedImage] = useState(0);
 
   return (
@@ -36,8 +35,8 @@ export function ProductImages() {
             key={index}
             onClick={() => setSelectedImage(index)}
             className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index
-                ? "border-primary ring-2 ring-primary/20"
-                : "border-transparent hover:border-primary/50"
+              ? "border-primary ring-2 ring-primary/20"
+              : "border-transparent hover:border-primary/50"
               }`}
           >
             <Image

@@ -1,8 +1,74 @@
-import { Users, CreditCard, Package, ArrowUpRight, ArrowDownRight, Zap, Target } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Users, CreditCard, Package, ArrowUpRight, ArrowDownRight, Zap, Target, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatIDR } from "@/lib/utils";
+import { formatIDR, cn } from "@/lib/utils";
+import { fetchSalesReport, fetchAllProducts, type SalesReport } from "@/lib/api-service";
 
 export default function AdminDashboardPage() {
+  const [report, setReport] = useState<SalesReport | null>(null);
+  const [productCount, setProductCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [salesData, products] = await Promise.all([
+          fetchSalesReport(),
+          fetchAllProducts(),
+        ]);
+        setReport(salesData);
+        setProductCount(products.length);
+      } catch (error) {
+        console.error("Failed to fetch admin dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Revenue",
+      val: formatIDR(report?.totalRevenue || 0),
+      trend: "+20.1%",
+      icon: <div className="font-bold text-emerald-500">Rp</div>,
+      positive: true
+    },
+    {
+      title: "Total Customers",
+      val: report?.totalCustomers?.toString() || "0",
+      trend: "+18.1%",
+      icon: <Users className="w-5 h-5 text-blue-500" />,
+      positive: true
+    },
+    {
+      title: "Total Orders",
+      val: report?.totalOrders?.toString() || "0",
+      trend: "+19%",
+      icon: <CreditCard className="w-5 h-5 text-purple-500" />,
+      positive: true
+    },
+    {
+      title: "Active Products",
+      val: productCount.toString(),
+      trend: "+2.4%",
+      icon: <Package className="w-5 h-5 text-amber-500" />,
+      positive: true
+    },
+  ];
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
@@ -12,17 +78,14 @@ export default function AdminDashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="rounded-lg font-bold border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-smooth">Download Report</Button>
-          <Button className="rounded-lg font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary-light transition-smooth">Add New Product</Button>
+          <Link href="/admin/catalog">
+            <Button className="rounded-lg font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary-light transition-smooth">Add New Product</Button>
+          </Link>
         </div>
       </div>
 
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { title: "Total Revenue", val: formatIDR(678478350), trend: "+20.1%", icon: <div className="font-bold text-emerald-500">Rp</div>, positive: true },
-          { title: "New Customers", val: "+2,350", trend: "+180.1%", icon: <Users className="w-5 h-5 text-blue-500" />, positive: true },
-          { title: "Total Sales", val: "12,234", trend: "+19%", icon: <CreditCard className="w-5 h-5 text-purple-500" />, positive: true },
-          { title: "Active Inventory", val: "573", trend: "-2.4%", icon: <Package className="w-5 h-5 text-amber-500" />, positive: false },
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <div key={i} className="group bg-zinc-900/50 p-6 rounded-xl border border-zinc-800/50 transition-smooth hover:border-zinc-700/50 hover:bg-zinc-900 shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center group-hover:bg-primary/20 transition-smooth">
@@ -107,6 +170,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-import { cn } from "@/lib/utils";
-import { ChevronRight } from "lucide-react";

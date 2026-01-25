@@ -63,7 +63,7 @@ export default function CheckoutPage() {
       const orderId = orderData.data.id
 
       // 2. Create Payment & Get Snap Token
-      const payRes = await fetch(`${API_URL}/payments/order/${orderId}`, {
+      const payRes = await fetch(`${API_URL}/payments/${orderId}/create`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`

@@ -3,7 +3,7 @@ import { CatalogGrid } from "../catalog/_components/catalog-grid"
 export default function DealsPage() {
   return (
     <div className="bg-background min-h-screen">
-      <section className="bg-gradient-to-r from-blue-900 to-indigo-900 py-24 text-white relative overflow-hidden">
+      <section className="bg-linear-to-r from-blue-900 to-indigo-900 py-24 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/30 rounded-full -mr-48 -mt-48 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/20 rounded-full -ml-40 -mb-40 blur-3xl opacity-50" />
 

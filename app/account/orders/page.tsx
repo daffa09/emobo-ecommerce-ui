@@ -163,7 +163,7 @@ export default function OrdersPage() {
 
       {/* Review Modal replaced with Sheet for compatibility */}
       <Sheet open={!!reviewOrder} onOpenChange={() => setReviewOrder(null)}>
-        <SheetContent side="bottom" className="h-[auto] max-h-[90vh]">
+        <SheetContent side="bottom" className="h-auto max-h-[90vh]">
           <SheetHeader>
             <SheetTitle>Beri Review</SheetTitle>
             <SheetDescription>

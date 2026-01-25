@@ -14,7 +14,7 @@ export default function CatalogPage() {
   return (
     <div className="flex flex-col bg-background min-h-screen">
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/10 via-primary/5 to-background py-12">
+      <section className="bg-linear-to-br from-primary/10 via-primary/5 to-background py-12">
         <div className="container-emobo">
           <div className="flex items-center justify-between">
             <div>

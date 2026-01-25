@@ -97,7 +97,7 @@ export function PerformanceAnalytics() {
 
           <div className="lg:w-1/2 w-full">
             <div className="relative rounded-3xl overflow-hidden bg-slate-800 border-2 border-slate-700 shadow-2xl group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-transparent pointer-events-none" />
 
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
@@ -135,7 +135,7 @@ export function PerformanceAnalytics() {
                       </div>
                       <div className="h-1.5 w-full bg-slate-700/30 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-primary to-blue-400 rounded-full relative overflow-hidden"
+                          className="h-full bg-linear-to-r from-primary to-blue-400 rounded-full relative overflow-hidden"
                           style={{ width: `${(laptop.searches / maxSearches) * 100}%` }}
                         >
                           <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]" />

@@ -1,0 +1,385 @@
+import { API_URL } from "./auth-service";
+
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
+
+export interface Product {
+  id: number;
+  sku: string;
+  name: string;
+  brand: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  images: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Review {
+  id: number;
+  orderId: number;
+  productId: number;
+  userId: number;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  user?: {
+    name: string | null;
+    email: string;
+  };
+}
+
+export interface Order {
+  id: number;
+  userId: number;
+  totalAmount: number;
+  shippingCost: number;
+  shippingService: string | null;
+  status: "PENDING" | "PROCESSING" | "SHIPPED" | "COMPLETED" | "CANCELLED";
+  shippingAddr: any;
+  shippingAddress?: {
+    fullName: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    postalCode: string;
+  };
+  phone: string;
+  trackingNo: string | null;
+  trackingNumber?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items?: OrderItem[];
+  payment?: Payment;
+  user?: {
+    name: string | null;
+    email: string;
+  };
+}
+
+export interface OrderItem {
+  id: number;
+  orderId: number;
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  price?: number;
+  product?: Product;
+}
+
+export interface Payment {
+  id: number;
+  orderId: number;
+  provider: string;
+  providerId: string | null;
+  snapToken: string | null;
+  redirectUrl: string | null;
+  amount: number;
+  status: "PENDING" | "PAID" | "FAILED" | "EXPIRED" | "REFUNDED";
+  paymentMethod?: string;
+  createdAt: string;
+  updatedAt: string;
+  paidAt: string | null;
+}
+
+export interface ShippingProvince {
+  province_id: string;
+  province: string;
+}
+
+export interface ShippingCity {
+  city_id: string;
+  province_id: string;
+  city_name: string;
+  type: string;
+  postal_code: string;
+}
+
+export interface ShippingCost {
+  service: string;
+  description: string;
+  cost: Array<{
+    value: number;
+    etd: string;
+    note: string;
+  }>;
+}
+
+export interface SalesReport {
+  totalRevenue: number;
+  totalOrders: number;
+  totalCustomers: number;
+  totalProducts: number;
+  salesByMonth?: Array<{ month: string; revenue: number; orders: number }>;
+  topProducts?: Array<{ productId: number; productName: string; totalSales: number }>;
+}
+
+export interface Customer {
+  id: number;
+  email: string;
+  name: string | null;
+  phone?: string;
+  address?: string;
+  role: "ADMIN" | "CUSTOMER";
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem("emobo-token");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Request failed" }));
+    throw new Error(error.message || `HTTP ${response.status}: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return data.data || data;
+}
+
+// ============================================
+// PRODUCT API
+// ============================================
+
+export async function fetchPublicProducts(params?: {
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  limit?: number;
+  offset?: number;
+  sortBy?: "price_asc" | "price_desc" | "newest";
+}): Promise<Product[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.brand) queryParams.append("brand", params.brand);
+  if (params?.minPrice) queryParams.append("minPrice", params.minPrice.toString());
+  if (params?.maxPrice) queryParams.append("maxPrice", params.maxPrice.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.offset) queryParams.append("offset", params.offset.toString());
+  if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
+
+  const url = `${API_URL}/products/public${queryParams.toString() ? `?${queryParams}` : ""}`;
+  const response = await fetch(url);
+  return handleResponse<Product[]>(response);
+}
+
+export async function fetchTopSellingProducts(limit: number = 4): Promise<Product[]> {
+  const response = await fetch(`${API_URL}/products/top-selling?limit=${limit}`);
+  return handleResponse<Product[]>(response);
+}
+
+export async function fetchProductById(id: number): Promise<Product> {
+  const response = await fetch(`${API_URL}/products/public`);
+  const products = await handleResponse<Product[]>(response);
+  const product = products.find((p) => p.id === id);
+  if (!product) throw new Error("Product not found");
+  return product;
+}
+
+export async function fetchAllProducts(): Promise<Product[]> {
+  const response = await fetch(`${API_URL}/products`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Product[]>(response);
+}
+
+export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt">): Promise<Product> {
+  const response = await fetch(`${API_URL}/products`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Product>(response);
+}
+
+export async function updateProduct(id: number, data: Partial<Product>): Promise<Product> {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Product>(response);
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  await handleResponse<void>(response);
+}
+
+// ============================================
+// REVIEW API
+// ============================================
+
+export async function fetchProductReviews(productId: number): Promise<Review[]> {
+  const response = await fetch(`${API_URL}/reviews/product/${productId}`);
+  return handleResponse<Review[]>(response);
+}
+
+export async function createReview(data: {
+  orderId: number;
+  productId: number;
+  rating: number;
+  comment?: string;
+}): Promise<Review> {
+  const response = await fetch(`${API_URL}/reviews`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Review>(response);
+}
+
+// ============================================
+// ORDER API
+// ============================================
+
+export async function createOrder(data: {
+  items: Array<{ productId: number; quantity: number }>;
+  shippingAddr: any;
+  phone: string;
+  shippingCost: number;
+  shippingService: string;
+}): Promise<Order> {
+  const response = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Order>(response);
+}
+
+export async function fetchUserOrders(): Promise<Order[]> {
+  const response = await fetch(`${API_URL}/orders`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Order[]>(response);
+}
+
+export async function fetchOrderById(id: number): Promise<Order> {
+  const response = await fetch(`${API_URL}/orders/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Order>(response);
+}
+
+// ============================================
+// PAYMENT API
+// ============================================
+
+export async function createPayment(orderId: number): Promise<Payment> {
+  const response = await fetch(`${API_URL}/payments/${orderId}/create`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Payment>(response);
+}
+
+export async function fetchPaymentStatus(orderId: number): Promise<Payment> {
+  const response = await fetch(`${API_URL}/payments/${orderId}/status`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Payment>(response);
+}
+
+// ============================================
+// SHIPPING API
+// ============================================
+
+export async function fetchProvinces(): Promise<ShippingProvince[]> {
+  const response = await fetch(`${API_URL}/shipping/provinces`);
+  return handleResponse<ShippingProvince[]>(response);
+}
+
+export async function fetchCities(provinceId: string): Promise<ShippingCity[]> {
+  const response = await fetch(`${API_URL}/shipping/cities?provinceId=${provinceId}`);
+  return handleResponse<ShippingCity[]>(response);
+}
+
+export async function calculateShippingCost(data: {
+  origin: string;
+  destination: string;
+  weight: number;
+  courier: string;
+}): Promise<ShippingCost[]> {
+  const response = await fetch(`${API_URL}/shipping/cost`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ShippingCost[]>(response);
+}
+
+// ============================================
+// CUSTOMER API (Admin Only)
+// ============================================
+
+export async function fetchAllCustomers(): Promise<Customer[]> {
+  const response = await fetch(`${API_URL}/customers`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Customer[]>(response);
+}
+
+export async function fetchCustomerById(id: number): Promise<Customer> {
+  const response = await fetch(`${API_URL}/customers/${id}`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Customer>(response);
+}
+
+export async function fetchAllOrders(): Promise<Order[]> {
+  const response = await fetch(`${API_URL}/orders/all`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Order[]>(response);
+}
+
+export async function updateOrderStatus(orderId: number, status: string): Promise<Order> {
+  const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  return handleResponse<Order>(response);
+}
+
+export async function fetchUserProfile(): Promise<Customer> {
+  const response = await fetch(`${API_URL}/users/profile`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Customer>(response);
+}
+
+export async function updateUserProfile(data: Partial<Customer>): Promise<Customer> {
+  const response = await fetch(`${API_URL}/users/profile`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Customer>(response);
+}
+
+// ============================================
+// REPORTS API (Admin Only)
+// ============================================
+
+export async function fetchSalesReport(): Promise<SalesReport> {
+  const response = await fetch(`${API_URL}/reports/sales`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<SalesReport>(response);
+}

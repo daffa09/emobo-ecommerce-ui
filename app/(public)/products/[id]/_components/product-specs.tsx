@@ -1,7 +1,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Product } from "@/lib/api-service";
 
-export function ProductSpecs() {
+interface ProductSpecsProps {
+  product: Product;
+}
+
+export function ProductSpecs({ product }: ProductSpecsProps) {
   return (
     <Tabs defaultValue="specs" className="w-full">
       <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
@@ -116,15 +121,8 @@ export function ProductSpecs() {
       <TabsContent value="description" className="mt-6">
         <Card>
           <CardContent className="p-6 prose prose-sm max-w-none">
-            <p className="text-muted-foreground">
-              The Lenovo ThinkPad X1 Carbon Gen 11 represents the pinnacle of business laptop design.
-              Built with a carbon fiber reinforced chassis and magnesium alloy, this ultrabook delivers
-              exceptional durability while maintaining an incredibly lightweight profile.
-            </p>
-            <p className="text-muted-foreground mt-4">
-              Powered by the latest 13th Gen Intel Core processors and featuring a stunning 14-inch display,
-              the X1 Carbon provides the perfect balance of performance and portability for professionals
-              on the go.
+            <p className="text-muted-foreground" style={{ whiteSpace: "pre-wrap" }}>
+              {product.description || "No description available for this product."}
             </p>
           </CardContent>
         </Card>

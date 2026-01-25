@@ -48,7 +48,7 @@ export default function ReturnsPage() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -mr-32 -mt-32 blur-3xl" />
           <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-gradient bg-gradient-to-r from-blue-400 to-blue-200 inline-block">Protection You Can Trust</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gradient bg-linear-to-r from-blue-400 to-blue-200 inline-block">Protection You Can Trust</h2>
               <p className="text-slate-400 text-lg leading-relaxed mb-8">
                 We work directly with brands like ASUS, Lenovo, and HP to ensure every machine we sell is authentic and fully backed by global warranty standards.
               </p>
