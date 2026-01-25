@@ -14,7 +14,7 @@ export function HeroSection() {
       <div className="container-emobo relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-white/10 text-blue-200 text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg glass border-white/10 text-blue-200 text-sm font-medium">
               <Sparkles className="w-4 h-4 text-primary" />
               <span>Premium Laptop Collections 2025</span>
             </div>
@@ -30,12 +30,12 @@ export function HeroSection() {
 
             <div className="flex flex-wrap gap-5 pt-4">
               <Link href="/catalog">
-                <Button size="lg" className="h-14 px-10 text-lg font-bold rounded-full gap-2 shadow-lg shadow-primary/20 transition-smooth hover:scale-105">
+                <Button size="lg" className="h-14 px-10 text-lg font-bold rounded-lg gap-2 shadow-lg shadow-primary/20 transition-smooth hover:scale-105">
                   Explore Catalog <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
               <Link href="/deals">
-                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-full border-white/20 text-white hover:bg-white/5 transition-smooth">
+                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-lg border-white/20 text-white hover:bg-white/5 transition-smooth">
                   View Special Deals
                 </Button>
               </Link>
@@ -55,9 +55,9 @@ export function HeroSection() {
           </div>
 
           <div className="relative animate-in fade-in slide-in-from-right duration-1000 delay-200">
-            <div className="relative aspect-[4/3] rounded-[2rem] overflow-hidden glass-card p-4 border-white/5 shadow-2xl">
+            <div className="relative aspect-4/3 rounded-lg overflow-hidden glass-card p-4 border-white/5 shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
-              <div className="relative h-full w-full rounded-[1.5rem] overflow-hidden">
+              <div className="relative h-full w-full rounded-lg overflow-hidden">
                 <Image
                   src="/lenovo-thinkpad-laptop.jpg"
                   alt="Featured High Performance Laptop"
@@ -68,9 +68,9 @@ export function HeroSection() {
             </div>
 
             {/* Floating Info Badge */}
-            <div className="absolute -bottom-6 -left-6 glass p-6 rounded-2xl border-white/10 shadow-2xl animate-float">
+            <div className="absolute -bottom-6 -left-6 glass p-6 rounded-lg border-white/10 shadow-2xl animate-float">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
                   <div className="w-3 h-3 rounded-full bg-primary animate-ping" />
                 </div>
                 <div>

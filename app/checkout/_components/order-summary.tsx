@@ -2,7 +2,7 @@ import { Package, Truck, AlertCircle } from "lucide-react"
 import { formatIDR } from "@/lib/utils"
 
 interface OrderItem {
-  id: string
+  id: string | number
   name: string
   price: number
   quantity: number

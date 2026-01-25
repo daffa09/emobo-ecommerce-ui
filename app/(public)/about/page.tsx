@@ -26,25 +26,25 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="aspect-square bg-slate-100 rounded-2xl flex items-center justify-center p-8">
+              <div className="aspect-square bg-slate-100 rounded-lg flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary mb-2">5k+</div>
                   <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Happy Clients</div>
                 </div>
               </div>
-              <div className="aspect-square bg-primary/5 rounded-2xl flex items-center justify-center p-8">
+              <div className="aspect-square bg-primary/5 rounded-lg flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary mb-2">10+</div>
                   <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Top Brands</div>
                 </div>
               </div>
-              <div className="aspect-square bg-primary/5 rounded-2xl flex items-center justify-center p-8">
+              <div className="aspect-square bg-primary/5 rounded-lg flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary mb-2">24h</div>
                   <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Expert Support</div>
                 </div>
               </div>
-              <div className="aspect-square bg-slate-100 rounded-2xl flex items-center justify-center p-8">
+              <div className="aspect-square bg-slate-100 rounded-lg flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary mb-2">100%</div>
                   <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Genuine Products</div>

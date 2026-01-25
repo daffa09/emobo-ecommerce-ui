@@ -33,7 +33,7 @@ export default function ProfilePage() {
               {/* Profile Header */}
               <div className="flex items-start justify-between mb-8">
                 <div className="flex gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center text-white text-2xl font-bold">
                     JD
                   </div>
                   <div>

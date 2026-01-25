@@ -3,15 +3,23 @@ import { CategoriesSection } from "./_components/categories-section";
 import { FeaturedProductsSection } from "./_components/featured-products-section";
 import { BrandsSection } from "./_components/brands-section";
 import { FeaturesSection } from "./_components/features-section";
+import { SalesChartSection } from "./_components/sales-chart-section";
+import { PerformanceAnalytics } from "./_components/performance-analytics";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-0">
       <HeroSection />
-      <CategoriesSection />
+      <div className="bg-slate-50">
+        <CategoriesSection />
+      </div>
       <FeaturedProductsSection />
+      <PerformanceAnalytics />
+      <SalesChartSection />
       <BrandsSection />
-      <FeaturesSection />
+      <div className="bg-slate-50">
+        <FeaturesSection />
+      </div>
     </div>
   );
 }

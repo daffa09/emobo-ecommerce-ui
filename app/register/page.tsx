@@ -26,12 +26,9 @@ export default function RegisterPage() {
             </Link>
           </div>
 
-          <div className="bg-background rounded-2xl shadow-xl p-10 space-y-8 border border-border">
+          <div className="bg-background rounded-lg shadow-xl p-10 space-y-8 border border-border">
             <div className="text-center lg:text-left">
               <h1 className="text-3xl font-bold tracking-tight">Join Emobo</h1>
-              <p className="text-muted-foreground mt-2 font-medium">
-                Already have an account? <Link href="/login" className="text-primary font-bold hover:underline underline-offset-4">Sign in</Link>
-              </p>
             </div>
 
             <RegisterForm />
@@ -83,8 +80,8 @@ export default function RegisterPage() {
                 desc: "Our technical experts are available 24/7 to help you optimize your laptop's performance."
               }
             ].map((item, i) => (
-              <div key={i} className="flex gap-4 p-6 rounded-2xl bg-white/5 border border-white/10 transition-smooth hover:bg-white/10">
-                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shrink-0">
+              <div key={i} className="flex gap-4 p-6 rounded-lg bg-white/5 border border-white/10 transition-smooth hover:bg-white/10">
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shrink-0">
                   {item.icon}
                 </div>
                 <div>
@@ -93,10 +90,6 @@ export default function RegisterPage() {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="mt-12 text-slate-500 text-sm">
-            Trusted by 500+ tech companies and educational institutions.
           </div>
         </div>
       </div>

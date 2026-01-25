@@ -36,7 +36,7 @@ export function AdminSidebar() {
     <Sidebar collapsible="icon" className="border-r border-slate-200 bg-white text-slate-600">
       <SidebarHeader className={cn("p-6", isCollapsed && "p-4 items-center")}>
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 outline outline-4 outline-primary/10">
+          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 outline-primary/10 outline-4">
             <Image src="/ic_logo_navbar.svg" alt="EMOBO" width={24} height={24} className="brightness-0 invert scale-110" />
           </div>
           {!isCollapsed && (
@@ -60,7 +60,7 @@ export function AdminSidebar() {
                     <SidebarMenuButton
                       asChild
                       className={cn(
-                        "h-12 px-4 rounded-xl transition-smooth group",
+                        "h-12 px-4 rounded-lg transition-smooth group",
                         isActive
                           ? "bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90"
                           : "hover:bg-slate-50 text-slate-600 hover:text-primary"
@@ -81,9 +81,9 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className={cn("p-4", isCollapsed && "p-2")}>
-        <div className={cn("bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 shadow-sm", isCollapsed && "p-0.5 bg-transparent border-0 shadow-none mt-auto")}>
+        <div className={cn("bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-4 shadow-sm", isCollapsed && "p-0.5 bg-transparent border-0 shadow-none mt-auto")}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
               <img src="https://i.pravatar.cc/100?img=12" alt="Admin" className="w-full h-full object-cover" />
             </div>
             {!isCollapsed && (

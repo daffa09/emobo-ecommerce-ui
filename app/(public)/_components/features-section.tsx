@@ -20,12 +20,12 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-background transition-colors duration-500">
       <div className="container-emobo">
         <div className="grid md:grid-cols-3 gap-12">
           {features.map((feature, index) => (
             <div key={index} className="flex flex-col items-center text-center space-y-6 group">
-              <div className="w-20 h-20 rounded-3xl bg-primary/5 flex items-center justify-center text-primary transition-smooth group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3">
+              <div className="w-20 h-20 rounded-lg bg-primary/5 flex items-center justify-center text-primary transition-smooth group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3">
                 {feature.icon}
               </div>
               <div className="space-y-3">

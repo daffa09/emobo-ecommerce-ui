@@ -25,8 +25,13 @@ export function LoginForm() {
     try {
       const result = await loginUser(email, password)
       console.log("Login Success:", result)
-      // Redirect based on role if needed, or just to home for now
-      router.push(result.user.role === "ADMIN" ? "/admin" : "/")
+
+      // Store token and user info
+      localStorage.setItem("emobo-token", result.data.access_token)
+      localStorage.setItem("emobo-user", JSON.stringify(result.data.user))
+
+      // Redirect based on role
+      router.push(result.data.user.role === "ADMIN" ? "/admin" : "/customer")
       router.refresh()
     } catch (err: any) {
       setError(err.message || "Invalid credentials")
@@ -86,7 +91,7 @@ export function LoginForm() {
 
       <Button
         type="submit"
-        className="w-full bg-primary hover:bg-primary-dark text-white h-10 rounded-xl"
+        className="w-full bg-primary hover:bg-primary-dark text-white h-10 rounded-lg"
         disabled={isLoading}
       >
         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}

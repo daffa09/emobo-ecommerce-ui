@@ -50,7 +50,7 @@ export function FeaturedProductsSection() {
     <section className="py-24">
       <div className="container-emobo">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase">
             <Sparkles className="w-3 h-3" /> Featured Collection
           </div>
           <h2 className="text-4xl font-bold tracking-tight">
@@ -71,7 +71,7 @@ export function FeaturedProductsSection() {
 
         <div className="mt-16 text-center">
           <Link href="/catalog">
-            <button className="px-12 py-4 bg-slate-900 text-white font-bold rounded-full transition-smooth hover:bg-slate-800 hover:shadow-xl hover:-translate-y-1">
+            <button className="px-12 py-4 bg-primary text-white font-bold rounded-lg transition-smooth hover:bg-primary/90 hover:shadow-xl hover:-translate-y-1">
               View Full Catalog
             </button>
           </Link>

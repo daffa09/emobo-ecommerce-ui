@@ -36,7 +36,7 @@ export default function ReturnsPage() {
 
         <div className="grid md:grid-cols-2 gap-8 mb-24">
           {policies.map((policy, i) => (
-            <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-border transition-smooth hover:shadow-md">
+            <div key={i} className="bg-white p-8 rounded-lg shadow-sm border border-border transition-smooth hover:shadow-md">
               <div className="mb-6">{policy.icon}</div>
               <h2 className="text-xl font-bold mb-3">{policy.title}</h2>
               <p className="text-muted-foreground leading-relaxed">{policy.desc}</p>
@@ -44,7 +44,7 @@ export default function ReturnsPage() {
           ))}
         </div>
 
-        <div className="bg-slate-900 rounded-3xl p-12 text-white overflow-hidden relative">
+        <div className="bg-slate-900 rounded-lg p-12 text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -mr-32 -mt-32 blur-3xl" />
           <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -67,7 +67,7 @@ export default function ReturnsPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-8 backdrop-blur-sm">
               <h3 className="text-xl font-bold mb-4">Warranty Claim Process</h3>
               <ol className="space-y-4 text-slate-300">
                 <li className="flex gap-4">

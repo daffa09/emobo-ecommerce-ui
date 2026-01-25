@@ -34,7 +34,7 @@ export default function FAQPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-8">
+        <div className="bg-white rounded-lg shadow-sm border border-border p-8">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border-b last:border-0">
@@ -49,12 +49,12 @@ export default function FAQPage() {
           </Accordion>
         </div>
 
-        <div className="mt-16 text-center p-12 bg-primary/5 rounded-3xl">
+        <div className="mt-16 text-center p-12 bg-primary/5 rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Still have questions?</h2>
           <p className="text-muted-foreground mb-8">
             Our support team is here to help you find the perfect laptop.
           </p>
-          <a href="/contact" className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-white font-medium transition-smooth hover:bg-primary-dark">
+          <a href="/contact" className="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3 text-white font-medium transition-smooth hover:bg-primary-dark">
             Contact Support
           </a>
         </div>
