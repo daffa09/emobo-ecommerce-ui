@@ -6,7 +6,19 @@ import { ProductCard } from "./product-card";
 import { Sparkles, Loader2 } from "lucide-react";
 import { fetchTopSellingProducts, type Product } from "@/lib/api-service";
 
-export function FeaturedProductsSection() {
+interface FeaturedProductsSectionProps {
+  title?: React.ReactNode;
+  subtitle?: string;
+  showButton?: boolean;
+  sortBy?: "top_selling" | "newest";
+}
+
+export function FeaturedProductsSection({
+  title,
+  subtitle,
+  showButton = true,
+  sortBy = "top_selling"
+}: FeaturedProductsSectionProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,17 +27,26 @@ export function FeaturedProductsSection() {
     async function loadProducts() {
       try {
         setLoading(true);
-        const data = await fetchTopSellingProducts(4);
+        let data: Product[] = [];
+
+        if (sortBy === "newest") {
+          const api = await import("@/lib/api-service");
+          const response = await api.fetchPublicProducts({ limit: 4, sortBy: "newest" });
+          data = response.products;
+        } else {
+          data = await fetchTopSellingProducts(4);
+        }
+
         setProducts(data);
       } catch (err) {
-        console.error("Failed to fetch featured products:", err);
-        setError("Failed to load featured products");
+        console.error("Failed to fetch products:", err);
+        setError("Failed to load products");
       } finally {
         setLoading(false);
       }
     }
     loadProducts();
-  }, []);
+  }, [sortBy]);
 
   return (
     <section className="py-32">
@@ -35,10 +56,14 @@ export function FeaturedProductsSection() {
             <Sparkles className="w-3 h-3" /> Featured Collection
           </div>
           <h2 className="text-4xl font-bold tracking-tight">
-            Curated <span className="text-primary italic">High-Performance</span> Selection
+            {title || (
+              <>
+                Curated <span className="text-primary italic">High-Performance</span> Selection
+              </>
+            )}
           </h2>
           <p className="text-muted-foreground text-lg">
-            Discover our handpicked premium laptops that blend power with sophisticated design.
+            {subtitle || "Discover our handpicked premium laptops that blend power with sophisticated design."}
           </p>
         </div>
 
@@ -67,14 +92,6 @@ export function FeaturedProductsSection() {
             ))}
           </div>
         )}
-
-        <div className="mt-16 text-center">
-          <Link href="/catalog">
-            <button className="px-12 py-4 bg-primary text-white font-bold rounded-lg transition-smooth hover:bg-primary/90 hover:shadow-xl hover:-translate-y-1">
-              View Full Catalog
-            </button>
-          </Link>
-        </div>
       </div>
     </section>
   );

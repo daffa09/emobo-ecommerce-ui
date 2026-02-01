@@ -42,11 +42,7 @@ export function Footer() {
                   Lenovo ThinkPad
                 </Link>
               </li>
-              <li>
-                <Link href="/deals" className="hover:text-primary transition-colors">
-                  Exclusive Deals
-                </Link>
-              </li>
+
             </ul>
           </div>
 

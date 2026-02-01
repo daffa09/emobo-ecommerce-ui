@@ -89,9 +89,8 @@ export default function RegisterPage() {
 
               <RegisterForm />
             </div>
-
-            <p className="text-center text-sm text-muted-foreground mt-8">
-              By signing up, you agree to our <Link href="/terms-of-service" className="hover:underline text-primary">Terms of Service</Link> and <Link href="/privacy-policy" className="hover:underline text-primary">Privacy Policy</Link>.
+            <p className="text-center text-xs text-muted-foreground mt-10 tracking-widest uppercase font-bold opacity-50">
+              © 2026 Emobo. All rights reserved.
             </p>
           </div>
         </div>

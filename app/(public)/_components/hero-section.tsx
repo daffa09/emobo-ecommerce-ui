@@ -34,11 +34,7 @@ export function HeroSection() {
                   Explore Catalog <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/deals">
-                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold rounded-lg border-white/20 text-white hover:bg-white/5 transition-smooth">
-                  View Special Deals
-                </Button>
-              </Link>
+
             </div>
 
             <div className="flex items-center gap-8 pt-8 border-t border-white/10">

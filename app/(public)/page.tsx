@@ -5,7 +5,6 @@ import { BrandsSection } from "./_components/brands-section";
 import { FeaturesSection } from "./_components/features-section";
 import { SalesChartSection } from "./_components/sales-chart-section";
 import { PerformanceAnalytics } from "./_components/performance-analytics";
-import { WhatsAppButton } from "@/components/template/whatsapp-button";
 
 export default function HomePage() {
   return (
@@ -14,14 +13,17 @@ export default function HomePage() {
       <div className="bg-slate-50">
         <CategoriesSection />
       </div>
-      <FeaturedProductsSection />
+      <FeaturedProductsSection
+        sortBy="newest"
+        title={<>Fresh <span className="text-primary italic">New Arrivals</span></>}
+        subtitle="Be the first to experience the latest in computing innovation."
+      />
       <PerformanceAnalytics />
       <SalesChartSection />
       <BrandsSection />
       <div className="bg-slate-50">
         <FeaturesSection />
       </div>
-      <WhatsAppButton />
     </div>
   );
 }
