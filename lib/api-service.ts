@@ -8,9 +8,10 @@ export interface Product {
   id: number;
   sku: string;
   name: string;
-  brand: string;
-  description: string | null;
   price: number;
+  brand: string;
+  category: string;
+  description: string | null;
   stock: number;
   images: string[];
   createdAt: string;
@@ -122,6 +123,7 @@ export interface Customer {
   email: string;
   name: string | null;
   phone?: string;
+  image?: string;
   address?: string;
   role: "ADMIN" | "CUSTOMER";
   createdAt: string;
@@ -155,14 +157,18 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export async function fetchPublicProducts(params?: {
   brand?: string;
+  category?: string;
+  search?: string;
   minPrice?: number;
   maxPrice?: number;
   limit?: number;
   offset?: number;
   sortBy?: "price_asc" | "price_desc" | "newest";
-}): Promise<Product[]> {
+}): Promise<{ products: Product[]; total: number }> {
   const queryParams = new URLSearchParams();
   if (params?.brand) queryParams.append("brand", params.brand);
+  if (params?.category) queryParams.append("category", params.category);
+  if (params?.search) queryParams.append("search", params.search);
   if (params?.minPrice) queryParams.append("minPrice", params.minPrice.toString());
   if (params?.maxPrice) queryParams.append("maxPrice", params.maxPrice.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
@@ -171,7 +177,7 @@ export async function fetchPublicProducts(params?: {
 
   const url = `${API_URL}/products/public${queryParams.toString() ? `?${queryParams}` : ""}`;
   const response = await fetch(url);
-  return handleResponse<Product[]>(response);
+  return handleResponse<{ products: Product[]; total: number }>(response);
 }
 
 export async function fetchTopSellingProducts(limit: number = 4): Promise<Product[]> {
@@ -180,8 +186,7 @@ export async function fetchTopSellingProducts(limit: number = 4): Promise<Produc
 }
 
 export async function fetchProductById(id: number): Promise<Product> {
-  const response = await fetch(`${API_URL}/products/public`);
-  const products = await handleResponse<Product[]>(response);
+  const { products } = await fetchPublicProducts();
   const product = products.find((p) => p.id === id);
   if (!product) throw new Error("Product not found");
   return product;
@@ -382,4 +387,31 @@ export async function fetchSalesReport(): Promise<SalesReport> {
     headers: getAuthHeaders(),
   });
   return handleResponse<SalesReport>(response);
+}
+
+// ============================================
+// AUTH API
+// ============================================
+
+export async function requestForgotPassword(email: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse<{ message: string }>(response);
+}
+
+export async function resetUserPassword(data: { token: string; password: string }): Promise<{ message: string }> {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<{ message: string }>(response);
+}
+
+export async function fetchAdminContact(): Promise<{ phone: string }> {
+  const response = await fetch(`${API_URL}/users/contact`);
+  return handleResponse<{ phone: string }>(response);
 }

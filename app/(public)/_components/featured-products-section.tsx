@@ -28,7 +28,7 @@ export function FeaturedProductsSection() {
   }, []);
 
   return (
-    <section className="py-24">
+    <section className="py-32">
       <div className="container-emobo">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase">
@@ -58,7 +58,7 @@ export function FeaturedProductsSection() {
                   id={product.id}
                   name={product.name}
                   price={product.price.toString()}
-                  image={product.images[0] || "/placeholder-laptop.jpg"}
+                  image={product.images[0] || "/no-image.svg"}
                   rating={4.5}
                   reviews={0}
                   specs={[product.brand]}

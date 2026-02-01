@@ -10,8 +10,14 @@ interface ProductImagesProps {
 }
 
 export function ProductImages({ product }: ProductImagesProps) {
-  const images = product.images.length > 0 ? product.images : ["/placeholder-laptop.jpg"];
+  const [images, setImages] = useState(product.images.length > 0 ? product.images : ["/no-image.svg"]);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  const handleImageError = (index: number) => {
+    const newImages = [...images];
+    newImages[index] = "/no-image.svg";
+    setImages(newImages);
+  };
 
   return (
     <div className="space-y-4">
@@ -24,6 +30,7 @@ export function ProductImages({ product }: ProductImagesProps) {
             fill
             className="object-cover"
             priority
+            onError={() => handleImageError(selectedImage)}
           />
         </div>
       </Card>
@@ -44,6 +51,7 @@ export function ProductImages({ product }: ProductImagesProps) {
               alt={`Thumbnail ${index + 1}`}
               fill
               className="object-cover"
+              onError={() => handleImageError(index)}
             />
           </button>
         ))}

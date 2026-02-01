@@ -20,7 +20,7 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 bg-background transition-colors duration-500">
+    <section className="py-32 bg-background transition-colors duration-500">
       <div className="container-emobo">
         <div className="grid md:grid-cols-3 gap-12">
           {features.map((feature, index) => (

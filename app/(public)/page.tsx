@@ -5,6 +5,7 @@ import { BrandsSection } from "./_components/brands-section";
 import { FeaturesSection } from "./_components/features-section";
 import { SalesChartSection } from "./_components/sales-chart-section";
 import { PerformanceAnalytics } from "./_components/performance-analytics";
+import { WhatsAppButton } from "@/components/template/whatsapp-button";
 
 export default function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default function HomePage() {
       <div className="bg-slate-50">
         <FeaturesSection />
       </div>
+      <WhatsAppButton />
     </div>
   );
 }

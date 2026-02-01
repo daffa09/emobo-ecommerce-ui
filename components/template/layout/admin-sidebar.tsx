@@ -89,7 +89,7 @@ export function AdminSidebar() {
             {!isCollapsed && (
               <div className="flex-1 min-w-0 animate-in fade-in slide-in-from-left-2 duration-300">
                 <p className="text-sm font-bold text-slate-900 truncate">Administrator</p>
-                <p className="text-[10px] text-slate-500 truncate">admin@emobo.local</p>
+                <p className="text-[10px] text-slate-500 truncate">admin@daffathan-labs.my.id</p>
               </div>
             )}
           </div>

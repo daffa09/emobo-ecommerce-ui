@@ -1,23 +1,72 @@
 "use client";
 
-import { useState } from "react";
-import { User, Mail, Shield, Camera, Edit2, Save, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { User, Mail, Shield, Camera, Edit2, Save, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { fetchUserProfile, updateUserProfile } from "@/lib/api-service";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export default function AdminProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "Administrator",
-    email: "management@emobo.com",
-    role: "System Administrator",
-    phone: "+62 812-3456-7890",
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Logic to save would go here
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchUserProfile();
+      setProfile(data);
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      await updateUserProfile({
+        name: profile.name,
+        phone: profile.phone,
+        image: profile.image
+      });
+
+      // Update localStorage to keep it in sync
+      const storedUser = localStorage.getItem("emobo-user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        localStorage.setItem("emobo-user", JSON.stringify({
+          ...user,
+          name: profile.name,
+          image: profile.image
+        }));
+      }
+
+      toast.success("Profile updated successfully");
+      setIsEditing(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -28,9 +77,15 @@ export default function AdminProfilePage() {
         </div>
         <Button
           onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+          disabled={saving}
           className="rounded-xl font-black bg-primary hover:bg-primary-light transition-smooth px-6"
         >
-          {isEditing ? (
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : isEditing ? (
             <>
               <Save className="w-4 h-4 mr-2" />
               Save Changes
@@ -49,7 +104,7 @@ export default function AdminProfilePage() {
           <div className="bg-slate-800/50 p-8 rounded-3xl border border-slate-800 flex flex-col items-center text-center relative group">
             <div className="relative w-32 h-32 mb-6 group cursor-pointer">
               <div className="w-full h-full rounded-2xl bg-slate-700 border-2 border-slate-600 overflow-hidden shadow-2xl transition-smooth group-hover:border-primary/50">
-                <img src="https://i.pravatar.cc/200?img=12" alt="Avatar" className="w-full h-full object-cover" />
+                <img src={profile.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=random`} alt="Avatar" className="w-full h-full object-cover" />
               </div>
               <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl opacity-0 group-hover:opacity-100 transition-smooth">
                 <Camera className="w-8 h-8 text-white" />
@@ -62,13 +117,15 @@ export default function AdminProfilePage() {
               <div>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">Status</p>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-sm font-bold text-white">Active Account</span>
+                  <span className={cn("w-2 h-2 rounded-full", profile.isEmailVerified ? "bg-emerald-500 animate-pulse" : "bg-yellow-500")} />
+                  <span className="text-sm font-bold text-white">{profile.isEmailVerified ? "Active Account" : "Pending Verification"}</span>
                 </div>
               </div>
               <div>
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">Joined Date</p>
-                <p className="text-sm font-bold text-white">Oct 24, 2025</p>
+                <p className="text-sm font-bold text-white">
+                  {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
               </div>
             </div>
           </div>
@@ -150,19 +207,6 @@ export default function AdminProfilePage() {
                 </Button>
               </div>
             )}
-          </div>
-
-          <div className="bg-slate-800/10 p-6 rounded-2xl border border-dashed border-slate-800 flex items-center justify-between group cursor-pointer hover:bg-slate-800/20 transition-smooth">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-primary transition-smooth">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-bold text-white">Security Settings</h4>
-                <p className="text-xs text-slate-500">Update your password and 2FA settings.</p>
-              </div>
-            </div>
-            <Edit2 className="w-4 h-4 text-slate-700 group-hover:text-white transition-smooth" />
           </div>
         </div>
       </div>

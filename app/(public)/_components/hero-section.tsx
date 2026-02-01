@@ -13,10 +13,10 @@ export function HeroSection() {
 
       <div className="container-emobo relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000">
+          <div className="space-y-8 mt-12 animate-in fade-in slide-in-from-left duration-1000">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg glass border-white/10 text-blue-200 text-sm font-medium">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span>Premium Laptop Collections 2025</span>
+              <span>Premium Laptop Collections 2026</span>
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1]">
@@ -75,7 +75,7 @@ export function HeroSection() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">New Arrival</p>
-                  <p className="text-white font-bold">Zenbook Duo 2025</p>
+                  <p className="text-white font-bold">Zenbook Duo 2026</p>
                 </div>
               </div>
             </div>

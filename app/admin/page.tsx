@@ -76,12 +76,6 @@ export default function AdminDashboardPage() {
           <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Dashboard Overview</h1>
           <p className="text-slate-400 font-medium">Welcome back. Here's what's happening today.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="rounded-lg font-bold border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-smooth">Download Report</Button>
-          <Link href="/admin/catalog">
-            <Button className="rounded-lg font-bold shadow-lg shadow-primary/20 bg-primary hover:bg-primary-light transition-smooth">Add New Product</Button>
-          </Link>
-        </div>
       </div>
 
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -137,16 +131,6 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-linear-to-br from-zinc-900 to-black p-8 rounded-2xl text-white shadow-2xl relative overflow-hidden border border-zinc-800/50 group">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/30 transition-smooth" />
-            <Zap className="w-12 h-12 text-primary mb-6 animate-pulse" />
-            <h3 className="text-2xl font-black mb-2 text-white tracking-tight">Pro Insights</h3>
-            <p className="text-slate-400 text-sm leading-relaxed mb-8 font-medium">
-              Your sales performance is 45% higher than the industry average this month. Keep up the high-end curation!
-            </p>
-            <Button className="w-full h-12 rounded-xl font-black bg-white text-slate-950 hover:bg-slate-200 transition-smooth shadow-lg shadow-white/5">View Details</Button>
-          </div>
-
           <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/50 overflow-hidden relative group shadow-lg">
             <div className="p-6 border-b border-zinc-800/50 bg-white/5">
               <div className="flex items-center gap-3">

@@ -92,21 +92,21 @@ export function Footer() {
                 </a>
               ))}
             </div>
-            <p className="text-sm font-bold text-foreground">support@emobo.com</p>
+            <p className="text-sm font-bold text-foreground">admin@daffathan-labs.my.id</p>
             <p className="text-xs text-muted-foreground mt-2 font-medium">Mon - Fri: 9:00 AM - 6:00 PM</p>
           </div>
         </div>
 
         <div className="border-t border-border pt-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest leading-loose">
-            © 2025 Emobo Corporation. <br className="md:hidden" /> All rights reserved.
+            © 2026 Emobo Corporation. <br className="md:hidden" /> All rights reserved.
           </p>
           <div className="flex gap-8 text-xs font-black uppercase tracking-widest">
-            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
-              Terms of Use
+            <Link href="/terms-of-service" className="text-muted-foreground hover:text-primary transition-colors">
+              Terms of Service
             </Link>
           </div>
         </div>

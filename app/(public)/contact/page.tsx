@@ -26,11 +26,11 @@ export default function ContactPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-primary" />
-                <p>+1 (555) 123-4567</p>
+                <p>+62 851-5744-1749</p>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary" />
-                <p>support@emobo.com</p>
+                <p>admin@daffathan-labs.my.id</p>
               </div>
             </CardContent>
           </Card>

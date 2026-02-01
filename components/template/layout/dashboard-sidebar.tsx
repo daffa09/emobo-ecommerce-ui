@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { LucideIcon, LogOut, ChevronRight, LayoutDashboard, Package, Users, FileText, CreditCard, User, History } from "lucide-react";
+import { LucideIcon, LogOut, ChevronRight, LayoutDashboard, Package, Users, FileText, CreditCard, User, History, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fetchUserProfile } from "@/lib/api-service";
 import {
   Sidebar,
   SidebarContent,
@@ -42,10 +44,31 @@ interface DashboardSidebarProps {
   roleDescription: string;
 }
 
-export function DashboardSidebar({ items, roleName, roleDescription }: DashboardSidebarProps) {
+export function DashboardSidebar({ items, roleName: initialRoleName, roleDescription: initialRoleDescription }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getProfile() {
+      try {
+        const data = await fetchUserProfile();
+        setProfile(data);
+      } catch (error) {
+        console.error("Failed to fetch profile in sidebar:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getProfile();
+  }, []);
+
+  const displayName = profile?.name || initialRoleName;
+  const displayEmail = profile?.email || `${initialRoleDescription.toLowerCase()}@emobo.com`;
+  const displayImage = profile?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-slate-800 bg-black text-slate-400">
@@ -70,8 +93,6 @@ export function DashboardSidebar({ items, roleName, roleDescription }: Dashboard
             <SidebarMenu className="gap-1">
               {items.map((item) => {
                 const Icon = IconMap[item.iconName] || LayoutDashboard;
-                // Fix: Dashboard (root) should only be active on exact match or very specific sub-paths if any
-                // If the path is just the base admin path, it should match carefully.
                 const isActive = item.href === "/admin"
                   ? pathname === "/admin"
                   : pathname.startsWith(item.href);
@@ -112,12 +133,25 @@ export function DashboardSidebar({ items, roleName, roleDescription }: Dashboard
         >
           <div className={cn("flex items-center gap-3", isCollapsed && "gap-0 justify-center w-full")}>
             <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-              <img src="https://i.pravatar.cc/100?img=12" alt={roleName} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+              ) : (
+                <img src={displayImage} alt={displayName} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+              )}
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0 animate-in fade-in slide-in-from-left-2 duration-300">
-                <p className="text-sm font-bold text-white truncate">{roleName}</p>
-                <p className="text-[10px] text-slate-500 truncate">{roleDescription.toLowerCase()}@emobo.com</p>
+                {loading ? (
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-slate-800 rounded animate-pulse" />
+                    <div className="h-3 w-32 bg-slate-800 rounded animate-pulse" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-white truncate">{displayName}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{displayEmail}</p>
+                  </>
+                )}
               </div>
             )}
           </div>

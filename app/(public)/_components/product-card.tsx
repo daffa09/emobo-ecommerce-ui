@@ -9,6 +9,7 @@ import { Star, ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
 import { formatIDR } from "@/lib/utils";
+import { useState } from "react";
 
 interface ProductCardProps {
   id: number;
@@ -25,6 +26,8 @@ interface ProductCardProps {
 export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku }: ProductCardProps) {
   const { addItem } = useCart();
 
+  const [imgSrc, setImgSrc] = useState(image || "/no-image.svg");
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -37,7 +40,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
       sku: sku || `SKU-${id}`,
       name,
       price: numericPrice,
-      image,
+      image: imgSrc,
     });
 
     toast.success("Added to cart!", {
@@ -56,10 +59,11 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
           )}
           <div className="relative aspect-square bg-muted/50 overflow-hidden">
             <Image
-              src={image}
+              src={imgSrc}
               alt={name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-300"
+              onError={() => setImgSrc("/no-image.svg")}
             />
           </div>
         </div>
@@ -82,9 +86,9 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
             </Badge>
           ))}
         </div>
-        <div className="flex items-center justify-between pt-2">
-          <span className="text-2xl font-bold text-primary">{formatIDR(Number(price))}</span>
-          <Button size="sm" className="gap-2" onClick={handleAddToCart}>
+        <div className="flex items-center justify-between pt-2 gap-2">
+          <span className="text-md font-bold text-primary">{formatIDR(Number(price))}</span>
+          <Button size="sm" className="rounded-sm" onClick={handleAddToCart}>
             <ShoppingCart className="h-4 w-4" />
             Add
           </Button>

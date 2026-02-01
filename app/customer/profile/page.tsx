@@ -157,6 +157,13 @@ export default function CustomerProfilePage() {
                 />
                 <p className="text-xs text-muted-foreground">Email cannot be changed</p>
               </div>
+
+              <div className="space-y-2">
+                <Label>Joined Date</Label>
+                <div className="h-10 px-3 py-2 rounded-md bg-muted text-sm text-muted-foreground flex items-center">
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : "-"}
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">

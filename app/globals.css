@@ -168,7 +168,7 @@
 
 @layer utilities {
   .container-emobo {
-    @apply w-full mx-auto px-10 sm:px-6;
+    @apply w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-20;
   }
 
   .transition-smooth {

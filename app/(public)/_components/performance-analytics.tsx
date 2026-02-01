@@ -129,7 +129,7 @@ export function PerformanceAnalytics() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-sm font-bold text-white block">{laptop.searches.toLocaleString()}</span>
+                          <span className="text-sm font-bold text-white block">{laptop.searches.toLocaleString('en-US')}</span>
                           <span className="text-[10px] font-bold text-slate-500 uppercase">Searches</span>
                         </div>
                       </div>

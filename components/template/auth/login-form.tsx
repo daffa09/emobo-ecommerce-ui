@@ -30,6 +30,10 @@ export function LoginForm() {
       localStorage.setItem("emobo-token", result.data.access_token)
       localStorage.setItem("emobo-user", JSON.stringify(result.data.user))
 
+      // Set cookie for middleware
+      document.cookie = `emobo-role=${result.data.user.role}; path=/; max-age=604800; samesite=lax`;
+      document.cookie = `emobo-token=${result.data.access_token}; path=/; max-age=604800; samesite=lax`;
+
       // Redirect based on role
       router.push(result.data.user.role === "ADMIN" ? "/admin" : "/customer")
       router.refresh()
@@ -94,7 +98,7 @@ export function LoginForm() {
         className="w-full bg-primary hover:bg-primary-dark text-white h-10 rounded-lg"
         disabled={isLoading}
       >
-        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
+        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Login"}
       </Button>
 
       <div className="relative">
@@ -109,7 +113,7 @@ export function LoginForm() {
       <p className="text-center text-sm text-muted-foreground">
         Don't have an account?{" "}
         <Link href="/register" className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline">
-          Sign up
+          Register
         </Link>
       </p>
     </form>

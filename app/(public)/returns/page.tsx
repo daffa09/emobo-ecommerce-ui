@@ -1,4 +1,5 @@
-import { Shield, RotateCcw, Truck, Headphones } from "lucide-react"
+import { Shield, RotateCcw, Truck, Headphones, ChevronRight, Check } from "lucide-react"
+import Link from "next/link"
 
 export default function ReturnsPage() {
   const policies = [
@@ -25,72 +26,90 @@ export default function ReturnsPage() {
   ]
 
   return (
-    <div className="bg-background min-h-screen py-24">
-      <div className="container-emobo max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold mb-4">Returns & Warranty</h1>
-          <p className="text-muted-foreground text-lg">
-            Your peace of mind is our priority. Learn about our commitment to quality.
+    <div className="bg-background min-h-screen pb-24 text-foreground dark:bg-slate-950">
+      {/* Hero Section */}
+      <section className="bg-slate-900 py-20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full -mr-48 -mt-48 blur-3xl opacity-50" />
+        <div className="container-emobo relative z-10">
+          <div className="flex items-center gap-2 text-primary-light mb-4 text-sm font-medium">
+            <Link href="/" className="hover:underline">Home</Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-slate-400">Returns & Warranty</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 italic">Returns & <span className="text-primary italic">Warranty</span></h1>
+          <p className="text-slate-400 text-lg max-w-2xl leading-relaxed">
+            Your peace of mind is our priority. Learn about our commitment to quality, authenticity, and customer satisfaction.
           </p>
         </div>
+      </section>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-24">
-          {policies.map((policy, i) => (
-            <div key={i} className="bg-white p-8 rounded-lg shadow-sm border border-border transition-smooth hover:shadow-md">
-              <div className="mb-6">{policy.icon}</div>
-              <h2 className="text-xl font-bold mb-3">{policy.title}</h2>
-              <p className="text-muted-foreground leading-relaxed">{policy.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-slate-900 rounded-lg p-12 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -mr-32 -mt-32 blur-3xl" />
-          <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6 text-gradient bg-linear-to-r from-blue-400 to-blue-200 inline-block">Protection You Can Trust</h2>
-              <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                We work directly with brands like ASUS, Lenovo, and HP to ensure every machine we sell is authentic and fully backed by global warranty standards.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span>Official Authorized Reseller</span>
+      <section className="py-16">
+        <div className="container-emobo max-w-6xl mx-auto">
+          {/* Main Policies Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-24">
+            {policies.map((policy, i) => (
+              <div key={i} className="bg-white dark:bg-slate-900 p-10 rounded-3xl border border-border transition-smooth hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 group">
+                <div className="mb-8 w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:bg-primary/10">
+                  {policy.icon}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                  </div>
-                  <span>Sealed & Genuine Products Only</span>
+                <h2 className="text-2xl font-bold mb-4 dark:text-white">{policy.title}</h2>
+                <p className="text-muted-foreground dark:text-slate-400 leading-relaxed text-lg">{policy.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Detailed Info Card */}
+          <div className="bg-slate-900 dark:bg-slate-900/50 rounded-3xl p-10 md:p-16 text-white overflow-hidden relative border border-slate-800 shadow-2xl">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full -mr-40 -mt-40 blur-3xl opacity-40" />
+            <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <div className="inline-block px-4 py-1.5 bg-primary/20 rounded-full text-primary-light font-bold text-xs tracking-wider uppercase mb-6">
+                  Authenticity Guarantee
+                </div>
+                <h2 className="text-4xl font-bold mb-8 leading-tight">Protection You <br /><span className="text-primary italic">Can Trust</span></h2>
+                <p className="text-slate-400 text-xl leading-relaxed mb-10">
+                  We work directly with industrial giants like ASUS, Lenovo, and HP to ensure every machine we sell is 100% authentic and fully backed by global warranty standards.
+                </p>
+                <div className="space-y-5">
+                  {[
+                    "Official Authorized Reseller",
+                    "Brand New Sealed & Genuine Products",
+                    "Global Service Network Support",
+                    "Verified Hardware Components"
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-4">
+                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                        <Check className="w-4 h-4 text-primary font-bold" />
+                      </div>
+                      <span className="text-slate-200 text-lg font-medium">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-8 backdrop-blur-sm">
-              <h3 className="text-xl font-bold mb-4">Warranty Claim Process</h3>
-              <ol className="space-y-4 text-slate-300">
-                <li className="flex gap-4">
-                  <span className="font-bold text-primary">01.</span>
-                  <span>Contact our support team via email or WhatsApp.</span>
-                </li>
-                <li className="flex gap-4">
-                  <span className="font-bold text-primary">02.</span>
-                  <span>Provide your order ID and a description of the issue.</span>
-                </li>
-                <li className="flex gap-4">
-                  <span className="font-bold text-primary">03.</span>
-                  <span>Ship the item back to our facility using our pre-paid label.</span>
-                </li>
-                <li className="flex gap-4">
-                  <span className="font-bold text-primary">04.</span>
-                  <span>Once verified, we'll process your repair, replacement or refund.</span>
-                </li>
-              </ol>
+
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-inner">
+                <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-primary rounded-full" />
+                  Warranty Claim Process
+                </h3>
+                <ol className="space-y-8">
+                  {[
+                    { step: "01", text: "Contact our support team via email or WhatsApp for a quick diagnostics." },
+                    { step: "02", text: "Provide your order ID and a brief description/video of the technical issue." },
+                    { step: "03", text: "Ship the item back or bring it to the nearest authorized service center." },
+                    { step: "04", text: "Receive your repaired, replaced, or refunded item within 7-14 business days." }
+                  ].map((s, i) => (
+                    <li key={i} className="flex gap-6 relative group">
+                      <span className="font-black text-3xl text-slate-800 transition-colors group-hover:text-primary/30 tabular-nums">{s.step}</span>
+                      <span className="text-slate-300 text-lg leading-snug pt-1">{s.text}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
