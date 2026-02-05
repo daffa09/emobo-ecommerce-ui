@@ -145,7 +145,17 @@ function getAuthHeaders(): HeadersInit {
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: "Request failed" }));
-    throw new Error(error.message || `HTTP ${response.status}: ${response.statusText}`);
+    const errorMessage = error.message || `HTTP ${response.status}: ${response.statusText}`;
+
+    // Handle expired or invalid token automatically
+    if (errorMessage.toLowerCase().includes("invalid or expired token") || response.status === 401) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("emobo-token");
+        localStorage.removeItem("emobo-user");
+      }
+    }
+
+    throw new Error(errorMessage);
   }
   const data = await response.json();
   return data.data || data;

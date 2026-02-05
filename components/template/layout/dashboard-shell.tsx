@@ -3,6 +3,19 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar, NavItem } from "./dashboard-sidebar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "@/lib/auth-service";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Settings, LogOut } from "lucide-react";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -12,6 +25,28 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ children, navItems, roleName, roleDescription }: DashboardShellProps) {
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("emobo-user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    setUser(null);
+    router.push("/");
+    router.refresh();
+  };
+
+  const getProfileLink = () => {
+    if (!user) return "/login";
+    return user.role === "ADMIN" ? "/admin/profile" : "/customer/profile";
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden bg-black text-slate-200 font-sans">
@@ -28,8 +63,8 @@ export function DashboardShell({ children, navItems, roleName, roleDescription }
               </div>
             </div>
 
-            {/* Right: Date & Status */}
-            <div className="ml-auto flex items-center gap-6">
+            {/* Right: Date, Notification & Profile */}
+            <div className="ml-auto flex items-center gap-4">
               <div className="hidden lg:flex flex-col items-end">
                 <p className="text-xs font-black text-slate-100 leading-none">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
@@ -40,6 +75,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription }
                 </p>
               </div>
 
+              {/* Notification Button */}
               <Sheet>
                 <SheetTrigger asChild>
                   <button className="relative w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-600 transition-all group">
@@ -74,6 +110,46 @@ export function DashboardShell({ children, navItems, roleName, roleDescription }
                   </div>
                 </SheetContent>
               </Sheet>
+
+              {/* Profile Dropdown */}
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 hover:border-primary/50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/30">
+                      <Avatar className="w-full h-full">
+                        <AvatarImage src={user.image} alt={user.name || "User"} />
+                        <AvatarFallback className="bg-primary/20 text-primary font-bold text-sm">
+                          {(user.name || "U").charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mt-2 bg-slate-900 border-slate-800" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-bold leading-none text-white">{user.name}</p>
+                        <p className="text-xs leading-none text-slate-400">{user.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-slate-800" />
+                    <DropdownMenuItem
+                      className="cursor-pointer font-bold gap-2 text-slate-300 hover:text-white focus:text-white focus:bg-slate-800"
+                      onClick={() => router.push(getProfileLink())}
+                    >
+                      <Settings className="h-4 w-4 text-slate-400" />
+                      Edit Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-slate-800" />
+                    <DropdownMenuItem
+                      className="cursor-pointer font-bold text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-500/10 gap-2"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </header>
 

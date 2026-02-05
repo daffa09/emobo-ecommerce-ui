@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Breadcrumb,
@@ -16,10 +16,12 @@ import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
 import { API_URL } from "@/lib/auth-service"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart()
   const [activeStep, setActiveStep] = useState<"address" | "payment">("address")
+  const [isProcessing, setIsProcessing] = useState(false)
   const [shippingInfo, setShippingInfo] = useState<{
     cost: number;
     service: string;
@@ -36,8 +38,16 @@ export default function CheckoutPage() {
     setActiveStep("payment")
   }
 
+  // Auto-trigger payment when entering payment step
+  useEffect(() => {
+    if (activeStep === "payment" && shippingInfo && !isProcessing) {
+      handlePayNow()
+    }
+  }, [activeStep, shippingInfo])
+
   const handlePayNow = async () => {
-    if (!shippingInfo) return
+    if (!shippingInfo || isProcessing) return
+    setIsProcessing(true)
 
     try {
       // 1. Create Order
@@ -74,31 +84,36 @@ export default function CheckoutPage() {
 
       const snapToken = payData.data.snapToken
 
-      // 3. Open Midtrans Snap
+      // 3. Embed Midtrans Snap in container (not popup)
       // @ts-ignore
-      window.snap.pay(snapToken, {
+      window.snap.embed(snapToken, {
+        embedId: 'snap-container',
         onSuccess: (result: any) => {
-          toast.success("Pembayaran Berhasil!")
+          toast.success("Payment Successful!")
           clearCart()
           window.location.href = "/account/orders"
         },
         onPending: (result: any) => {
-          toast.info("Menunggu Pembayaran...")
+          toast.info("Waiting for Payment...")
           clearCart()
           window.location.href = "/account/orders"
         },
         onError: (result: any) => {
-          toast.error("Pembayaran Gagal!")
+          toast.error("Payment Failed!")
+          setIsProcessing(false)
         },
         onClose: () => {
-          toast.warning("Anda menutup jendela pembayaran")
+          setIsProcessing(false)
+          setActiveStep("address")
         }
       })
 
     } catch (err: any) {
       toast.error(err.message)
+      setIsProcessing(false)
     }
   }
+
 
   return (
     <div>
@@ -130,50 +145,61 @@ export default function CheckoutPage() {
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Forms */}
-          <div className="lg:col-span-2">
-            <div className="bg-background border border-border rounded-xl p-6">
-              <Tabs
-                value={activeStep}
-                onValueChange={(v) => setActiveStep(v as "address" | "payment")}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-8">
-                  <TabsTrigger value="address">Alamat Pengiriman</TabsTrigger>
-                  <TabsTrigger value="payment" disabled={activeStep === "address"}>
-                    Pembayaran
-                  </TabsTrigger>
-                </TabsList>
+          {/* Forms & Payment - Expands when in payment step */}
+          <div className={activeStep === "payment" ? "lg:col-span-3 flex justify-center" : "lg:col-span-2"}>
+            <div className={`bg-background border border-border rounded-xl w-full transition-all duration-300 ${activeStep === "payment" ? "p-0 overflow-hidden max-w-5xl" : "p-6"}`}>
 
-                <TabsContent value="address" className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-semibold mb-4">Informasi Pengiriman</h2>
-                    <AddressForm onSubmit={handleAddressSubmit} />
-                  </div>
-                </TabsContent>
+              {/* Custom Tab Navigation */}
+              <div className="flex w-full bg-muted/50 p-1 rounded-lg mb-8">
+                <button
+                  onClick={() => setActiveStep("address")}
+                  className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 ${activeStep === "address"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    }`}
+                >
+                  Shipping Address
+                </button>
+                <button
+                  disabled={!shippingInfo}
+                  onClick={() => setActiveStep("payment")}
+                  className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 ${activeStep === "payment"
+                    ? "bg-background text-foreground shadow-sm"
+                    : !shippingInfo
+                      ? "opacity-40 cursor-not-allowed bg-muted/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    }`}
+                >
+                  Payment
+                </button>
+              </div>
 
-                <TabsContent value="payment" className="space-y-6">
-                  <div className="text-center py-8">
-                    <h2 className="text-2xl font-semibold mb-4">Siap untuk Membayar?</h2>
-                    <p className="text-muted mb-8 max-w-md mx-auto">
-                      Pesanan Anda akan segera diproses setelah pembayaran dikonfirmasi melalui Midtrans.
-                    </p>
-                    <button
-                      onClick={handlePayNow}
-                      className="bg-primary text-white px-8 py-3 rounded-lg font-bold text-lg hover:scale-105 transition-transform"
-                    >
-                      Bayar Sekarang
-                    </button>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              {/* Step 1: Address Form - Persisted by using 'hidden' instead of unmounting */}
+              <div className={activeStep === "address" ? "space-y-6 pt-2" : "hidden"}>
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
+                  <AddressForm onSubmit={handleAddressSubmit} />
+                </div>
+              </div>
+
+              {/* Step 2: Payment - Persisted visibility toggle */}
+              <div className={activeStep === "payment" ? "w-full" : "hidden"}>
+                <div className="flex flex-col items-center w-full bg-white dark:bg-white min-h-[900px]">
+                  <div
+                    id="snap-container"
+                    className="w-full min-h-[700px] md:min-h-[900px] border-0 overflow-hidden"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Summary */}
-          <div className="lg:col-span-1">
-            <OrderSummary items={items} shippingCost={shippingInfo?.cost || 0} />
-          </div>
+          {/* Summary - Hidden in payment step to give space */}
+          {activeStep !== "payment" && (
+            <div className="lg:col-span-1">
+              <OrderSummary items={items} shippingCost={shippingInfo?.cost || 0} />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Package, Truck, AlertCircle } from "lucide-react"
+import { Package, Truck } from "lucide-react"
 import { formatIDR } from "@/lib/utils"
 
 interface OrderItem {
@@ -14,7 +14,7 @@ interface OrderSummaryProps {
   tax?: number
 }
 
-export function OrderSummary({ items, shippingCost = 150000, tax = 0 }: OrderSummaryProps) {
+export function OrderSummary({ items, shippingCost = 0, tax = 0 }: OrderSummaryProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const total = subtotal + (shippingCost || 0) + (tax || 0)
 
@@ -47,7 +47,7 @@ export function OrderSummary({ items, shippingCost = 150000, tax = 0 }: OrderSum
           <span className="flex items-center gap-1 text-muted">
             <Truck className="w-4 h-4" /> Shipping
           </span>
-          <span className="text-foreground">{formatIDR(shippingCost)}</span>
+          <span className="text-foreground">{shippingCost > 0 ? formatIDR(shippingCost) : "-"}</span>
         </div>
         {tax > 0 && (
           <div className="flex justify-between text-sm">
@@ -61,14 +61,7 @@ export function OrderSummary({ items, shippingCost = 150000, tax = 0 }: OrderSum
         <span className="font-semibold text-lg">Total</span>
         <span className="text-2xl font-bold text-primary">{formatIDR(total)}</span>
       </div>
-
-      {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2">
-        <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <p className="text-sm text-blue-700">
-          <span className="font-semibold">Free shipping</span> on orders over {formatIDR(1000000)}
-        </p>
-      </div>
     </div>
   )
 }
+

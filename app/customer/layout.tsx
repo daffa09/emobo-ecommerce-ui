@@ -1,5 +1,6 @@
 import { DashboardShell } from "@/components/template/layout/dashboard-shell";
 import { LayoutDashboard, User, History } from "lucide-react";
+import { WhatsAppCTA } from "@/components/template/layout/whatsapp-cta";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
       roleDescription="Customer"
     >
       {children}
+      <WhatsAppCTA />
     </DashboardShell>
   );
 }

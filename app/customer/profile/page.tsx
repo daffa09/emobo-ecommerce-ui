@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Lock } from "lucide-react";
@@ -212,9 +213,8 @@ export default function CustomerProfilePage() {
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="currentPassword">Current Password *</Label>
-              <Input
+              <PasswordInput
                 id="currentPassword"
-                type="password"
                 required
                 value={passwordData.currentPassword}
                 onChange={(e) =>
@@ -227,9 +227,8 @@ export default function CustomerProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password * (min. 6 characters)</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 required
                 minLength={6}
                 value={passwordData.newPassword}
@@ -241,9 +240,8 @@ export default function CustomerProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm New Password *</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 required
                 minLength={6}
                 value={passwordData.confirmPassword}

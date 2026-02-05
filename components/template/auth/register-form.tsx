@@ -5,6 +5,7 @@ import { useState } from "react"
 import { Mail, Lock, User, Loader2, AlertCircle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
 import { registerUser } from "@/lib/auth-service"
 
@@ -104,8 +105,7 @@ export function RegisterForm() {
         <label className="text-sm font-medium text-foreground block mb-2">Password</label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -120,8 +120,7 @@ export function RegisterForm() {
         <label className="text-sm font-medium text-foreground block mb-2">Confirm Password</label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            type="password"
+          <PasswordInput
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}

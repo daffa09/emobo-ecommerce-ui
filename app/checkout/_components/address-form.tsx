@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
-import { fetchProvinces, fetchCities, calculateShippingCost, type ShippingProvince, type ShippingCity, type ShippingCost } from "@/lib/api-service"
+import { fetchProvinces, fetchCities, calculateShippingCost, fetchUserProfile, type ShippingProvince, type ShippingCity, type ShippingCost } from "@/lib/api-service"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
@@ -28,6 +28,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
   const [shippingOptions, setShippingOptions] = useState<ShippingCost[]>([])
   const [loading, setLoading] = useState(false)
   const [loadingCost, setLoadingCost] = useState(false)
+  const [loadingProfile, setLoadingProfile] = useState(true)
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AddressFormData>({
     defaultValues: {
@@ -45,6 +46,31 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
   const cityId = watch("cityId")
   const courier = watch("courier")
 
+  // Load user profile and pre-fill form
+  useEffect(() => {
+    async function loadUserProfile() {
+      const token = typeof window !== "undefined" ? localStorage.getItem("emobo-token") : null
+      if (!token) {
+        setLoadingProfile(false)
+        return
+      }
+
+      try {
+        setLoadingProfile(true)
+        const profile = await fetchUserProfile()
+        if (profile.name) setValue("fullName", profile.name)
+        if (profile.phone) setValue("phone", profile.phone)
+        if (profile.address) setValue("address", profile.address)
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error)
+        // Don't show error - user can fill manually
+      } finally {
+        setLoadingProfile(false)
+      }
+    }
+    loadUserProfile()
+  }, [setValue])
+
   useEffect(() => {
     async function loadProvinces() {
       try {
@@ -60,6 +86,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
     }
     loadProvinces()
   }, [])
+
 
   useEffect(() => {
     async function loadCities() {
@@ -114,7 +141,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
 
   const handleFormSubmit = (data: AddressFormData) => {
     if (!selectedService || selectedCost === 0) {
-      toast.error("Pilih layanan pengiriman terlebih dahulu")
+      toast.error("Please select a shipping service first")
       return
     }
     onSubmit({
@@ -128,26 +155,42 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Nama Lengkap</label>
-          <Input placeholder="John Doe" {...register("fullName", { required: true })} />
+          <label className="text-sm font-medium text-foreground block mb-2">Full Name <span className="text-red-500">*</span></label>
+          <Input
+            placeholder="John Doe"
+            {...register("fullName", { required: "Full name is required" })}
+            className={errors.fullName ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+          />
+          {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Nomor Telepon</label>
-          <Input placeholder="0812..." {...register("phone", { required: true })} />
+          <label className="text-sm font-medium text-foreground block mb-2">Phone Number <span className="text-red-500">*</span></label>
+          <Input
+            placeholder="0812..."
+            {...register("phone", { required: "Phone number is required" })}
+            className={errors.phone ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+          />
+          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
         </div>
       </div>
 
       <div>
-        <label className="text-sm font-medium text-foreground block mb-2">Alamat Lengkap</label>
-        <Input placeholder="Jl. Raya No. 1..." {...register("address", { required: true })} />
+        <label className="text-sm font-medium text-foreground block mb-2">Full Address <span className="text-red-500">*</span></label>
+        <Input
+          placeholder="Street Name, Building No..."
+          {...register("address", { required: "Address is required" })}
+          className={errors.address ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+        />
+        {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>}
       </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Provinsi</label>
+          <label className="text-sm font-medium text-foreground block mb-2">Province</label>
           <Select onValueChange={(val) => setValue("provinceId", val)}>
             <SelectTrigger>
-              <SelectValue placeholder="Pilih Provinsi" />
+              <SelectValue placeholder="Select Province" />
             </SelectTrigger>
             <SelectContent>
               {provinces.map((p) => (
@@ -159,10 +202,10 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
           </Select>
         </div>
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Kota/Kabupaten</label>
+          <label className="text-sm font-medium text-foreground block mb-2">City/Regency</label>
           <Select onValueChange={(val) => setValue("cityId", val)} disabled={!provinceId}>
             <SelectTrigger>
-              <SelectValue placeholder="Pilih Kota" />
+              <SelectValue placeholder="Select City" />
             </SelectTrigger>
             <SelectContent>
               {cities.map((c) => (
@@ -177,10 +220,10 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Kurir</label>
+          <label className="text-sm font-medium text-foreground block mb-2">Courier</label>
           <Select onValueChange={(val) => setValue("courier", val)} defaultValue="jne">
             <SelectTrigger>
-              <SelectValue placeholder="Pilih Kurir" />
+              <SelectValue placeholder="Select Courier" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="jne">JNE</SelectItem>
@@ -190,7 +233,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
           </Select>
         </div>
         <div>
-          <label className="text-sm font-medium text-foreground block mb-2">Layanan Pengiriman</label>
+          <label className="text-sm font-medium text-foreground block mb-2">Shipping Service</label>
           <Select
             onValueChange={(val) => {
               const opt = shippingOptions.find(o => o.service === val);
@@ -202,13 +245,13 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
             disabled={loadingCost || shippingOptions.length === 0}
           >
             <SelectTrigger>
-              <SelectValue placeholder={loadingCost ? "Memuat biaya pengiriman..." : shippingOptions.length === 0 ? "Pilih kota & kurir dulu" : "Pilih Layanan"} />
+              <SelectValue placeholder={loadingCost ? "Loading shipping costs..." : shippingOptions.length === 0 ? "Select city & courier first" : "Select Service"} />
             </SelectTrigger>
             <SelectContent>
               {shippingOptions.map((opt) => (
                 <SelectItem key={opt.service} value={opt.service}>
                   {opt.service} ({opt.description}) - Rp {opt.cost[0].value.toLocaleString('id-ID')}
-                  {opt.cost[0].etd && ` - ${opt.cost[0].etd} hari`}
+                  {opt.cost[0].etd && ` - ${opt.cost[0].etd} days`}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -216,7 +259,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
           {loadingCost && (
             <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <Loader2 className="h-3 w-3 animate-spin" />
-              Menghitung biaya pengiriman...
+              Calculating shipping cost...
             </div>
           )}
         </div>
@@ -227,8 +270,9 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
         className="w-full bg-primary hover:bg-primary-dark mt-6"
         disabled={loading || loadingCost || !selectedService}
       >
-        {loadingCost ? "Menghitung biaya..." : "Lanjut ke Pembayaran"}
+        {loadingCost ? "Calculating..." : "Proceed to Payment"}
       </Button>
     </form>
+
   )
 }

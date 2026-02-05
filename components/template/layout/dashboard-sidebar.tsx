@@ -93,8 +93,8 @@ export function DashboardSidebar({ items, roleName: initialRoleName, roleDescrip
             <SidebarMenu className="gap-1">
               {items.map((item) => {
                 const Icon = IconMap[item.iconName] || LayoutDashboard;
-                const isActive = item.href === "/admin"
-                  ? pathname === "/admin"
+                const isActive = (item.href === "/admin" || item.href === "/customer")
+                  ? pathname === item.href
                   : pathname.startsWith(item.href);
 
                 return (
@@ -123,52 +123,12 @@ export function DashboardSidebar({ items, roleName: initialRoleName, roleDescrip
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className={cn("p-4", isCollapsed && "px-0 py-8")}>
-        <Link
-          href="/admin/profile"
-          className={cn(
-            "bg-white/5 p-4 rounded-lg border border-slate-800 space-y-4 transition-smooth hover:bg-white/10 hover:border-slate-700",
-            isCollapsed && "p-0 bg-transparent border-0 shadow-none mt-auto flex justify-center w-full"
-          )}
-        >
-          <div className={cn("flex items-center gap-3", isCollapsed && "gap-0 justify-center w-full")}>
-            <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
-              ) : (
-                <img src={displayImage} alt={displayName} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex-1 min-w-0 animate-in fade-in slide-in-from-left-2 duration-300">
-                {loading ? (
-                  <div className="space-y-2">
-                    <div className="h-4 w-24 bg-slate-800 rounded animate-pulse" />
-                    <div className="h-3 w-32 bg-slate-800 rounded animate-pulse" />
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-sm font-bold text-white truncate">{displayName}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{displayEmail}</p>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-          {!isCollapsed && (
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 pt-2 border-t border-slate-800/50">
-              <span className="text-[10px] uppercase tracking-widest text-primary/60">Click to edit profile</span>
-            </div>
-          )}
-        </Link>
-        <div className={cn("px-4 pb-4", isCollapsed && "px-0 flex justify-center")}>
-          <Link href="/logout" className={cn(
-            "flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-red-500 transition-smooth group/logout pt-4",
-            isCollapsed && "justify-center"
-          )}>
-            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform shrink-0" />
-            {!isCollapsed && <span>Logout Account</span>}
-          </Link>
+      <SidebarFooter className={cn("p-4", isCollapsed && "px-2 py-4")}>
+        <div className={cn(
+          "text-[10px] text-slate-600 font-medium text-center",
+          isCollapsed && "hidden"
+        )}>
+          © 2024 EMOBO
         </div>
       </SidebarFooter>
     </Sidebar>
