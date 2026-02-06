@@ -10,6 +10,7 @@ import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { loginUser } from "@/lib/auth-service"
+import { setCookie } from "@/lib/cookie-utils"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -27,13 +28,10 @@ export function LoginForm() {
       const result = await loginUser(email, password)
       console.log("Login Success:", result)
 
-      // Store token and user info
-      localStorage.setItem("emobo-token", result.data.access_token)
-      localStorage.setItem("emobo-user", JSON.stringify(result.data.user))
-
-      // Set cookie for middleware
-      document.cookie = `emobo-role=${result.data.user.role}; path=/; max-age=604800; samesite=lax`;
-      document.cookie = `emobo-token=${result.data.access_token}; path=/; max-age=604800; samesite=lax`;
+      // Store token and user info in cookies
+      setCookie("emobo-token", result.data.access_token)
+      setCookie("emobo-user", JSON.stringify(result.data.user))
+      setCookie("emobo-role", result.data.user.role)
 
       // Redirect based on role
       router.push(result.data.user.role === "ADMIN" ? "/admin" : "/customer")

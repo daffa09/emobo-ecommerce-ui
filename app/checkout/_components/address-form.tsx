@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { fetchProvinces, fetchCities, calculateShippingCost, fetchUserProfile, type ShippingProvince, type ShippingCity, type ShippingCost } from "@/lib/api-service"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { getCookie } from "@/lib/cookie-utils"
 
 export interface AddressFormData {
   fullName: string
@@ -19,10 +20,11 @@ export interface AddressFormData {
 }
 
 interface AddressFormProps {
-  onSubmit: (data: AddressFormData & { shippingCost: number; shippingService: string }) => void
+  onSubmit: (data: AddressFormData & { shippingCost: number; shippingService: string }) => void;
+  totalWeight: number;
 }
 
-export function AddressForm({ onSubmit }: AddressFormProps) {
+export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
   const [provinces, setProvinces] = useState<ShippingProvince[]>([])
   const [cities, setCities] = useState<ShippingCity[]>([])
   const [shippingOptions, setShippingOptions] = useState<ShippingCost[]>([])
@@ -49,7 +51,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
   // Load user profile and pre-fill form
   useEffect(() => {
     async function loadUserProfile() {
-      const token = typeof window !== "undefined" ? localStorage.getItem("emobo-token") : null
+      const token = getCookie("emobo-token")
       if (!token) {
         setLoadingProfile(false)
         return
@@ -121,7 +123,7 @@ export function AddressForm({ onSubmit }: AddressFormProps) {
         const data = await calculateShippingCost({
           origin: "501", // Jakarta - should be configurable
           destination: cityId,
-          weight: 1000, // 1kg default - should calculate from cart
+          weight: totalWeight,
           courier: courier
         })
         setShippingOptions(data)

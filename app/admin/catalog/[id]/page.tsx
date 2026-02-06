@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Upload, X, Image as ImageIcon, Save } from "lucide-react";
 import { toast } from "sonner";
 import { fetchProductById, updateProduct, type Product } from "@/lib/api-service";
+import { getCookie } from "@/lib/cookie-utils";
 
 const BRANDS = ["ASUS", "Lenovo", "Apple", "HP", "Dell", "Acer", "MSI", "Razer"];
 
@@ -35,6 +36,10 @@ export default function EditProductPage() {
     price: "",
     stock: "",
     description: "",
+    condition: "NEW",
+    warranty: "",
+    weight: "2000",
+    specs: "{}",
   });
 
   useEffect(() => {
@@ -49,6 +54,10 @@ export default function EditProductPage() {
           price: data.price.toString(),
           stock: data.stock.toString(),
           description: data.description || "",
+          condition: data.condition || "NEW",
+          warranty: data.warranty || "",
+          weight: (data.weight || 2000).toString(),
+          specs: JSON.stringify(data.specifications || {}, null, 2),
         });
         setExistingImages(data.images);
       } catch (error) {
@@ -108,7 +117,7 @@ export default function EditProductPage() {
       formData.append("images", file);
     });
 
-    const token = localStorage.getItem("token");
+    const token = getCookie("emobo-token");
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/images`, {
       method: "POST",
       headers: {
@@ -150,6 +159,17 @@ export default function EditProductPage() {
       const allImages = [...existingImages, ...newImageUrls];
 
       // Update product
+      // Update product
+      let specifications = {};
+      try {
+        specifications = JSON.parse(formData.specs);
+      } catch (e) {
+        toast.error("Invalid JSON in specifications");
+        setSaving(false);
+        setUploadingImages(false);
+        return;
+      }
+
       await updateProduct(productId, {
         sku: formData.sku,
         name: formData.name,
@@ -158,6 +178,10 @@ export default function EditProductPage() {
         stock: parseInt(formData.stock),
         description: formData.description,
         images: allImages,
+        specifications: specifications,
+        condition: formData.condition,
+        warranty: formData.warranty,
+        weight: parseInt(formData.weight) || 1500,
       });
 
       toast.success("Product updated successfully!");
@@ -318,6 +342,47 @@ export default function EditProductPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
+                <Select
+                  value={formData.condition}
+                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                >
+                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="USED">Used</SelectItem>
+                    <SelectItem value="REFURBISHED">Refurbished</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="warranty" className="text-zinc-300">Warranty</Label>
+                <Input
+                  id="warranty"
+                  placeholder="e.g., 1 Year Official"
+                  value={formData.warranty}
+                  onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="weight" className="text-zinc-300">Weight (grams)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  min="0"
+                  placeholder="2000"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="description" className="text-zinc-300">Description</Label>
               <Textarea
@@ -328,6 +393,19 @@ export default function EditProductPage() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="bg-zinc-800/50 border-zinc-700"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="specs" className="text-zinc-300">Specifications (JSON Format)</Label>
+              <Textarea
+                id="specs"
+                rows={6}
+                placeholder='{"Performance": {"Processor": "i7-1355U", "RAM": "16GB"}, "Display": {"Size": "14 inch"}}'
+                value={formData.specs}
+                onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
+                className="bg-zinc-800/50 border-zinc-700 font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">Enter specifications as valid JSON.</p>
             </div>
           </CardContent>
         </Card>

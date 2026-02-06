@@ -17,6 +17,7 @@ import { useCart } from "@/lib/cart-context"
 import { API_URL } from "@/lib/auth-service"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { getCookie } from "@/lib/cookie-utils"
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart()
@@ -51,7 +52,7 @@ export default function CheckoutPage() {
 
     try {
       // 1. Create Order
-      const token = localStorage.getItem("emobo-token")
+      const token = getCookie("emobo-token")
       const orderRes = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: {
@@ -178,7 +179,10 @@ export default function CheckoutPage() {
               <div className={activeStep === "address" ? "space-y-6 pt-2" : "hidden"}>
                 <div>
                   <h2 className="text-xl font-semibold mb-4">Shipping Information</h2>
-                  <AddressForm onSubmit={handleAddressSubmit} />
+                  <AddressForm
+                    onSubmit={handleAddressSubmit}
+                    totalWeight={items.reduce((total, item) => total + ((item.weight || 1500) * item.quantity), 0)}
+                  />
                 </div>
               </div>
 

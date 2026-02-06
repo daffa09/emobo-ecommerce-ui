@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Lock } from "lucide-react";
 import { fetchUserProfile, updateUserProfile, type Customer } from "@/lib/api-service";
 import { toast } from "sonner";
+import { getCookie, setCookie } from "@/lib/cookie-utils";
 
 export default function CustomerProfilePage() {
   const [user, setUser] = useState<Customer | null>(null);
@@ -59,6 +60,17 @@ export default function CustomerProfilePage() {
       // Reload profile
       const data = await fetchUserProfile();
       setUser(data);
+
+      // Update cookies to keep user info in sync
+      const storedUser = getCookie("emobo-user");
+      if (storedUser) {
+        const userObj = JSON.parse(storedUser);
+        setCookie("emobo-user", JSON.stringify({
+          ...userObj,
+          name: data.name,
+          image: data.image
+        }));
+      }
     } catch (error: any) {
       console.error("Failed to update profile:", error);
       toast.error(error.message || "Failed to update profile");
@@ -83,7 +95,7 @@ export default function CustomerProfilePage() {
     try {
       setChangingPassword(true);
       // Call password change endpoint
-      const token = localStorage.getItem("token");
+      const token = getCookie("emobo-token");
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, {
         method: "POST",
         headers: {

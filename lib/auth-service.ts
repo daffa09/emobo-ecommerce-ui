@@ -1,3 +1,5 @@
+import { getCookie, clearAuthCookies } from "./cookie-utils";
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
 export async function loginUser(email: string, password: string) {
@@ -51,7 +53,7 @@ export async function verifyEmail(token: string) {
 }
 
 export async function logoutUser() {
-  const token = localStorage.getItem("emobo-token");
+  const token = getCookie("emobo-token");
   if (!token) return;
 
   const response = await fetch(`${API_URL}/auth/logout`, {
@@ -61,14 +63,7 @@ export async function logoutUser() {
     },
   });
 
-  localStorage.removeItem("emobo-token");
-  localStorage.removeItem("emobo-user");
-
-  // Clear cookies
-  document.cookie = "emobo-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "emobo-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "emobo-role=; path=/; max-age=0; samesite=lax";
-  document.cookie = "emobo-token=; path=/; max-age=0; samesite=lax";
+  clearAuthCookies();
 
   return response.ok;
 }

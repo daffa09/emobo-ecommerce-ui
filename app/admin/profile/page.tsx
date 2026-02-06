@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { fetchUserProfile, updateUserProfile } from "@/lib/api-service";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getCookie, setCookie } from "@/lib/cookie-utils";
 
 export default function AdminProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -40,11 +41,11 @@ export default function AdminProfilePage() {
         image: profile.image
       });
 
-      // Update localStorage to keep it in sync
-      const storedUser = localStorage.getItem("emobo-user");
+      // Update cookies to keep it in sync
+      const storedUser = getCookie("emobo-user");
       if (storedUser) {
         const user = JSON.parse(storedUser);
-        localStorage.setItem("emobo-user", JSON.stringify({
+        setCookie("emobo-user", JSON.stringify({
           ...user,
           name: profile.name,
           image: profile.image

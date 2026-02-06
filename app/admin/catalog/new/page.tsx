@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createProduct } from "@/lib/api-service";
+import { getCookie } from "@/lib/cookie-utils";
 
 const BRANDS = ["ASUS", "Lenovo", "Apple", "HP", "Dell", "Acer", "MSI", "Razer"];
 
@@ -28,6 +29,10 @@ export default function NewProductPage() {
     price: "",
     stock: "",
     description: "",
+    condition: "NEW",
+    warranty: "",
+    weight: "2000",
+    specs: "{}",
   });
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +77,7 @@ export default function NewProductPage() {
       formData.append("images", file);
     });
 
-    const token = localStorage.getItem("token");
+    const token = getCookie("emobo-token");
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/images`, {
       method: "POST",
       headers: {
@@ -107,14 +112,29 @@ export default function NewProductPage() {
       setUploadingImages(false);
 
       // Create product
+      let specifications = {};
+      try {
+        specifications = JSON.parse(formData.specs);
+      } catch (e) {
+        toast.error("Invalid JSON in specifications");
+        setLoading(false);
+        setUploadingImages(false);
+        return;
+      }
+
       await createProduct({
         sku: formData.sku,
         name: formData.name,
         brand: formData.brand,
+        category: "Laptop", // Default category
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
         description: formData.description,
         images: imageUrls,
+        specifications: specifications,
+        condition: formData.condition,
+        warranty: formData.warranty,
+        weight: parseInt(formData.weight) || 1500,
       });
 
       toast.success("Product created successfully!");
@@ -224,6 +244,47 @@ export default function NewProductPage() {
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
+                <Select
+                  value={formData.condition}
+                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                >
+                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="USED">Used</SelectItem>
+                    <SelectItem value="REFURBISHED">Refurbished</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="warranty" className="text-zinc-300">Warranty</Label>
+                <Input
+                  id="warranty"
+                  placeholder="e.g., 1 Year Official"
+                  value={formData.warranty}
+                  onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="weight" className="text-zinc-300">Weight (grams)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  min="0"
+                  placeholder="2000"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="price" className="text-zinc-300">Price (IDR)</Label>
@@ -260,12 +321,25 @@ export default function NewProductPage() {
               <Textarea
                 id="description"
                 required
-                rows={6}
+                rows={4}
                 placeholder="Product description..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="bg-zinc-800/50 border-zinc-700"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="specs" className="text-zinc-300">Specifications (JSON Format)</Label>
+              <Textarea
+                id="specs"
+                rows={6}
+                placeholder='{"Performance": {"Processor": "i7-1355U", "RAM": "16GB"}, "Display": {"Size": "14 inch"}}'
+                value={formData.specs}
+                onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
+                className="bg-zinc-800/50 border-zinc-700 font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">Enter specifications as valid JSON.</p>
             </div>
           </CardContent>
         </Card>

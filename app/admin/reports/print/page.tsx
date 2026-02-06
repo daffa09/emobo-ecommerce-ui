@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { API_URL } from "@/lib/auth-service";
+import { getCookie } from "@/lib/cookie-utils";
 
 interface ReportData {
   orders: {
@@ -33,7 +34,7 @@ export default function PrintReportPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("emobo-token");
+        const token = getCookie("emobo-token");
         const res = await fetch(`${API_URL}/reports/sales?start=${startDate}&end=${endDate}`, {
           headers: {
             "Authorization": `Bearer ${token}`

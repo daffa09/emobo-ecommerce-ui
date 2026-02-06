@@ -21,9 +21,10 @@ interface ProductCardProps {
   discount?: string;
   specs: string[];
   sku?: string;
+  weight?: number;
 }
 
-export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight }: ProductCardProps) {
   const { addItem } = useCart();
 
   const [imgSrc, setImgSrc] = useState(image || "/no-image.svg");
@@ -41,6 +42,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
       name,
       price: numericPrice,
       image: imgSrc,
+      weight: weight || 1500,
     });
 
     toast.success("Added to cart!", {

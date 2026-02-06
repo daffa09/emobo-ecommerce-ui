@@ -19,6 +19,7 @@ import {
   SheetFooter
 } from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
+import { getCookie } from "@/lib/cookie-utils"
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([])
@@ -30,7 +31,7 @@ export default function OrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("emobo-token")
+      const token = getCookie("emobo-token")
       const res = await fetch(`${API_URL}/orders`, {
         headers: { "Authorization": `Bearer ${token}` }
       })
@@ -51,7 +52,7 @@ export default function OrdersPage() {
     if (!reviewOrder) return
     setSubmittingReview(true)
     try {
-      const token = localStorage.getItem("emobo-token")
+      const token = getCookie("emobo-token")
       // Post review for each item in the order (simplification)
       for (const item of reviewOrder.items) {
         await fetch(`${API_URL}/reviews`, {
@@ -78,6 +79,27 @@ export default function OrdersPage() {
       setSubmittingReview(false)
     }
   }
+
+  const handleCancelOrder = async (orderId: number) => {
+    if (!window.confirm("Apakah Anda yakin ingin membatalkan pesanan ini? Stok akan dikembalikan otomatis.")) return;
+
+    try {
+      const token = getCookie("emobo-token");
+      const res = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
+        method: "PUT",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Pesanan berhasil dibatalkan");
+        fetchOrders();
+      } else {
+        toast.error(data.message || "Gagal membatalkan pesanan");
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   if (loading) return <div className="container-emobo py-12">Memuat pesanan...</div>
 
@@ -152,6 +174,15 @@ export default function OrdersPage() {
                         <Download className="w-4 h-4 mr-2" />
                         Invoice
                       </Button>
+                      {order.status === "PENDING" && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleCancelOrder(order.id)}
+                        >
+                          Batalkan
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>

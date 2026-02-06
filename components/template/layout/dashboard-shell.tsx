@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut } from "lucide-react";
+import { getCookie } from "@/lib/cookie-utils";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -29,7 +30,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription }
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("emobo-user");
+    const storedUser = getCookie("emobo-user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }

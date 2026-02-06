@@ -3,7 +3,6 @@ import { CategoriesSection } from "./_components/categories-section";
 import { FeaturedProductsSection } from "./_components/featured-products-section";
 import { BrandsSection } from "./_components/brands-section";
 import { FeaturesSection } from "./_components/features-section";
-import { SalesChartSection } from "./_components/sales-chart-section";
 import { PerformanceAnalytics } from "./_components/performance-analytics";
 
 export default function HomePage() {
@@ -19,7 +18,6 @@ export default function HomePage() {
         subtitle="Be the first to experience the latest in computing innovation."
       />
       <PerformanceAnalytics />
-      <SalesChartSection />
       <BrandsSection />
       <div className="bg-slate-50">
         <FeaturesSection />

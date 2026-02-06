@@ -24,13 +24,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getCookie } from "@/lib/cookie-utils";
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("emobo-user");
+    const storedUser = getCookie("emobo-user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }

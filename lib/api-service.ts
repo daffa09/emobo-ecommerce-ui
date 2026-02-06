@@ -1,4 +1,5 @@
 import { API_URL } from "./auth-service";
+import { getCookie, clearAuthCookies } from "./cookie-utils";
 
 // ============================================
 // TYPE DEFINITIONS
@@ -14,6 +15,10 @@ export interface Product {
   description: string | null;
   stock: number;
   images: string[];
+  specifications: any; // JSON
+  condition: string;
+  warranty: string | null;
+  weight: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -135,7 +140,7 @@ export interface Customer {
 // ============================================
 
 function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem("emobo-token");
+  const token = getCookie("emobo-token");
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -148,10 +153,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
     const errorMessage = error.message || `HTTP ${response.status}: ${response.statusText}`;
 
     // Handle expired or invalid token automatically
-    if (errorMessage.toLowerCase().includes("invalid or expired token") || response.status === 401) {
+    if (
+      errorMessage.toLowerCase().includes("invalid or expired token") || 
+      response.status === 401 ||
+      errorMessage === "User not found"
+    ) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("emobo-token");
-        localStorage.removeItem("emobo-user");
+        clearAuthCookies();
+        window.location.href = "/login";
       }
     }
 
@@ -196,10 +205,8 @@ export async function fetchTopSellingProducts(limit: number = 4): Promise<Produc
 }
 
 export async function fetchProductById(id: number): Promise<Product> {
-  const { products } = await fetchPublicProducts();
-  const product = products.find((p) => p.id === id);
-  if (!product) throw new Error("Product not found");
-  return product;
+  const response = await fetch(`${API_URL}/products/public/${id}`);
+  return handleResponse<Product>(response);
 }
 
 export async function fetchAllProducts(): Promise<Product[]> {
