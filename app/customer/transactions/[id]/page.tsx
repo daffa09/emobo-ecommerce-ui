@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2 } from "lucide-react";
-import { fetchOrderById, type Order } from "@/lib/api-service";
+import { fetchOrderById, cancelOrder, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { getCookie } from "@/lib/cookie-utils";
+import { API_URL } from "@/lib/auth-service";
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -33,12 +35,38 @@ export default function OrderDetailPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     async function loadOrder() {
       try {
         const data = await fetchOrderById(orderId);
         setOrder(data);
+
+        // If we're returning from Midtrans with success params, but order is still PENDING
+        const searchParams = new URLSearchParams(window.location.search);
+        const transactionStatus = searchParams.get('transaction_status');
+
+        if (data.status === "PENDING" && transactionStatus) {
+          console.log("Verifying payment with status:", transactionStatus);
+          const token = getCookie("emobo-token");
+
+          try {
+            await fetch(`${API_URL}/payments/${orderId}/verify`, {
+              headers: { "Authorization": `Bearer ${token}` }
+            });
+            // Reload data after verification
+            const updatedData = await fetchOrderById(orderId);
+            setOrder(updatedData);
+
+            if (updatedData.status !== "PENDING") {
+              toast.success("Payment Verified!");
+            }
+          } catch (err) {
+            console.error("Verification error:", err);
+          }
+        }
       } catch (error) {
         console.error("Failed to load order:", error);
         toast.error("Order not found");
@@ -49,6 +77,83 @@ export default function OrderDetailPage() {
     }
     loadOrder();
   }, [orderId, router]);
+
+  const handlePayment = async () => {
+    if (!order || isPaying) return;
+    setIsPaying(true);
+
+    try {
+      const token = getCookie("emobo-token");
+
+      // 1. Get or create snap token
+      const payRes = await fetch(`${API_URL}/payments/${order.id}/create`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const payData = await payRes.json();
+      if (!payRes.ok) throw new Error(payData.message);
+
+      const snapToken = payData.data.snapToken;
+
+      // 2. Trigger Midtrans Snap Popup
+      // @ts-ignore
+      window.snap.pay(snapToken, {
+        onSuccess: async (result: any) => {
+          toast.success("Payment Successful!");
+          // Verify on backend to update status immediately
+          try {
+            await fetch(`${API_URL}/payments/${order.id}/verify`, {
+              headers: { "Authorization": `Bearer ${token}` }
+            });
+          } catch (err) {
+            console.error("Verification error:", err);
+          }
+          window.location.reload();
+        },
+        onPending: async (result: any) => {
+          toast.info("Waiting for Payment...");
+          // Also verify/check for pending status
+          try {
+            await fetch(`${API_URL}/payments/${order.id}/verify`, {
+              headers: { "Authorization": `Bearer ${token}` }
+            });
+          } catch (err) { }
+          window.location.reload();
+        },
+        onError: (result: any) => {
+          toast.error("Payment Failed!");
+          setIsPaying(false);
+        },
+        onClose: () => {
+          setIsPaying(false);
+          // Refresh in case they actually paid but closed the popup
+          window.location.reload();
+        }
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to trigger payment");
+      setIsPaying(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!order || isCancelling) return;
+
+    if (!confirm("Are you sure you want to cancel this order? This will restore the product stock.")) return;
+
+    setIsCancelling(true);
+    try {
+      await cancelOrder(order.id);
+      toast.success("Order cancelled successfully");
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to cancel order");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -223,6 +328,44 @@ export default function OrderDetailPage() {
                   {order.payment?.status || "PENDING"}
                 </Badge>
               </div>
+
+              {order.status === "PENDING" && order.payment?.status !== "PAID" && (
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
+                  onClick={handlePayment}
+                  disabled={isPaying}
+                >
+                  {isPaying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Pay Now
+                    </>
+                  )}
+                </Button>
+              )}
+
+              {order.status === "PENDING" && (
+                <Button
+                  variant="outline"
+                  className="w-full border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
+                  onClick={handleCancel}
+                  disabled={isCancelling || isPaying}
+                >
+                  {isCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    "Cancel Order"
+                  )}
+                </Button>
+              )}
               {order.payment?.paymentMethod && (
                 <div className="flex justify-between items-center">
                   <p className="text-xs font-bold text-slate-500 uppercase">Method</p>
@@ -294,9 +437,9 @@ export default function OrderDetailPage() {
               </p>
             </CardContent>
           </Card>
-        </div>
-      </div>
-    </div>
+        </div >
+      </div >
+    </div >
   );
 }
 

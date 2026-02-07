@@ -75,7 +75,7 @@ export function RegisterForm() {
           <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="John Doe"
+            placeholder="Enter your name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="pl-10 h-11"
@@ -91,7 +91,7 @@ export function RegisterForm() {
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="email"
-            placeholder="you@example.com"
+            placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="pl-10 h-11"

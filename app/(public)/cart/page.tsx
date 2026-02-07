@@ -7,9 +7,39 @@ import { Separator } from "@/components/ui/separator";
 import { CartItemCard } from "./_components/cart-item-card";
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import { fetchUserProfile } from "@/lib/api-service";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function CartPage() {
   const { items, totalPrice, updateQuantity, removeItem } = useCart();
+  const router = useRouter();
+  const [checking, setChecking] = useState(false);
+
+  const handleCheckoutClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      setChecking(true);
+      const profile = await fetchUserProfile();
+      if (!profile.name || !profile.phone || !profile.address) {
+        toast.error("Profile Incomplete", {
+          description: "Please complete your Name, Phone, and Address in settings before checkout.",
+          action: {
+            label: "Update Profile",
+            onClick: () => router.push("/customer/profile")
+          }
+        });
+        return;
+      }
+      router.push("/checkout");
+    } catch (error) {
+      // If not logged in or other error, let middleware handle or redirect to login
+      router.push("/checkout");
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -93,11 +123,14 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                <Link href="/checkout" className="block">
-                  <Button className="w-full" size="lg">
-                    Proceed to Checkout
-                  </Button>
-                </Link>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleCheckoutClick}
+                  disabled={checking}
+                >
+                  {checking ? "Checking..." : "Proceed to Checkout"}
+                </Button>
 
                 <Link href="/catalog" className="block">
                   <Button variant="outline" className="w-full">

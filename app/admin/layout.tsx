@@ -9,18 +9,15 @@ export const metadata: Metadata = {
 
 const adminNavItems: any[] = [
   { name: "Dashboard", href: "/admin", iconName: "Dashboard" },
-  { name: "Manage Catalog", href: "/admin/catalog", iconName: "Catalog" },
-  { name: "Customers", href: "/admin/customers", iconName: "Users" },
-  { name: "Reports", href: "/admin/reports", iconName: "Reports" },
-  { name: "Transactions", href: "/admin/transactions", iconName: "Transactions" },
+  { name: "Manage Barang", href: "/admin/catalog", iconName: "Catalog" },
+  { name: "Penjualan", href: "/admin/reports", iconName: "Reports" },
+  { name: "Manage Order", href: "/admin/transactions", iconName: "Transactions" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <DashboardShell
       navItems={adminNavItems}
-      roleName="Administrator"
-      roleDescription="Management"
     >
       {children}
     </DashboardShell>

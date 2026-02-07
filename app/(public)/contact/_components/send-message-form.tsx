@@ -33,30 +33,18 @@ export function SendMessageForm() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // For now, just log to console and show success message
-      console.log("Contact Form Submission:", data);
-
-      // Store to localStorage as backup (optional)
-      const existingMessages = localStorage.getItem("contactMessages");
-      const messages = existingMessages ? JSON.parse(existingMessages) : [];
-      messages.push({
-        ...data,
-        timestamp: new Date().toISOString(),
-      });
-      localStorage.setItem("contactMessages", JSON.stringify(messages));
+      const { sendContactMessage } = await import("@/lib/api-service");
+      await sendContactMessage(data);
 
       toast.success("Message sent successfully!", {
         description: "We'll get back to you as soon as possible.",
       });
 
       reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message", {
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
       });
     }
   };

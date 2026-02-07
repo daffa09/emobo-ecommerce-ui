@@ -84,7 +84,7 @@ export function FeaturedProductsSection({
                   name={product.name}
                   price={product.price.toString()}
                   image={product.images[0] || "/no-image.svg"}
-                  rating={4.5}
+                  rating={0}
                   reviews={0}
                   specs={[product.brand]}
                 />

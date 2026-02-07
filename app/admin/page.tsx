@@ -2,25 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, CreditCard, Package, ArrowUpRight, ArrowDownRight, Zap, Target, Loader2, ChevronRight } from "lucide-react";
+import { Users, CreditCard, Package, Loader2, ChevronRight, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatIDR, cn } from "@/lib/utils";
-import { fetchSalesReport, fetchAllProducts, type SalesReport } from "@/lib/api-service";
+import { fetchSalesReport, fetchAllProducts, fetchAllOrders, type SalesReport, type Order } from "@/lib/api-service";
 
 export default function AdminDashboardPage() {
   const [report, setReport] = useState<SalesReport | null>(null);
   const [productCount, setProductCount] = useState(0);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [salesData, products] = await Promise.all([
+        const [salesData, products, orders] = await Promise.all([
           fetchSalesReport(),
           fetchAllProducts(),
+          fetchAllOrders(),
         ]);
         setReport(salesData);
         setProductCount(products.length);
+        setRecentOrders(orders.slice(0, 3));
       } catch (error) {
         console.error("Failed to fetch admin dashboard data:", error);
       } finally {
@@ -32,7 +35,7 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -42,30 +45,22 @@ export default function AdminDashboardPage() {
     {
       title: "Total Revenue",
       val: formatIDR(report?.totalRevenue || 0),
-      trend: "+20.1%",
       icon: <div className="font-bold text-emerald-500">Rp</div>,
-      positive: true
     },
     {
       title: "Total Customers",
       val: report?.totalCustomers?.toString() || "0",
-      trend: "+18.1%",
       icon: <Users className="w-5 h-5 text-blue-500" />,
-      positive: true
     },
     {
       title: "Total Orders",
       val: report?.totalOrders?.toString() || "0",
-      trend: "+19%",
       icon: <CreditCard className="w-5 h-5 text-purple-500" />,
-      positive: true
     },
     {
       title: "Active Products",
       val: productCount.toString(),
-      trend: "+2.4%",
       icon: <Package className="w-5 h-5 text-amber-500" />,
-      positive: true
     },
   ];
 
@@ -84,13 +79,6 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center group-hover:bg-primary/20 transition-smooth">
                 {stat.icon}
-              </div>
-              <div className={cn(
-                "flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full",
-                stat.positive ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
-              )}>
-                {stat.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                {stat.trend}
               </div>
             </div>
             <div>
@@ -111,20 +99,28 @@ export default function AdminDashboardPage() {
                 <h2 className="text-2xl font-black text-white tracking-tight">Recent Activity</h2>
               </div>
               <div className="space-y-4">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="flex items-center justify-between p-4 rounded-xl bg-black/40 border border-zinc-800/50 hover:bg-black/60 transition-smooth">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-500">
-                        <Package className="w-5 h-5" />
+                {recentOrders.length > 0 ? (
+                  recentOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-black/40 border border-zinc-800/50 hover:bg-black/60 transition-smooth">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-500">
+                          <Package className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white">Order #{order.id} - {order.status}</p>
+                          <p className="text-xs text-slate-500 font-medium">
+                            {new Date(order.createdAt).toLocaleDateString()} • {formatIDR(order.totalAmount)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-white">Order #SKU-{2930 + item} Processed</p>
-                        <p className="text-xs text-slate-500 font-medium">{item * 2} hours ago • Admin Panel</p>
-                      </div>
+                      <Link href={`/admin/transactions?id=${order.id}`}>
+                        <Button variant="ghost" size="sm" className="font-bold text-primary hover:text-primary-light hover:bg-primary/10">View</Button>
+                      </Link>
                     </div>
-                    <Button variant="ghost" size="sm" className="font-bold text-primary hover:text-primary-light hover:bg-primary/10">Views</Button>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-slate-500 text-center py-10 font-bold">No recent activity</p>
+                )}
               </div>
             </div>
           </div>
@@ -140,11 +136,16 @@ export default function AdminDashboardPage() {
             </div>
             <div className="p-6">
               <div className="space-y-2">
-                {["Update Prices", "Manage Inventory", "User Permissions", "System Configuration"].map((action, i) => (
-                  <button key={i} className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-white/5 transition-smooth group border border-transparent hover:border-zinc-800/50">
-                    <span className="text-sm font-bold text-zinc-400 group-hover:text-white">{action}</span>
+                {[
+                  { name: "Manage Barang", href: "/admin/catalog" },
+                  { name: "Manage Order", href: "/admin/transactions" },
+                  { name: "View Customers", href: "/admin/customers" },
+                  { name: "Sales Reports", href: "/admin/reports" }
+                ].map((action, i) => (
+                  <Link key={i} href={action.href} className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-white/5 transition-smooth group border border-transparent hover:border-zinc-800/50 text-left">
+                    <span className="text-sm font-bold text-zinc-400 group-hover:text-white">{action.name}</span>
                     <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-white group-hover:translate-x-1 transition-smooth" />
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>

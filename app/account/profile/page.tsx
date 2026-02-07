@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [profile, setProfile] = useState({
-    fullName: "John Doe",
-    email: "john@example.com",
-    phone: "+1 (555) 000-0000",
-    address: "123 Main Street, New York, NY 10001",
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
   })
 
   return (
@@ -33,8 +33,8 @@ export default function ProfilePage() {
               {/* Profile Header */}
               <div className="flex items-start justify-between mb-8">
                 <div className="flex gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center text-white text-2xl font-bold">
-                    JD
+                  <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center text-white text-2xl font-bold uppercase">
+                    {(profile.fullName || "U").charAt(0)}
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold">{profile.fullName}</h2>

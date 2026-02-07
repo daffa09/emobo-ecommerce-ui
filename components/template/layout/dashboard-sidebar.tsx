@@ -22,7 +22,7 @@ import {
 
 export type IconType = "Dashboard" | "Catalog" | "Users" | "Reports" | "Transactions" | "Profile" | "History";
 
-const IconMap: Record<IconType, LucideIcon> = {
+export const IconMap: Record<IconType, LucideIcon> = {
   Dashboard: LayoutDashboard,
   Catalog: Package,
   Users: Users,
@@ -40,8 +40,8 @@ export interface NavItem {
 
 interface DashboardSidebarProps {
   items: NavItem[];
-  roleName: string;
-  roleDescription: string;
+  roleName?: string;
+  roleDescription?: string;
 }
 
 export function DashboardSidebar({ items, roleName: initialRoleName, roleDescription: initialRoleDescription }: DashboardSidebarProps) {
@@ -66,9 +66,9 @@ export function DashboardSidebar({ items, roleName: initialRoleName, roleDescrip
     getProfile();
   }, []);
 
-  const displayName = profile?.name || initialRoleName;
-  const displayEmail = profile?.email || `${initialRoleDescription.toLowerCase()}@emobo.com`;
-  const displayImage = profile?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+  const displayName = profile?.name || initialRoleName || "";
+  const displayEmail = profile?.email || "";
+  const displayImage = profile?.image || (displayName ? `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random` : "");
 
   return (
     <Sidebar collapsible="icon" className="border-r border-slate-800 bg-black text-slate-400">

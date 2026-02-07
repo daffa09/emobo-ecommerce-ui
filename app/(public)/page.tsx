@@ -17,7 +17,7 @@ export default function HomePage() {
         title={<>Fresh <span className="text-primary italic">New Arrivals</span></>}
         subtitle="Be the first to experience the latest in computing innovation."
       />
-      <PerformanceAnalytics />
+      {/* <PerformanceAnalytics /> - Hidden until BE data is available */}
       <BrandsSection />
       <div className="bg-slate-50">
         <FeaturesSection />

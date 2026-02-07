@@ -7,15 +7,19 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, User, Lock } from "lucide-react";
+import { Loader2, User, Lock, LogOut } from "lucide-react";
 import { fetchUserProfile, updateUserProfile, type Customer } from "@/lib/api-service";
+import { logoutUser } from "@/lib/auth-service";
 import { toast } from "sonner";
 import { getCookie, setCookie } from "@/lib/cookie-utils";
+import { useRouter } from "next/navigation";
 
 export default function CustomerProfilePage() {
+  const router = useRouter();
   const [user, setUser] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -124,6 +128,19 @@ export default function CustomerProfilePage() {
       toast.error(error.message || "Failed to change password");
     } finally {
       setChangingPassword(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logoutUser();
+      toast.success("Logged out successfully");
+      router.push("/login");
+    } catch (error: any) {
+      toast.error("Failed to logout");
+    } finally {
+      setLoggingOut(false);
     }
   };
 
@@ -276,6 +293,22 @@ export default function CustomerProfilePage() {
           </form>
         </CardContent>
       </Card>
+
+      <div className="flex justify-end pt-4">
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="rounded-xl border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white border transition-all duration-300 px-8"
+        >
+          {loggingOut ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <LogOut className="h-4 w-4 mr-2" />
+          )}
+          Logout from Account
+        </Button>
+      </div>
     </div>
   );
 }

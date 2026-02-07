@@ -18,8 +18,6 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   return (
     <DashboardShell
       navItems={customerNavItems}
-      roleName="John Doe"
-      roleDescription="Customer"
     >
       {children}
       <WhatsAppCTA />

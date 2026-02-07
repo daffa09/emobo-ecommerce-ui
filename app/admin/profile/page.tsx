@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User, Mail, Shield, Camera, Edit2, Save, X, Loader2 } from "lucide-react";
+import { User, Mail, Shield, Camera, Edit2, Save, X, Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchUserProfile, updateUserProfile } from "@/lib/api-service";
+import { logoutUser } from "@/lib/auth-service";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getCookie, setCookie } from "@/lib/cookie-utils";
+import { useRouter } from "next/navigation";
 
 export default function AdminProfilePage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -29,6 +33,19 @@ export default function AdminProfilePage() {
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await logoutUser();
+      toast.success("Logged out successfully");
+      router.push("/login");
+    } catch (error: any) {
+      toast.error("Failed to logout");
+    } finally {
+      setLoggingOut(false);
     }
   };
 
@@ -127,6 +144,24 @@ export default function AdminProfilePage() {
                 <p className="text-sm font-bold text-white">
                   {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
+              </div>
+
+              <div className="pt-4">
+                <Button
+                  variant="outline"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="w-full rounded-xl border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white border transition-all duration-300 font-black h-12"
+                >
+                  {loggingOut ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>

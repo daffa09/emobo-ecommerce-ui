@@ -21,6 +21,7 @@ export interface Product {
   weight: number;
   createdAt: string;
   updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface Review {
@@ -133,6 +134,27 @@ export interface Customer {
   role: "ADMIN" | "CUSTOMER";
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Notification {
+  id: number;
+  userId: number;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContactMessage {
+  id: number;
+  firstName: string;
+  lastName: string;
+  subject: string;
+  phone: string;
+  message: string;
+  createdAt: string;
 }
 
 // ============================================
@@ -294,6 +316,15 @@ export async function fetchUserOrders(): Promise<Order[]> {
 export async function fetchOrderById(id: number): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${id}`, {
     headers: getAuthHeaders(),
+    cache: "no-store",
+  });
+  return handleResponse<Order>(response);
+}
+
+export async function cancelOrder(id: number): Promise<Order> {
+  const response = await fetch(`${API_URL}/orders/${id}/cancel`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
   });
   return handleResponse<Order>(response);
 }
@@ -431,4 +462,44 @@ export async function resetUserPassword(data: { token: string; password: string 
 export async function fetchAdminContact(): Promise<{ phone: string }> {
   const response = await fetch(`${API_URL}/users/contact`);
   return handleResponse<{ phone: string }>(response);
+}
+
+// ============================================
+// NOTIFICATION API
+// ============================================
+
+export async function fetchNotifications(): Promise<Notification[]> {
+  const response = await fetch(`${API_URL}/notifications`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Notification[]>(response);
+}
+
+export async function markNotificationAsRead(id: number): Promise<Notification> {
+  const response = await fetch(`${API_URL}/notifications/${id}/read`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Notification>(response);
+}
+
+export async function deleteNotification(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/notifications/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  await handleResponse<void>(response);
+}
+
+// ============================================
+// CONTACT API
+// ============================================
+
+export async function sendContactMessage(data: Omit<ContactMessage, "id" | "createdAt">): Promise<ContactMessage> {
+  const response = await fetch(`${API_URL}/contact`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse<ContactMessage>(response);
 }

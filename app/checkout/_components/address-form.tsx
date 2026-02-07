@@ -8,6 +8,7 @@ import { fetchProvinces, fetchCities, calculateShippingCost, fetchUserProfile, t
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { getCookie } from "@/lib/cookie-utils"
+import { cn } from "@/lib/utils"
 
 export interface AddressFormData {
   fullName: string
@@ -159,9 +160,13 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">Full Name <span className="text-red-500">*</span></label>
           <Input
-            placeholder="John Doe"
+            placeholder="Enter your name"
             {...register("fullName", { required: "Full name is required" })}
-            className={errors.fullName ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+            readOnly
+            className={cn(
+              "bg-muted/50 cursor-not-allowed",
+              errors.fullName ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+            )}
           />
           {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
         </div>
@@ -170,7 +175,11 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
           <Input
             placeholder="0812..."
             {...register("phone", { required: "Phone number is required" })}
-            className={errors.phone ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+            readOnly
+            className={cn(
+              "bg-muted/50 cursor-not-allowed",
+              errors.phone ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+            )}
           />
           {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
         </div>
@@ -181,7 +190,11 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
         <Input
           placeholder="Street Name, Building No..."
           {...register("address", { required: "Address is required" })}
-          className={errors.address ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}
+          readOnly
+          className={cn(
+            "bg-muted/50 cursor-not-allowed",
+            errors.address ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+          )}
         />
         {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>}
       </div>

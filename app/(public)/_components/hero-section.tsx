@@ -39,13 +39,13 @@ export function HeroSection() {
 
             <div className="flex items-center gap-8 pt-8 border-t border-white/10">
               <div className="flex flex-col">
-                <span className="text-2xl font-bold text-white">500+</span>
-                <span className="text-sm text-slate-500">Models Available</span>
+                <span className="text-2xl font-bold text-white">Best</span>
+                <span className="text-sm text-slate-500">Quality Laptops</span>
               </div>
               <div className="w-px h-8 bg-white/10" />
               <div className="flex flex-col">
-                <span className="text-2xl font-bold text-white">24/7</span>
-                <span className="text-sm text-slate-500">Expert Support</span>
+                <span className="text-2xl font-bold text-white">Expert</span>
+                <span className="text-sm text-slate-500">Support Team</span>
               </div>
             </div>
           </div>

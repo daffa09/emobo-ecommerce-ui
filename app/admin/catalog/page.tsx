@@ -18,6 +18,16 @@ import { fetchAllProducts, deleteProduct, type Product } from "@/lib/api-service
 import { formatIDR } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -25,6 +35,7 @@ export default function AdminCatalogPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -61,13 +72,15 @@ export default function AdminCatalogPage() {
   }
 
   async function handleDelete(product: Product) {
-    if (!window.confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`)) {
-      return;
-    }
+    setProductToDelete(product);
+  }
+
+  async function confirmDelete() {
+    if (!productToDelete) return;
 
     try {
-      setDeleting(product.id);
-      await deleteProduct(product.id);
+      setDeleting(productToDelete.id);
+      await deleteProduct(productToDelete.id);
       toast.success("Product deleted successfully");
       loadProducts();
     } catch (error: any) {
@@ -75,6 +88,7 @@ export default function AdminCatalogPage() {
       toast.error(error.message || "Failed to delete product");
     } finally {
       setDeleting(null);
+      setProductToDelete(null);
     }
   }
 
@@ -187,6 +201,25 @@ export default function AdminCatalogPage() {
           )}
         </CardContent>
       </Card>
+      <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Barang yang sudah memiliki riwayat transaksi atau stok akan tetap disimpan sebagai arsip (soft delete). Barang yang belum ada transaksi dan sudah kosong stoknya akan dihapus permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 hover:text-white">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white border-none"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

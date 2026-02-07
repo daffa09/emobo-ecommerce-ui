@@ -20,6 +20,16 @@ import {
 } from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
 import { getCookie } from "@/lib/cookie-utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([])
@@ -28,6 +38,7 @@ export default function OrdersPage() {
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState("")
   const [submittingReview, setSubmittingReview] = useState(false)
+  const [orderToCancel, setOrderToCancel] = useState<number | null>(null)
 
   const fetchOrders = async () => {
     try {
@@ -81,11 +92,15 @@ export default function OrdersPage() {
   }
 
   const handleCancelOrder = async (orderId: number) => {
-    if (!window.confirm("Apakah Anda yakin ingin membatalkan pesanan ini? Stok akan dikembalikan otomatis.")) return;
+    setOrderToCancel(orderId);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!orderToCancel) return;
 
     try {
       const token = getCookie("emobo-token");
-      const res = await fetch(`${API_URL}/orders/${orderId}/cancel`, {
+      const res = await fetch(`${API_URL}/orders/${orderToCancel}/cancel`, {
         method: "PUT",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -98,6 +113,8 @@ export default function OrdersPage() {
       }
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setOrderToCancel(null);
     }
   };
 
@@ -226,6 +243,25 @@ export default function OrdersPage() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+      <AlertDialog open={!!orderToCancel} onOpenChange={(open) => !open && setOrderToCancel(null)}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Batalkan Pesanan?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Apakah Anda yakin ingin membatalkan pesanan ini? Stok produk akan dikembalikan secara otomatis. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 hover:text-white">Kembali</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmCancelOrder}
+              className="bg-red-600 hover:bg-red-700 text-white border-none"
+            >
+              Ya, Batalkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

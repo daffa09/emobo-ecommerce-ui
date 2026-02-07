@@ -76,11 +76,13 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
             {name}
           </h3>
         </Link>
-        <div className="flex items-center gap-1 text-sm">
-          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium">{rating}</span>
-          <span className="text-muted-foreground">({reviews})</span>
-        </div>
+        {rating > 0 && (
+          <div className="flex items-center gap-1 text-sm">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="font-medium">{rating}</span>
+            <span className="text-muted-foreground">({reviews})</span>
+          </div>
+        )}
         <div className="flex flex-wrap gap-1">
           {specs.map((spec, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs">
