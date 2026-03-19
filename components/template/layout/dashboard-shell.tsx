@@ -167,101 +167,61 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
                 <PopoverContent className="w-[380px] p-0 bg-slate-900 border-slate-800 shadow-2xl shadow-black/50" align="end" sideOffset={8}>
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Notifikasi</h3>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Notifications</h3>
                     <button className="text-slate-500 hover:text-white transition-colors">
                       <Settings className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <Tabs defaultValue="transactions" className="w-full">
-                    <TabsList className="w-full h-11 bg-transparent border-b border-slate-800 rounded-none p-0">
-                      <TabsTrigger 
-                        value="transactions" 
-                        className="flex-1 h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold transition-all"
-                      >
-                        Transaksi
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="updates" 
-                        className="flex-1 h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold transition-all"
-                      >
-                        Update
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="transactions" className="m-0 max-h-[400px] overflow-y-auto custom-scrollbar">
-                      {notifications.filter(n => n.type === "ORDER").length > 0 ? (
-                        <div className="divide-y divide-slate-800/50">
-                          {notifications.filter(n => n.type === "ORDER").map((notif) => (
-                            <div
-                              key={notif.id}
-                              onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
-                              className={`p-4 flex gap-3 transition-colors cursor-pointer hover:bg-slate-800/40 ${!notif.isRead ? "bg-primary/5" : ""}`}
-                            >
-                              <div className="shrink-0 mt-0.5">
-                                {getNotificationIcon(notif.type)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start">
-                                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter mb-0.5">Info &bull; {new Date(notif.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
-                                  {!notif.isRead && <div className="w-2 h-2 bg-primary rounded-full" />}
-                                </div>
-                                <p className={`text-xs font-black leading-snug mb-1 ${notif.isRead ? "text-slate-300" : "text-white"}`}>{notif.title}</p>
-                                <p className={`text-[11px] leading-relaxed line-clamp-2 ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>{notif.message}</p>
-                              </div>
+                  <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                    {notifications.length > 0 ? (
+                      <div className="divide-y divide-slate-800/50">
+                        {notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+                            className={`p-4 flex gap-3 transition-colors cursor-pointer hover:bg-slate-800/40 ${!notif.isRead ? "bg-primary/5" : ""}`}
+                          >
+                            <div className="shrink-0 mt-0.5">
+                              {getNotificationIcon(notif.type)}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="py-12 flex flex-col items-center justify-center text-center px-6">
-                          <Package className="w-10 h-10 text-slate-800 mb-3" />
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Belum ada transaksi</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="updates" className="m-0 max-h-[400px] overflow-y-auto custom-scrollbar">
-                      {notifications.filter(n => n.type !== "ORDER").length > 0 ? (
-                        <div className="divide-y divide-slate-800/50">
-                          {notifications.filter(n => n.type !== "ORDER").map((notif) => (
-                            <div
-                              key={notif.id}
-                              onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
-                              className={`p-4 flex gap-3 transition-colors cursor-pointer hover:bg-slate-800/40 ${!notif.isRead ? "bg-primary/5" : ""}`}
-                            >
-                              <div className="shrink-0 mt-0.5">
-                                {getNotificationIcon(notif.type)}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start">
+                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter mb-0.5">Info &bull; {new Date(notif.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
+                                {!notif.isRead && <div className="w-2 h-2 bg-primary rounded-full" />}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start">
-                                  <p className="text-[10px] font-bold text-primary uppercase tracking-tighter mb-0.5">Update &bull; {new Date(notif.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
-                                  {!notif.isRead && <div className="w-2 h-2 bg-primary rounded-full" />}
-                                </div>
-                                <p className={`text-xs font-black leading-snug mb-1 ${notif.isRead ? "text-slate-300" : "text-white"}`}>{notif.title}</p>
-                                <p className={`text-[11px] leading-relaxed line-clamp-2 ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>{notif.message}</p>
-                              </div>
+                              <p className={`text-xs font-black leading-snug mb-1 ${notif.isRead ? "text-slate-300" : "text-white"}`}>{notif.title}</p>
+                              <p className={`text-[11px] leading-relaxed line-clamp-2 ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>{notif.message}</p>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="py-12 flex flex-col items-center justify-center text-center px-6">
-                          <Settings className="w-10 h-10 text-slate-800 mb-3" />
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Belum ada update</p>
-                        </div>
-                      )}
-                    </TabsContent>
-                  </Tabs>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-12 flex flex-col items-center justify-center text-center px-6">
+                        <Package className="w-10 h-10 text-slate-800 mb-3" />
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">No notifications yet</p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Footer */}
                   <div className="flex items-center justify-between p-3 border-t border-slate-800 bg-slate-900 overflow-hidden">
                     <button 
-                      onClick={() => setNotifications(notifications.map(n => ({ ...n, isRead: true })))}
+                      onClick={async () => {
+                        try {
+                          const { markAllNotificationsAsRead } = await import("@/lib/api-service");
+                          await markAllNotificationsAsRead();
+                          setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+                        } catch (error) {
+                          console.error("Failed to mark all as read:", error);
+                        }
+                      }}
                       className="text-[11px] font-black text-primary hover:text-primary/80 transition-colors uppercase tracking-tight"
                     >
-                      Tandai semua dibaca
+                      Mark all as read
                     </button>
                     <button className="text-[11px] font-black text-primary hover:text-primary/80 transition-colors uppercase tracking-tight">
-                      Lihat selengkapnya
+                      See more
                     </button>
                   </div>
                 </PopoverContent>

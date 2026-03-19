@@ -129,7 +129,7 @@ export function DashboardSidebar({ items, roleName: initialRoleName, roleDescrip
           "text-[10px] text-slate-600 font-medium text-center",
           isCollapsed && "hidden"
         )}>
-          © 2024 EMOBO
+          © 2026 Emobo
         </div>
       </SidebarFooter>
     </Sidebar>

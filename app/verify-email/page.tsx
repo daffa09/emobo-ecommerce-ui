@@ -17,7 +17,7 @@ function VerifyEmailContent() {
   useEffect(() => {
     if (!token) {
       setStatus("error")
-      setMessage("Token verifikasi tidak ditemukan.")
+      setMessage("Verification token not found.")
       return
     }
 
@@ -27,7 +27,7 @@ function VerifyEmailContent() {
         setStatus("success")
       } catch (err: any) {
         setStatus("error")
-        setMessage(err.message || "Gagal memverifikasi email.")
+        setMessage(err.message || "Failed to verify email.")
       }
     }
 
@@ -49,8 +49,8 @@ function VerifyEmailContent() {
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Memverifikasi...</h1>
-              <p className="text-muted-foreground">Sabar ya bos, lagi dicek datanya.</p>
+              <h1 className="text-3xl font-bold">Verifying...</h1>
+              <p className="text-muted-foreground">Please wait, we are verifying your data.</p>
             </div>
           </div>
         )}
@@ -63,14 +63,14 @@ function VerifyEmailContent() {
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Berhasil!</h1>
+              <h1 className="text-3xl font-bold">Success!</h1>
               <p className="text-muted-foreground text-lg">
-                Email kamu udah dikonfirmasi. Sekarang kamu bisa login dan mulai belanja laptop premium.
+                Your email has been confirmed. You can now login and start shopping for premium laptops.
               </p>
             </div>
             <Button asChild className="w-full bg-primary hover:bg-primary-dark transition-smooth h-12 text-lg font-bold shadow-lg shadow-primary/20">
               <Link href="/login" className="flex items-center justify-center gap-2">
-                Login Sekarang <ChevronRight className="w-5 h-5" />
+                Login Now <ChevronRight className="w-5 h-5" />
               </Link>
             </Button>
           </div>
@@ -84,15 +84,15 @@ function VerifyEmailContent() {
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-red-600">Gagal Verifikasi</h1>
+              <h1 className="text-3xl font-bold text-red-600">Verification Failed</h1>
               <p className="text-muted-foreground">{message}</p>
             </div>
             <div className="grid gap-4">
               <Button asChild variant="outline" className="w-full h-12 font-bold">
-                <Link href="/contact">Hubungi Support</Link>
+                <Link href="/contact">Contact Support</Link>
               </Button>
               <Button asChild variant="ghost" className="w-full">
-                <Link href="/register">Coba Daftar Lagi</Link>
+                <Link href="/register">Try Registering Again</Link>
               </Button>
             </div>
           </div>

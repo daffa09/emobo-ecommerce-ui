@@ -131,6 +131,9 @@ export interface Customer {
   phone?: string;
   image?: string;
   address?: string;
+  addressNotes?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   role: "ADMIN" | "CUSTOMER";
   createdAt: string;
   updatedAt: string;
@@ -490,12 +493,28 @@ export async function markNotificationAsRead(id: number): Promise<Notification> 
   return handleResponse<Notification>(response);
 }
 
+export async function markAllNotificationsAsRead(): Promise<void> {
+  const response = await fetch(`${API_URL}/notifications/mark-all-read`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+  });
+  await handleResponse<void>(response);
+}
+
 export async function deleteNotification(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/notifications/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
   await handleResponse<void>(response);
+}
+
+export async function confirmOrderReceived(orderId: number): Promise<Order> {
+  const response = await fetch(`${API_URL}/orders/${orderId}/confirm-received`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Order>(response);
 }
 
 // ============================================

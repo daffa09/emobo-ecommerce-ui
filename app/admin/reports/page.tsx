@@ -16,7 +16,7 @@ export default function AdminReportsPage() {
 
   const printReport = () => {
     if (!startDate || !endDate) {
-      return toast.error("Pilih rentang tanggal terlebih dahulu");
+      return toast.error("Please select a date range first");
     }
 
     const printUrl = `/admin/reports/print?startDate=${startDate}&endDate=${endDate}`;
@@ -26,14 +26,14 @@ export default function AdminReportsPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Laporan & Analitik</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Reports & Analytics</h1>
       </div>
 
       <Tabs defaultValue="financial" className="w-full">
         <TabsList>
-          <TabsTrigger value="financial">Penjualan</TabsTrigger>
-          <TabsTrigger value="inbound">Barang Masuk</TabsTrigger>
-          <TabsTrigger value="outbound">Barang Keluar</TabsTrigger>
+          <TabsTrigger value="financial">Sales</TabsTrigger>
+          <TabsTrigger value="inbound">Incoming Goods</TabsTrigger>
+          <TabsTrigger value="outbound">Outgoing Goods</TabsTrigger>
         </TabsList>
 
         <TabsContent value="financial" className="space-y-4">
@@ -41,13 +41,13 @@ export default function AdminReportsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Laporan Penjualan (PDF)
+                Sales Report (PDF)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-4 items-end max-w-2xl">
                 <div className="space-y-2 flex-1">
-                  <label className="text-sm font-medium">Tanggal Mulai</label>
+                  <label className="text-sm font-medium">Start Date</label>
                   <Input
                     type="date"
                     value={startDate}
@@ -55,7 +55,7 @@ export default function AdminReportsPage() {
                   />
                 </div>
                 <div className="space-y-2 flex-1">
-                  <label className="text-sm font-medium">Tanggal Selesai</label>
+                  <label className="text-sm font-medium">End Date</label>
                   <Input
                     type="date"
                     value={endDate}
@@ -68,11 +68,11 @@ export default function AdminReportsPage() {
                   className="bg-primary"
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  {loading ? "Menyiapkan..." : "Cetak Laporan"}
+                  {loading ? "Preparing..." : "Print Report"}
                 </Button>
               </div>
               <p className="mt-6 text-sm text-muted-foreground">
-                Laporan ini berisi rincian semua pesanan yang telah diselesaikan (PAID/COMPLETED) dalam rentang tanggal yang dipilih.
+                This report contains details of all completed orders (PAID/COMPLETED) within the selected date range.
               </p>
             </CardContent>
           </Card>
@@ -81,10 +81,10 @@ export default function AdminReportsPage() {
         <TabsContent value="inbound">
           <Card>
             <CardHeader>
-              <CardTitle>Barang Masuk</CardTitle>
+              <CardTitle>Incoming Goods</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Fitur pencatatan barang masuk akan segera hadir.</p>
+              <p className="text-muted-foreground">Incoming goods recording feature is coming soon.</p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -92,10 +92,10 @@ export default function AdminReportsPage() {
         <TabsContent value="outbound">
           <Card>
             <CardHeader>
-              <CardTitle>Barang Keluar</CardTitle>
+              <CardTitle>Outgoing Goods</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Fitur pencatatan barang keluar akan segera hadir.</p>
+              <p className="text-muted-foreground">Outgoing goods recording feature is coming soon.</p>
             </CardContent>
           </Card>
         </TabsContent>

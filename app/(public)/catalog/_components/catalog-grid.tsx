@@ -79,7 +79,7 @@ export function CatalogGrid() {
         setHasMore(currentPage * itemsPerPage < total);
       } catch (err) {
         console.error("Failed to fetch products:", err);
-        setError("Gagal memuat produk. Coba lagi nanti bos!");
+        setError("Failed to load products. Please try again later!");
       } finally {
         setLoading(false);
       }

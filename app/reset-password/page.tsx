@@ -22,27 +22,27 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      toast.error("Token reset tidak valid atau hilang.");
+      toast.error("Reset token is invalid or missing.");
     }
   }, [token]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return toast.error("Token reset tidak valid.");
-    if (password !== confirmPassword) return toast.error("Password tidak cocok.");
-    if (password.length < 8) return toast.error("Password minimal 8 karakter.");
+    if (!token) return toast.error("Invalid reset token.");
+    if (password !== confirmPassword) return toast.error("Passwords do not match.");
+    if (password.length < 8) return toast.error("Password must be at least 8 characters.");
 
     setIsLoading(true);
 
     try {
       await resetUserPassword({ token, password });
       setIsSuccess(true);
-      toast.success("Password berhasil diperbarui!");
+      toast.success("Password updated successfully!");
       setTimeout(() => {
         router.push("/login");
       }, 3000);
     } catch (error: any) {
-      toast.error(error.message || "Gagal mereset password");
+      toast.error(error.message || "Failed to reset password");
     } finally {
       setIsLoading(false);
     }

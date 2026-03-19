@@ -1,18 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, User, Lock, LogOut } from "lucide-react";
+import { Loader2, User, Lock, LogOut, MapPin, Pencil } from "lucide-react";
 import { fetchUserProfile, updateUserProfile, type Customer } from "@/lib/api-service";
 import { logoutUser } from "@/lib/auth-service";
 import { toast } from "sonner";
 import { getCookie, setCookie } from "@/lib/cookie-utils";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import dynamic from "next/dynamic";
+import type { PickedLocation } from "@/components/map/map-picker";
+
+// Dynamically import MapPicker to avoid SSR error with Leaflet
+const MapPicker = dynamic(
+  () => import("@/components/map/map-picker").then((m) => m.MapPicker),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[350px] flex items-center justify-center rounded-xl border border-border bg-muted/20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    ),
+  }
+);
 
 export default function CustomerProfilePage() {
   const router = useRouter();
@@ -22,11 +45,16 @@ export default function CustomerProfilePage() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showMapDialog, setShowMapDialog] = useState(false);
+  const [pendingLocation, setPendingLocation] = useState<PickedLocation | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     address: "",
+    addressNotes: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -44,6 +72,9 @@ export default function CustomerProfilePage() {
           name: data.name || "",
           phone: data.phone || "",
           address: data.address || "",
+          addressNotes: data.addressNotes || "",
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
         });
       } catch (error) {
         console.error("Failed to load profile:", error);
@@ -54,6 +85,23 @@ export default function CustomerProfilePage() {
     }
     loadProfile();
   }, []);
+
+  const handleLocationPick = useCallback((location: PickedLocation) => {
+    setPendingLocation(location);
+  }, []);
+
+  const handleConfirmLocation = () => {
+    if (!pendingLocation) return;
+    setFormData((prev) => ({
+      ...prev,
+      address: pendingLocation.address,
+      latitude: pendingLocation.lat,
+      longitude: pendingLocation.lng,
+    }));
+    setShowMapDialog(false);
+    setPendingLocation(null);
+    toast.success("Location selected! You can now refine the address details.");
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +148,6 @@ export default function CustomerProfilePage() {
 
     try {
       setChangingPassword(true);
-      // Call password change endpoint
       const token = getCookie("emobo-token");
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, {
         method: "POST",
@@ -205,25 +252,76 @@ export default function CustomerProfilePage() {
                 id="phone"
                 type="tel"
                 disabled={!isEditing}
-                placeholder="08123456789"
+                placeholder="e.g. 08123456789"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                disabled={!isEditing}
-                placeholder="Street address, city, postal code"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
+            {/* Address Section */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="address">
+                  Street Address
+                  {formData.latitude && formData.longitude && (
+                    <span className="ml-2 text-xs text-emerald-500 font-normal">
+                      ✓ Coordinates saved
+                    </span>
+                  )}
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="address"
+                    required
+                    disabled={!isEditing}
+                    placeholder="Click 'Set on Map' to auto-fill"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="flex-1"
+                  />
+                  {isEditing && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-none gap-1.5 whitespace-nowrap border-primary/40 text-primary hover:bg-primary/10 hover:text-primary"
+                      onClick={() => {
+                        setPendingLocation(null);
+                        setShowMapDialog(true);
+                      }}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Set on Map
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="addressNotes">Additional Details</Label>
+                <Input
+                  id="addressNotes"
+                  disabled={!isEditing}
+                  placeholder="House number, Floor, Apartment name, or Landmarks"
+                  value={formData.addressNotes}
+                  onChange={(e) => setFormData({ ...formData, addressNotes: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground italic">
+                  Provide specific details to help the courier find your location faster.
+                </p>
+              </div>
+
+              {formData.latitude && formData.longitude && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                  <MapPin className="h-3 w-3" />
+                  GPS: {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                </p>
+              )}
             </div>
 
             {!isEditing ? (
               <Button type="button" onClick={() => setIsEditing(true)} className="gap-2">
+                <Pencil className="h-4 w-4" />
                 Edit Profile
               </Button>
             ) : (
@@ -249,6 +347,9 @@ export default function CustomerProfilePage() {
                         name: user.name || "",
                         phone: user.phone || "",
                         address: user.address || "",
+                        addressNotes: user.addressNotes || "",
+                        latitude: user.latitude ?? null,
+                        longitude: user.longitude ?? null,
                       });
                     }
                   }}
@@ -260,6 +361,50 @@ export default function CustomerProfilePage() {
           </form>
         </CardContent>
       </Card>
+
+      {/* Map Location Dialog */}
+      <Dialog open={showMapDialog} onOpenChange={setShowMapDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Set Delivery Location
+            </DialogTitle>
+            <DialogDescription>
+              Click on the map or drag the marker to set your exact location.
+              The address will be automatically detected and can be refined afterwards.
+            </DialogDescription>
+          </DialogHeader>
+
+          <MapPicker
+            initialLat={formData.latitude ?? undefined}
+            initialLng={formData.longitude ?? undefined}
+            onLocationPick={handleLocationPick}
+          />
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowMapDialog(false);
+                setPendingLocation(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={!pendingLocation}
+              onClick={handleConfirmLocation}
+              className="gap-2"
+            >
+              <MapPin className="h-4 w-4" />
+              Confirm Location
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>

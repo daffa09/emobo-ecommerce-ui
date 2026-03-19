@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 
 const adminNavItems: any[] = [
   { name: "Dashboard", href: "/admin", iconName: "Dashboard" },
-  { name: "Manage Barang", href: "/admin/catalog", iconName: "Catalog" },
-  { name: "Penjualan", href: "/admin/reports", iconName: "Reports" },
-  { name: "Manage Order", href: "/admin/transactions", iconName: "Transactions" },
+  { name: "Manage Products", href: "/admin/catalog", iconName: "Catalog" },
+  { name: "Sales Reports", href: "/admin/reports", iconName: "Reports" },
+  { name: "Manage Orders", href: "/admin/transactions", iconName: "Transactions" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

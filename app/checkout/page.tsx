@@ -28,6 +28,7 @@ export default function CheckoutPage() {
   const [shippingInfo, setShippingInfo] = useState<{
     cost: number;
     service: string;
+    etd: string;
     addressData: any;
   } | null>(null)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -50,10 +51,11 @@ export default function CheckoutPage() {
   }, [])
 
   const handleAddressSubmit = (data: any) => {
-    const { shippingCost, shippingService, ...addressData } = data
+    const { shippingCost, shippingService, shippingEtd, ...addressData } = data
     setShippingInfo({
       cost: shippingCost,
       service: shippingService,
+      etd: shippingEtd || "",
       addressData
     })
     setActiveStep("payment")
@@ -84,7 +86,8 @@ export default function CheckoutPage() {
           shippingAddr: shippingInfo.addressData,
           phone: shippingInfo.addressData.phone,
           shippingCost: shippingInfo.cost,
-          shippingService: shippingInfo.service
+          shippingService: shippingInfo.service,
+          estimatedDays: shippingInfo.etd ? parseInt(shippingInfo.etd.split("-")[0]) || null : null,
         })
       })
 

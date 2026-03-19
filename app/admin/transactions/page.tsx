@@ -180,13 +180,13 @@ export default function AdminTransactionsPage() {
                           <span className="text-sm">{order.shippingService}</span>
                           {(order.trackingNumber || order.trackingNo) && (
                             <span className="text-xs text-muted-foreground">
-                              Resi: {order.trackingNumber || order.trackingNo}
+                              No Resi: {order.trackingNumber || order.trackingNo}
                             </span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="text-zinc-300 text-sm">
-                        {new Date(order.createdAt).toLocaleDateString('id-ID')}
+                        {new Date(order.createdAt).toLocaleDateString('en-US')}
                       </TableCell>
                       <TableCell>
                         <Select

@@ -23,7 +23,7 @@ export interface AddressFormData {
 }
 
 interface AddressFormProps {
-  onSubmit: (data: AddressFormData & { shippingCost: number; shippingService: string }) => void;
+  onSubmit: (data: AddressFormData & { shippingCost: number; shippingService: string; shippingEtd: string }) => void;
   totalWeight: number;
 }
 
@@ -145,6 +145,7 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
 
   const [selectedService, setSelectedService] = useState("")
   const [selectedCost, setSelectedCost] = useState(0)
+  const [selectedEtd, setSelectedEtd] = useState("")
 
   const handleFormSubmit = (data: AddressFormData) => {
     if (!selectedService || selectedCost === 0) {
@@ -154,7 +155,8 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
     onSubmit({
       ...data,
       shippingCost: selectedCost,
-      shippingService: `${courier.toUpperCase()} - ${selectedService}`
+      shippingService: `${courier.toUpperCase()} - ${selectedService}`,
+      shippingEtd: selectedEtd,
     })
   }
 
@@ -333,6 +335,7 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
               if (opt) {
                 setSelectedService(val);
                 setSelectedCost(opt.cost[0].value);
+                setSelectedEtd(opt.cost[0].etd || "");
               }
             }}
             disabled={loadingCost || shippingOptions.length === 0}

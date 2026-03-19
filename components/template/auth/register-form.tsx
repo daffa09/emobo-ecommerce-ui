@@ -20,8 +20,8 @@ export function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirmPassword) {
-      setError("Password tidak cocok!")
+    if (confirmPassword && password !== confirmPassword) {
+      setError("Passwords do not match!")
       return
     }
 
@@ -32,7 +32,7 @@ export function RegisterForm() {
       await registerUser(email, password, fullName)
       setIsSuccess(true)
     } catch (err: any) {
-      setError(err.message || "Gagal melakukan pendaftaran")
+      setError(err.message || "Registration failed")
     } finally {
       setIsLoading(false)
     }
@@ -47,14 +47,14 @@ export function RegisterForm() {
           </div>
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold">Cek Email Kamu!</h2>
+          <h2 className="text-2xl font-bold">Check Your Email!</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Link konfirmasi sudah dikirim ke <span className="font-bold text-foreground">{email}</span>.
-            Silakan klik link tersebut untuk mengaktifkan akun kamu sebelum login.
+            A confirmation link has been sent to <span className="font-bold text-foreground">{email}</span>.
+            Please click the link to activate your account before logging in.
           </p>
         </div>
         <Button asChild className="w-full bg-primary hover:bg-primary-dark transition-smooth text-white">
-          <Link href="/login">Kembali ke Login</Link>
+          <Link href="/login">Back to Login</Link>
         </Button>
       </div>
     )

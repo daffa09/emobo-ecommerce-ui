@@ -102,7 +102,7 @@ export default function CustomerTransactionsPage() {
                     )}
                     {order.trackingNo && (
                       <p className="text-sm font-mono">
-                        Tracking: {order.trackingNo}
+                        No Resi: {order.trackingNo}
                       </p>
                     )}
                     <Link href={`/customer/transactions/${order.id}`}>

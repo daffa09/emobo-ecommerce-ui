@@ -40,7 +40,7 @@ export default function PrintReportPage() {
             "Authorization": `Bearer ${token}`
           }
         });
-        if (!res.ok) throw new Error("Gagal mengambil data laporan");
+        if (!res.ok) throw new Error("Failed to fetch report data");
         const json = await res.json();
         setData(json);
       } catch (err) {
@@ -63,53 +63,53 @@ export default function PrintReportPage() {
     }
   }, [data]);
 
-  if (loading) return <div className="p-8 text-center">Memuat data laporan...</div>;
-  if (!data) return <div className="p-8 text-center text-red-500">Data laporan tidak ditemukan.</div>;
+  if (loading) return <div className="p-8 text-center">Loading report data...</div>;
+  if (!data) return <div className="p-8 text-center text-red-500">Report data not found.</div>;
 
   return (
     <div className="p-8 max-w-4xl mx-auto bg-white text-black min-h-screen">
       <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-4">
         <div>
-          <h1 className="text-3xl font-bold uppercase">Laporan Penjualan</h1>
+          <h1 className="text-3xl font-bold uppercase">Sales Report</h1>
           <p className="text-gray-600">Emobo Ecommerce</p>
         </div>
         <div className="text-right">
-          <p className="font-semibold">Periode:</p>
-          <p>{data.period.startDate ? new Date(data.period.startDate).toLocaleDateString("id-ID") : "-"} - {data.period.endDate ? new Date(data.period.endDate).toLocaleDateString("id-ID") : "-"}</p>
+          <p className="font-semibold">Period:</p>
+          <p>{data.period.startDate ? new Date(data.period.startDate).toLocaleDateString("en-US") : "-"} - {data.period.endDate ? new Date(data.period.endDate).toLocaleDateString("en-US") : "-"}</p>
         </div>
       </div>
 
       <table className="w-full border-collapse mb-8">
         <thead>
           <tr className="bg-gray-100 border-y-2 border-black">
-            <th className="p-2 text-left border border-gray-300">Tanggal</th>
+            <th className="p-2 text-left border border-gray-300">Date</th>
             <th className="p-2 text-left border border-gray-300">Order ID</th>
-            <th className="p-2 text-left border border-gray-300">Pelanggan</th>
+            <th className="p-2 text-left border border-gray-300">Customer</th>
             <th className="p-2 text-right border border-gray-300">Total</th>
           </tr>
         </thead>
         <tbody>
           {data.orders.map((order) => (
             <tr key={order.id} className="border-b border-gray-200">
-              <td className="p-2 border border-gray-300">{new Date(order.date).toLocaleDateString("id-ID")}</td>
+              <td className="p-2 border border-gray-300">{new Date(order.date).toLocaleDateString("en-US")}</td>
               <td className="p-2 border border-gray-300">#{order.id}</td>
               <td className="p-2 border border-gray-300">{order.customer}</td>
-              <td className="p-2 text-right border border-gray-300">Rp {order.totalAmount.toLocaleString("id-ID")}</td>
+              <td className="p-2 text-right border border-gray-300">Rp {order.totalAmount.toLocaleString("en-ID")}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr className="font-bold bg-gray-50">
-            <td colSpan={3} className="p-2 text-right border border-gray-300">TOTAL PENJUALAN</td>
-            <td className="p-2 text-right border border-gray-300">Rp {data.totalSales.toLocaleString("id-ID")}</td>
+            <td colSpan={3} className="p-2 text-right border border-gray-300">TOTAL SALES</td>
+            <td className="p-2 text-right border border-gray-300">Rp {data.totalSales.toLocaleString("en-ID")}</td>
           </tr>
         </tfoot>
       </table>
 
       <div className="mt-12 flex justify-end">
         <div className="text-center w-48">
-          <p>Dicetak pada:</p>
-          <p className="mb-16">{new Date().toLocaleDateString("id-ID")}</p>
+          <p>Printed on:</p>
+          <p className="mb-16">{new Date().toLocaleDateString("en-US")}</p>
           <div className="border-t border-black">Admin Emobo</div>
         </div>
       </div>

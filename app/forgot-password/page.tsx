@@ -21,9 +21,9 @@ export default function ForgotPasswordPage() {
     try {
       await requestForgotPassword(email);
       setIsSubmitted(true);
-      toast.success("Link reset password telah dikirim!");
+      toast.success("Password reset link has been sent!");
     } catch (error: any) {
-      toast.error(error.message || "Gagal memproses permintaan");
+      toast.error(error.message || "Failed to process request");
     } finally {
       setIsLoading(false);
     }

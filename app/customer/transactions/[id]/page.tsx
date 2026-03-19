@@ -18,7 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2 } from "lucide-react";
-import { fetchOrderById, cancelOrder, type Order } from "@/lib/api-service";
+import { fetchOrderById, cancelOrder, confirmOrderReceived, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
@@ -48,6 +48,7 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     async function loadOrder() {
@@ -161,6 +162,22 @@ export default function OrderDetailPage() {
       toast.error(err.message || "Failed to cancel order");
     } finally {
       setIsCancelling(false);
+    }
+  };
+
+  const handleConfirmReceived = async () => {
+    if (!order || isConfirming) return;
+    setIsConfirming(true);
+    try {
+      await confirmOrderReceived(order.id);
+      toast.success("Order confirmed received!", {
+        description: "Thank you for shopping at Emobo!",
+      });
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to confirm order");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -422,7 +439,7 @@ export default function OrderDetailPage() {
               </div>
               {(order.trackingNo || order.trackingNumber) && (
                 <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">No Resi</p>
                   <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
                     <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNo || order.trackingNumber}</p>
                     <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {
@@ -432,6 +449,43 @@ export default function OrderDetailPage() {
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {order.status === "SHIPPED" && (
+                <div className="pt-3 border-t border-slate-700/50">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-3">
+                    <p className="text-xs font-bold text-blue-400 mb-1">📦 Order Shipped</p>
+                    <p className="text-xs text-slate-400">
+                      If the order has been received, please confirm immediately. The order will be automatically completed if not confirmed within 3 days after the notification is received.
+                    </p>
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                        disabled={isConfirming}
+                      >
+                        {isConfirming ? (
+                          <><Loader2 className="h-4 w-4 animate-spin" /> Confirming...</>
+                        ) : (
+                          <>✅ Confirm Order Received</>
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Order Receipt?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-400">
+                          Have you received this order? This action will complete the order and cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white">Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmReceived} className="bg-emerald-600 hover:bg-emerald-700 text-white border-0">Yes, Order Received</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               )}
             </CardContent>

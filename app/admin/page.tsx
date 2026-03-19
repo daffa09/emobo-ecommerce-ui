@@ -137,8 +137,8 @@ export default function AdminDashboardPage() {
             <div className="p-6">
               <div className="space-y-2">
                 {[
-                  { name: "Manage Barang", href: "/admin/catalog" },
-                  { name: "Manage Order", href: "/admin/transactions" },
+                  { name: "Manage Products", href: "/admin/catalog" },
+                  { name: "Manage Orders", href: "/admin/transactions" },
                   { name: "View Customers", href: "/admin/customers" },
                   { name: "Sales Reports", href: "/admin/reports" }
                 ].map((action, i) => (

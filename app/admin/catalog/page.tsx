@@ -325,7 +325,7 @@ export default function AdminCatalogPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400">
-              Barang yang sudah memiliki riwayat transaksi atau stok akan tetap disimpan sebagai arsip (soft delete). Barang yang belum ada transaksi dan sudah kosong stoknya akan dihapus permanen.
+              Products with transaction history or stock will be archived (soft delete). Products without transactions and empty stock will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

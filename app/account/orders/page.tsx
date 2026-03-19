@@ -80,7 +80,7 @@ export default function OrdersPage() {
           })
         })
       }
-      toast.success("Review berhasil dikirim!")
+      toast.success("Review sent successfully!")
       setReviewOrder(null)
       setComment("")
       setRating(5)
@@ -106,10 +106,10 @@ export default function OrdersPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success("Pesanan berhasil dibatalkan");
+        toast.success("Order cancelled successfully");
         fetchOrders();
       } else {
-        toast.error(data.message || "Gagal membatalkan pesanan");
+        toast.error(data.message || "Failed to cancel order");
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -118,24 +118,24 @@ export default function OrdersPage() {
     }
   };
 
-  if (loading) return <div className="container-emobo py-12">Memuat pesanan...</div>
+  if (loading) return <div className="container-emobo py-12">Loading orders...</div>
 
   return (
     <div className="container-emobo py-12">
       <div className="max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Pesanan Saya</h1>
+        <h1 className="text-3xl font-bold mb-8">My Orders</h1>
 
         <Tabs defaultValue="all" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="all">Semua</TabsTrigger>
+            <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="processing">Diproses</TabsTrigger>
-            <TabsTrigger value="completed">Selesai</TabsTrigger>
+            <TabsTrigger value="processing">Processing</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
             {orders.length === 0 ? (
-              <p className="text-muted text-center py-10">Belum ada pesanan.</p>
+              <p className="text-muted text-center py-10">No orders yet.</p>
             ) : (
               orders.map((order) => (
                 <Card key={order.id} className="p-6 space-y-4">
@@ -172,7 +172,7 @@ export default function OrdersPage() {
                   {/* Total */}
                   <div className="border-t border-border pt-4 flex justify-between items-center">
                     <div>
-                      <p className="text-xs text-muted">Total Pembayaran</p>
+                      <p className="text-xs text-muted">Total Payment</p>
                       <span className="text-xl font-bold text-primary">{formatIDR(order.totalAmount)}</span>
                     </div>
                     <div className="flex gap-2">
@@ -184,7 +184,7 @@ export default function OrdersPage() {
                           onClick={() => setReviewOrder(order)}
                         >
                           <Star className="w-4 h-4 mr-2" />
-                          Beri Review
+                          Write Review
                         </Button>
                       )}
                       <Button variant="outline" size="sm">
@@ -197,7 +197,7 @@ export default function OrdersPage() {
                           size="sm"
                           onClick={() => handleCancelOrder(order.id)}
                         >
-                          Batalkan
+                          Cancel
                         </Button>
                       )}
                     </div>
@@ -213,9 +213,9 @@ export default function OrdersPage() {
       <Sheet open={!!reviewOrder} onOpenChange={() => setReviewOrder(null)}>
         <SheetContent side="bottom" className="h-auto max-h-[90vh]">
           <SheetHeader>
-            <SheetTitle>Beri Review</SheetTitle>
+            <SheetTitle>Write a Review</SheetTitle>
             <SheetDescription>
-              Bagikan pengalaman Anda menggunakan produk ini.
+              Share your experience using this product.
             </SheetDescription>
           </SheetHeader>
           <div className="space-y-4 py-4">
@@ -229,16 +229,16 @@ export default function OrdersPage() {
               ))}
             </div>
             <Textarea
-              placeholder="Tulis ulasan Anda di sini..."
+              placeholder="Write your review here..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}
             />
           </div>
           <SheetFooter className="pb-8">
-            <Button variant="outline" onClick={() => setReviewOrder(null)}>Batal</Button>
+            <Button variant="outline" onClick={() => setReviewOrder(null)}>Cancel</Button>
             <Button onClick={handleReviewSubmit} disabled={submittingReview}>
-              {submittingReview ? "Mengirim..." : "Kirim Review"}
+              {submittingReview ? "Sending..." : "Submit Review"}
             </Button>
           </SheetFooter>
         </SheetContent>
@@ -246,18 +246,18 @@ export default function OrdersPage() {
       <AlertDialog open={!!orderToCancel} onOpenChange={(open) => !open && setOrderToCancel(null)}>
         <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Batalkan Pesanan?</AlertDialogTitle>
+            <AlertDialogTitle>Cancel Order?</AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-400">
-              Apakah Anda yakin ingin membatalkan pesanan ini? Stok produk akan dikembalikan secara otomatis. Tindakan ini tidak dapat dibatalkan.
+              Are you sure you want to cancel this order? Product stock will be automatically returned. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 hover:text-white">Kembali</AlertDialogCancel>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700 hover:text-white">Back</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmCancelOrder}
               className="bg-red-600 hover:bg-red-700 text-white border-none"
             >
-              Ya, Batalkan
+              Yes, Cancel
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

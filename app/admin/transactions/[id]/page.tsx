@@ -55,8 +55,8 @@ export default function OrderDetailPage() {
 
   const handleMarkAsShipped = async () => {
     if (!trackingInput.trim()) {
-      toast.error("Tracking number required", {
-        description: "Please enter a tracking number (no resi) to mark this order as shipped.",
+      toast.error("No Resi is required", {
+        description: "Please enter the No Resi to mark this order as shipped.",
       });
       return;
     }
@@ -64,7 +64,7 @@ export default function OrderDetailPage() {
       setIsShipping(true);
       await updateOrderStatus(orderId, "SHIPPED", trackingInput.trim());
       toast.success("Order marked as Shipped!", {
-        description: `Tracking number ${trackingInput.trim()} has been saved.`,
+        description: `No Resi ${trackingInput.trim()} has been saved.`,
       });
       // Reload the order data
       const updated = await fetchOrderById(orderId);
@@ -326,7 +326,7 @@ export default function OrderDetailPage() {
               </div>
               {order.trackingNo ? (
                 <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">No Resi</p>
                   <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
                     <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNo}</p>
                     <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {
@@ -340,7 +340,7 @@ export default function OrderDetailPage() {
               ) : (
                 order.trackingNumber ? (
                   <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase mb-2">No Resi</p>
                     <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
                       <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNumber}</p>
                       <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {
@@ -352,7 +352,7 @@ export default function OrderDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-500">No tracking number yet.</p>
+                  <p className="text-xs text-slate-500">No Resi has not been added yet.</p>
                 )
               )}
 
@@ -361,7 +361,7 @@ export default function OrderDetailPage() {
                 <div className="pt-2 border-t border-slate-700/50 space-y-3">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mark as Shipped</p>
                   <Input
-                    placeholder="Enter tracking number (no resi)..."
+                    placeholder="Enter No Resi..."
                     value={trackingInput}
                     onChange={(e) => setTrackingInput(e.target.value)}
                     className="bg-slate-800/60 border-slate-600 text-white placeholder:text-slate-500 text-sm"
@@ -373,9 +373,9 @@ export default function OrderDetailPage() {
                     disabled={isShipping || !trackingInput.trim()}
                   >
                     {isShipping ? (
-                      <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+                      <><Loader2 className="h-4 v-4 animate-spin" /> Saving...</>
                     ) : (
-                      <><Send className="h-4 w-4" /> Confirm Shipment</>  
+                      <><Send className="h-4 w-4" /> Confirm Shipping</>  
                     )}
                   </Button>
                 </div>
