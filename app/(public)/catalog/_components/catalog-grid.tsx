@@ -48,6 +48,13 @@ export function CatalogGrid() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Force grid view on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode("grid");
+    }
+  }, [isMobile]);
+
   useEffect(() => {
     async function loadProducts() {
       try {
@@ -69,10 +76,10 @@ export function CatalogGrid() {
 
         const { products: data, total } = await fetchPublicProducts(params);
         
-        if (currentPage === 1) {
-          setProducts(data);
-        } else {
+        if (isMobile && currentPage > 1) {
           setProducts(prev => [...prev, ...data]);
+        } else {
+          setProducts(data);
         }
         
         setTotalProducts(total);
@@ -85,12 +92,15 @@ export function CatalogGrid() {
       }
     }
     loadProducts();
-  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy, currentPage]);
+  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy, currentPage, isMobile]);
 
-  // Reset page when filters change
+  // Reset page when filters or view mode change
   useEffect(() => {
     setCurrentPage(1);
-  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy]);
+    if (!isMobile) {
+      setProducts([]); // Clear products when switching to desktop to ensure fresh load
+    }
+  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy, isMobile]);
 
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
@@ -154,78 +164,76 @@ export function CatalogGrid() {
   return (
     <div className="space-y-8">
       {/* Toolbar */}
-      <div className="bg-white dark:bg-slate-900/40 p-4 sm:p-5 rounded-2xl border border-border/50 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-6">
-        <div>
-          <h2 className="text-xl font-bold dark:text-white">
-            {searchParam ? `Results for "${searchParam}"` : "Laptop Catalog"}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Showing <span className="font-bold text-primary">{products.length}</span> of <span className="font-medium text-foreground dark:text-slate-300">{totalProducts}</span> items
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-          {/* Mobile Filters Trigger */}
-          <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full h-10 rounded-xl gap-2 border-border/50 hover:bg-primary/5 hover:text-primary transition-all">
-                  <Filter className="h-4 w-4" />
-                  Filters
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] overflow-y-auto pt-10 border-l-border/50 bg-background/95 backdrop-blur-md">
-                <SheetHeader className="mb-6">
-                  <SheetTitle className="text-2xl font-bold">Adjust Filters</SheetTitle>
-                </SheetHeader>
-                <CatalogFilters />
-              </SheetContent>
-            </Sheet>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold dark:text-white">
+              {searchParam ? `Results for "${searchParam}"` : "Laptop Catalog"}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-bold text-primary">{products.length}</span> of <span className="font-medium text-foreground dark:text-slate-300">{totalProducts}</span> items
+            </p>
           </div>
+          
+          <div className="flex items-center gap-2 justify-between sm:justify-end">
+            {/* Mobile Filters Trigger */}
+            <div className="lg:hidden shrink-0">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="h-10 rounded-xl gap-2 border-border/50 hover:bg-primary/5 hover:text-primary transition-all">
+                    <Filter className="h-4 w-4" />
+                    Filters
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] overflow-y-auto pt-10 border-l-border/50 bg-background/95 backdrop-blur-md">
+                  <SheetHeader className="mb-6">
+                    <SheetTitle className="text-2xl font-bold">Adjust Filters</SheetTitle>
+                  </SheetHeader>
+                  <CatalogFilters />
+                </SheetContent>
+              </Sheet>
+            </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">Sort:</span>
-            <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-              <SelectTrigger className="flex-1 sm:w-[160px] h-10 rounded-xl bg-background border-border/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="featured">Featured</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="newest">Newest</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="hidden sm:block h-8 w-px bg-border/50 mx-1" />
-
-          <div className="col-span-2 flex items-center justify-between sm:justify-start gap-1 pt-2 sm:pt-0 border-t border-border/30 sm:border-none">
-            <span className="sm:hidden text-xs font-bold text-muted-foreground/70 uppercase tracking-wider">Layout Mode</span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                className={`h-10 w-10 rounded-xl transition-all ${viewMode === "grid" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10"}`}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="h-5 w-5" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                className={`h-10 w-10 rounded-xl transition-all ${viewMode === "list" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10"}`}
-                onClick={() => setViewMode("list")}
-              >
-                <LayoutList className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-initial">
+              <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+                <SelectTrigger className="w-full sm:w-[160px] h-10 rounded-xl bg-background border-border/50">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="featured">Featured</SelectItem>
+                  <SelectItem value="price-low">Price: Low-High</SelectItem>
+                  <SelectItem value="price-high">Price: High-Low</SelectItem>
+                  <SelectItem value="newest">Newest</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Layout Mode - Hidden on Mobile */}
+        <div className="hidden sm:flex items-center justify-between pt-4 border-t border-border/30">
+          <span className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wider">Layout Mode</span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="icon"
+              className={`h-9 w-9 rounded-xl transition-all ${viewMode === "grid" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10"}`}
+              onClick={() => setViewMode("grid")}
+            >
+              <LayoutGrid className="h-4.5 w-4.5" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="icon"
+              className={`h-9 w-9 rounded-xl transition-all ${viewMode === "list" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10"}`}
+              onClick={() => setViewMode("list")}
+            >
+              <LayoutList className="h-4.5 w-4.5" />
+            </Button>
+          </div>
+        </div>
 
       {/* Products Display */}
-      {loading ? (
+      {loading && products.length === 0 ? (
         <div className="flex flex-col justify-center items-center py-32 space-y-4">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <p className="text-muted-foreground font-medium animate-pulse">Hunting laptops for you...</p>
@@ -238,7 +246,7 @@ export function CatalogGrid() {
       ) : products.length > 0 ? (
         <>
           {viewMode === "grid" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
               {products.map((product: Product) => (
                 <ProductCard
                   key={product.id}

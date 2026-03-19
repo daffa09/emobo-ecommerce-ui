@@ -37,7 +37,7 @@ export default function CustomerDashboardPage() {
           fetchUserProfile(),
           fetchTopSellingProducts(4)
         ]);
-        
+
         setOrders(ordersData);
         setProfile(profileData);
         setRecommendedProducts(productsData);
@@ -105,20 +105,6 @@ export default function CustomerDashboardPage() {
             Glad to see you back. Here is a summary of your shopping activity.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-           <Link href="/customer/profile">
-            <Button variant="outline" className="rounded-xl gap-2 shadow-sm">
-              <User className="h-4 w-4" />
-              Manage Profile
-            </Button>
-           </Link>
-           <Link href="/catalog">
-            <Button className="rounded-xl gap-2 shadow-lg shadow-primary/20">
-              <ShoppingBag className="h-4 w-4" />
-              Shop Again
-            </Button>
-           </Link>
-        </div>
       </div>
 
       {/* Main Stats Grid */}
@@ -133,7 +119,7 @@ export default function CustomerDashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">Since you joined</p>
           </CardContent>
         </Card>
-        
+
         <Card className="border-none bg-linear-to-br from-blue-500/10 to-transparent shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Delivery</CardTitle>
@@ -301,7 +287,7 @@ export default function CustomerDashboardPage() {
             <Button variant="link" className="text-primary font-bold">View All</Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
           {recommendedProducts.map((product) => (
             <ProductCard
               key={product.id}

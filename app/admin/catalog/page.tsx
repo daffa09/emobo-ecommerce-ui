@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Edit, Trash2, Plus, LayoutGrid, LayoutList, Star, Cpu, HardDrive, PackageCheck, PackageX } from "lucide-react";
-import { fetchAllProducts, deleteProduct, type Product } from "@/lib/api-service";
-import { formatIDR } from "@/lib/utils";
+import { Loader2, Search, Edit, Trash2, Plus, LayoutGrid, LayoutList, PackageCheck, PackageX } from "lucide-react";
+import { fetchAdminProducts, deleteProduct, type Product } from "@/lib/api-service";
+import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useInView } from "react-intersection-observer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,16 +21,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Image from "next/image";
 
 export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 12;
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: "200px",
+  });
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Force grid view on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode("grid");
+    }
+  }, [isMobile]);
 
   const getImageUrl = (url?: string) => {
     if (!url) return "/no-image.svg";
@@ -38,36 +67,55 @@ export default function AdminCatalogPage() {
   };
 
   useEffect(() => {
-    loadProducts();
+    loadProducts(1, false);
   }, []);
 
+  // Trigger load more on mobile infinite scroll
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredProducts(products);
-    } else {
-      const query = searchQuery.toLowerCase();
-      setFilteredProducts(
-        products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(query) ||
-            p.sku.toLowerCase().includes(query) ||
-            p.brand.toLowerCase().includes(query)
-        )
-      );
+    if (inView && hasMore && isMobile && !loading && !loadingMore) {
+      loadProducts(page + 1, true);
     }
-  }, [searchQuery, products]);
+  }, [inView, hasMore, isMobile, loading, loadingMore, page]);
 
-  async function loadProducts() {
+  // Handle Search with debounce or direct reset
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(1);
+      loadProducts(1, false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  async function loadProducts(targetPage: number, append: boolean = false) {
     try {
-      setLoading(true);
-      const data = await fetchAllProducts();
-      setProducts(data);
-      setFilteredProducts(data);
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
+      const offset = (targetPage - 1) * LIMIT;
+      const response = await fetchAdminProducts({
+        search: searchQuery,
+        limit: LIMIT,
+        offset: offset,
+      });
+
+      if (append) {
+        setProducts((prev) => [...prev, ...response.products]);
+      } else {
+        setProducts(response.products);
+      }
+
+      setTotalProducts(response.total);
+      setPage(targetPage);
+      setHasMore(offset + response.products.length < response.total);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       toast.error("Failed to load products");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }
 
@@ -82,7 +130,7 @@ export default function AdminCatalogPage() {
       setDeleting(productToDelete.id);
       await deleteProduct(productToDelete.id);
       toast.success("Product deleted successfully");
-      loadProducts();
+      loadProducts(page, false);
     } catch (error: any) {
       console.error("Failed to delete product:", error);
       toast.error(error.message || "Failed to delete product");
@@ -105,17 +153,17 @@ export default function AdminCatalogPage() {
       </div>
 
       <div className="bg-zinc-900/50 p-4 sm:p-5 rounded-2xl border border-zinc-800/50 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-6">
-        <div>
+        <div className="flex-1">
           <h2 className="text-xl font-bold text-white">
             {searchQuery ? `Results for "${searchQuery}"` : "Product Catalog"}
           </h2>
           <p className="text-sm text-zinc-400">
-            Showing <span className="font-bold text-primary">{filteredProducts.length}</span> items
+            Total <span className="font-bold text-primary">{totalProducts}</span> items
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64 col-span-2 sm:col-span-1">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by SKU, Name, or Brand..."
@@ -127,26 +175,24 @@ export default function AdminCatalogPage() {
 
           <div className="hidden sm:block h-8 w-px bg-zinc-800 mx-1" />
 
-          <div className="col-span-2 flex items-center justify-between sm:justify-start gap-1 pt-2 sm:pt-0">
-            <span className="sm:hidden text-xs font-bold text-zinc-500 uppercase tracking-wider">Layout</span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="icon"
-                className={`h-10 w-10 rounded-xl transition-all ${viewMode === "grid" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10 text-zinc-400"}`}
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="h-5 w-5" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="icon"
-                className={`h-10 w-10 rounded-xl transition-all ${viewMode === "list" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10 text-zinc-400"}`}
-                onClick={() => setViewMode("list")}
-              >
-                <LayoutList className="h-5 w-5" />
-              </Button>
-            </div>
+          {/* Layout Toggle - Hidden on Mobile */}
+          <div className="hidden sm:flex items-center gap-1">
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="icon"
+              className={`h-10 w-10 rounded-xl transition-all ${viewMode === "grid" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10 text-zinc-400"}`}
+              onClick={() => setViewMode("grid")}
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="icon"
+              className={`h-10 w-10 rounded-xl transition-all ${viewMode === "list" ? "shadow-lg shadow-primary/20 scale-105" : "hover:bg-primary/10 text-zinc-400"}`}
+              onClick={() => setViewMode("list")}
+            >
+              <LayoutList className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -156,7 +202,7 @@ export default function AdminCatalogPage() {
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
           <p className="text-zinc-400 font-medium animate-pulse">Loading products data...</p>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : products.length === 0 ? (
         <div className="text-center py-20 bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-800/50">
           <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Search className="w-10 h-10 text-primary opacity-20" />
@@ -168,10 +214,10 @@ export default function AdminCatalogPage() {
       ) : (
         <>
           {viewMode === "grid" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
+              {products.map((product) => (
                 <Card key={product.id} className="group overflow-hidden bg-zinc-900/50 border-zinc-800 hover:shadow-xl hover:border-zinc-700 transition-all flex flex-col">
-                  <div className="relative aspect-square bg-zinc-800/50 overflow-hidden">
+                  <div className="relative aspect-16/11 bg-zinc-800/50 overflow-hidden">
                     <img
                       src={getImageUrl(product.images?.[0])}
                       alt={product.name}
@@ -184,19 +230,19 @@ export default function AdminCatalogPage() {
                       {product.brand}
                     </Badge>
                   </div>
-                  <CardContent className="p-4 flex flex-col flex-1 space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                       <h3 className="font-semibold text-white line-clamp-2 min-h-[48px] leading-tight">
-                         {product.name}
-                       </h3>
+                  <CardContent className="p-3 sm:p-4 flex flex-col flex-1 space-y-2.5">
+                    <div className="flex items-start justify-between gap-1.5">
+                      <h3 className="font-semibold text-white line-clamp-2 min-h-[36px] leading-tight text-xs sm:text-sm">
+                        {product.name}
+                      </h3>
                     </div>
                     
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="text-xs bg-zinc-800/50 border-zinc-700 text-zinc-300 font-mono">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+                      <Badge variant="outline" className="text-[9px] sm:text-[10px] bg-zinc-800/50 border-zinc-700 text-zinc-300 font-mono">
                          {product.sku}
                       </Badge>
                       <Badge 
-                        className="text-xs"
+                        className="text-[9px] sm:text-[10px]"
                         variant={
                             product.stock > 10
                               ? "default"
@@ -205,30 +251,30 @@ export default function AdminCatalogPage() {
                                 : "destructive"
                           }
                       >
-                         {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                         {product.stock > 0 ? `${product.stock} Stock` : "Empty"}
                       </Badge>
                     </div>
 
-                    <div className="mt-auto pt-2">
-                      <span className="text-lg font-bold text-primary block mb-3">{formatIDR(product.price)}</span>
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="mt-auto pt-1 sm:pt-2">
+                      <span className="text-sm sm:text-base font-bold text-primary block mb-1.5 sm:mb-2">{formatIDR(product.price)}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                         <Link href={`/admin/catalog/${product.id}`} className="w-full">
-                          <Button variant="outline" size="sm" className="w-full h-9 rounded-lg border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 text-zinc-100">
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
+                          <Button variant="outline" size="sm" className="w-full h-7 sm:h-8 rounded-lg border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800 text-zinc-100 text-[10px] sm:text-xs">
+                            <Edit className="h-3 w-3 mr-1 sm:mr-1.5" />
+                             Edit
                           </Button>
                         </Link>
                         <Button 
                           variant="destructive" 
                           size="sm" 
-                          className="w-full h-9 rounded-lg"
+                          className="w-full h-7 sm:h-8 rounded-lg text-[10px] sm:text-xs"
                           onClick={() => handleDelete(product)}
                           disabled={deleting === product.id}
                         >
                           {deleting === product.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <Loader2 className="h-3 w-3 animate-spin" />
                           ) : (
-                            <Trash2 className="h-4 w-4 mr-2" />
+                            <Trash2 className="h-3 w-3 mr-1 sm:mr-1.5" />
                           )}
                           Delete
                         </Button>
@@ -240,7 +286,7 @@ export default function AdminCatalogPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <div key={product.id} className="bg-zinc-900/50 rounded-3xl border border-zinc-800 p-5 flex flex-col md:flex-row gap-6 hover:shadow-xl hover:border-zinc-700 transition-all group overflow-hidden">
                   <div className="w-full md:w-48 h-40 rounded-2xl overflow-hidden bg-zinc-800/50 shrink-0 relative">
                     <img
@@ -315,6 +361,75 @@ export default function AdminCatalogPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Desktop Pagination */}
+          {!isMobile && totalProducts > LIMIT && (
+            <div className="flex items-center justify-center gap-2 py-8">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => loadProducts(page - 1)}
+                disabled={page === 1 || loading}
+                className="bg-zinc-900 border-zinc-800 text-white"
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.ceil(totalProducts / LIMIT) }, (_, i) => i + 1).map((p) => {
+                  // Show limited page numbers if too many
+                  const totalPages = Math.ceil(totalProducts / LIMIT);
+                  if (
+                    p === 1 ||
+                    p === totalPages ||
+                    (p >= page - 1 && p <= page + 1)
+                  ) {
+                    return (
+                      <Button
+                        key={p}
+                        variant={p === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => loadProducts(p)}
+                        disabled={loading}
+                        className={cn(
+                          "w-9 h-9 p-0",
+                          p === page ? "bg-primary text-black" : "bg-zinc-900 border-zinc-800 text-white"
+                        )}
+                      >
+                        {p}
+                      </Button>
+                    );
+                  } else if (p === page - 2 || p === page + 2) {
+                    return <span key={p} className="text-zinc-600 px-1">...</span>;
+                  }
+                  return null;
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => loadProducts(page + 1)}
+                disabled={!hasMore || loading}
+                className="bg-zinc-900 border-zinc-800 text-white"
+              >
+                Next
+              </Button>
+            </div>
+          )}
+
+          {/* Mobile Loading Sentinel */}
+          {isMobile && (
+            <div ref={ref} className="py-10 flex justify-center">
+              {loadingMore && (
+                <div className="flex items-center gap-3 text-zinc-500">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  <span className="text-sm font-bold">LOADING MORE...</span>
+                </div>
+              )}
+              {!hasMore && products.length > 0 && (
+                <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">End of Catalog</p>
+              )}
             </div>
           )}
         </>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Users, CreditCard, Package, Loader2, ChevronRight, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatIDR, cn } from "@/lib/utils";
-import { fetchSalesReport, fetchAllProducts, fetchAllOrders, type SalesReport, type Order } from "@/lib/api-service";
+import { fetchSalesReport, fetchAdminProducts, fetchAllOrders, type SalesReport, type Order } from "@/lib/api-service";
 
 export default function AdminDashboardPage() {
   const [report, setReport] = useState<SalesReport | null>(null);
@@ -16,13 +16,13 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [salesData, products, orders] = await Promise.all([
+        const [salesData, orders, productData] = await Promise.all([
           fetchSalesReport(),
-          fetchAllProducts(),
           fetchAllOrders(),
+          fetchAdminProducts({ limit: 1 })
         ]);
         setReport(salesData);
-        setProductCount(products.length);
+        setProductCount(productData.total);
         setRecentOrders(orders.slice(0, 3));
       } catch (error) {
         console.error("Failed to fetch admin dashboard data:", error);
@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: "Active Products",
-      val: productCount.toString(),
+      val: (productCount || 0).toString(),
       icon: <Package className="w-5 h-5 text-amber-500" />,
     },
   ];

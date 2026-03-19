@@ -53,10 +53,10 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 container-emobo py-10">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Shopping Cart</h1>
-            <Link href="/customer/catalog">
-              <Button variant="outline">Back to Catalog</Button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold">Shopping Cart</h1>
+            <Link href="/customer/catalog" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full sm:w-auto">Back to Catalog</Button>
             </Link>
           </div>
 

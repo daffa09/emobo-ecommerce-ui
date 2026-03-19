@@ -19,7 +19,7 @@ export function MobileBottomNav({ items, user, profileLink }: MobileBottomNavPro
   // and slice to max 4 to allow space for the explicit Profile button
   const filteredItems = items
     .filter(item => item.href !== profileLink && !item.name.toLowerCase().includes("profile"))
-    .slice(0, 4);
+    .slice(0, 5);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-black/80 backdrop-blur-xl border-t border-slate-800 px-2 py-3 pb-safe">
@@ -48,24 +48,6 @@ export function MobileBottomNav({ items, user, profileLink }: MobileBottomNavPro
             </Link>
           );
         })}
-
-        {/* Explicit Profile Button at the end */}
-        {user && (
-          <Link
-            href={profileLink}
-            className={cn(
-              "flex flex-col items-center justify-center relative p-2 rounded-xl transition-all duration-300",
-              pathname.startsWith(profileLink)
-                ? "text-primary scale-110"
-                : "text-slate-500 hover:text-slate-300"
-            )}
-          >
-            <User className={cn("h-6 w-6 transition-all", pathname.startsWith(profileLink) ? "stroke-[2.5px]" : "stroke-2")} />
-            {pathname.startsWith(profileLink) && (
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.6)]" />
-            )}
-          </Link>
-        )}
       </nav>
     </div>
   );

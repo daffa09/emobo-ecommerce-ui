@@ -248,6 +248,49 @@ export async function fetchAllProducts(): Promise<Product[]> {
   return handleResponse<Product[]>(response);
 }
 
+export async function fetchAdminProducts(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ products: Product[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+  const url = `${API_URL}/products${queryParams.toString() ? `?${queryParams}` : ""}`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders(),
+  });
+  const data = await handleResponse<any>(response);
+  
+  if (Array.isArray(data)) {
+    let allProducts = data;
+
+    if (params?.search) {
+      const q = params.search.toLowerCase();
+      allProducts = allProducts.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        (p.sku && p.sku.toLowerCase().includes(q)) || 
+        (p.brand && p.brand.toLowerCase().includes(q))
+      );
+    }
+
+    // Implement client-side slicing as fallback
+    const start = params?.offset || 0;
+    const limit = params?.limit || allProducts.length;
+    return {
+      products: allProducts.slice(start, start + limit),
+      total: allProducts.length
+    };
+  }
+  
+  return {
+    products: data.products || [],
+    total: data.total || 0
+  };
+}
+
 export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">): Promise<Product> {
   const response = await fetch(`${API_URL}/products`, {
     method: "POST",

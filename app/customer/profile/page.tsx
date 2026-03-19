@@ -336,10 +336,10 @@ export default function CustomerProfilePage() {
                     "Update Changes"
                   )}
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  disabled={saving} 
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={saving}
                   onClick={() => {
                     setIsEditing(false);
                     if (user) {
@@ -468,22 +468,6 @@ export default function CustomerProfilePage() {
           </form>
         </CardContent>
       </Card>
-
-      <div className="flex justify-end pt-4">
-        <Button
-          variant="outline"
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="rounded-xl border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white border transition-all duration-300 px-8"
-        >
-          {loggingOut ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <LogOut className="h-4 w-4 mr-2" />
-          )}
-          Logout from Account
-        </Button>
-      </div>
     </div>
   );
 }

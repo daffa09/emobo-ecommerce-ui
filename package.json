@@ -62,6 +62,7 @@
     "react-day-picker": "9.8.0",
     "react-dom": "19.2.0",
     "react-hook-form": "latest",
+    "react-intersection-observer": "^10.0.3",
     "react-leaflet": "^5.0.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "latest",

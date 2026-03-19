@@ -19,6 +19,7 @@ import {
 import { Settings, LogOut, Package } from "lucide-react";
 import { getCookie } from "@/lib/cookie-utils";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { WhatsAppCTA } from "./whatsapp-cta";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -31,6 +32,7 @@ interface DashboardShellProps {
 export function DashboardShell({ children, navItems, roleName, roleDescription, hideHeaderProfile }: DashboardShellProps) {
   const [user, setUser] = useState<any>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -38,6 +40,13 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const fetchUserNotifications = async () => {
@@ -127,7 +136,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
       <div className="flex h-screen w-full overflow-hidden bg-black text-slate-200 font-sans">
         <DashboardSidebar items={navItems} roleName={roleName} roleDescription={roleDescription} />
         <main className="flex-1 overflow-y-auto relative bg-black">
-          <header className="sticky top-0 z-30 flex h-20 items-center bg-black/80 backdrop-blur-md border-b border-slate-800 px-8">
+          <header className="sticky top-0 z-30 flex h-20 items-center bg-black/80 backdrop-blur-md border-b border-slate-800 px-4 md:px-8">
             {/* Left: Sidebar Toggle & Title */}
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hidden md:flex h-9 w-9 text-slate-400 hover:text-white transition-all hover:bg-slate-800 rounded-lg" />
@@ -139,7 +148,11 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
             </div>
 
             {/* Right: Date, Notification & Profile */}
-            <div className="ml-auto flex items-center gap-4">
+            <div className="ml-auto flex items-center gap-2 sm:gap-4">
+              {/* WhatsApp CTA */}
+              <WhatsAppCTA variant="header" />
+
+              {/* Notification Popover ... */}
               <div className="hidden lg:flex flex-col items-end">
                 <p className="text-xs font-black text-slate-100 leading-none">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
@@ -164,7 +177,11 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
                     )}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[380px] p-0 bg-slate-900 border-slate-800 shadow-2xl shadow-black/50" align="end" sideOffset={8}>
+                <PopoverContent 
+                  className="w-[300px] sm:w-[380px] p-0 bg-slate-900 border-slate-800 shadow-2xl shadow-black/50" 
+                  align={isMobile ? "center" : "end"} 
+                  sideOffset={8}
+                >
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
                     <h3 className="text-sm font-black text-white uppercase tracking-wider">Notifications</h3>
@@ -231,7 +248,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
               {user && !hideHeaderProfile && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="relative hidden md:flex w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 hover:border-primary/50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <button className="relative flex w-10 h-10 rounded-full overflow-hidden border-2 border-slate-700 hover:border-primary/50 transition-all focus:outline-none focus:ring-2 focus:ring-primary/30">
                       <Avatar className="w-full h-full">
                         <AvatarImage src={user.image} alt={user.name || "User"} />
                         <AvatarFallback className="bg-primary/20 text-primary font-bold text-sm">

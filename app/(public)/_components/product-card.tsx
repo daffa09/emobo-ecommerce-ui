@@ -63,49 +63,53 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-xl transition-all">
+    <Card className="group overflow-hidden hover:shadow-lg transition-all border-border/50">
       <Link href={`/products/${id}`}>
         <div className="relative">
           {discount && (
-            <Badge className="absolute top-3 right-3 z-10 bg-red-500">
+            <Badge className="absolute top-2 left-2 z-10 bg-red-500 text-[10px] px-1.5 h-5">
               {discount} OFF
             </Badge>
           )}
-          <div className="relative aspect-square bg-muted/50 overflow-hidden">
+          <div className="relative aspect-4/3 bg-muted/30 overflow-hidden">
             <Image
               src={imgSrc}
               alt={name}
               fill
-              className="object-cover group-hover:scale-110 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
               onError={() => setImgSrc("/no-image.svg")}
             />
           </div>
         </div>
       </Link>
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="p-3 space-y-2">
         <Link href={`/products/${id}`}>
-          <h3 className="font-semibold line-clamp-2 min-h-[48px] hover:text-primary transition-colors">
+          <h3 className="text-sm font-bold line-clamp-2 min-h-[40px] leading-tight hover:text-primary transition-colors">
             {name}
           </h3>
         </Link>
-        {rating > 0 && (
-          <div className="flex items-center gap-1 text-sm">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="font-medium">{rating}</span>
-            <span className="text-muted-foreground">({reviews})</span>
+        
+        <div className="flex items-center justify-between">
+          {rating > 0 && (
+            <div className="flex items-center gap-1 text-[11px]">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <span className="font-bold">{rating}</span>
+              <span className="text-muted-foreground">({reviews})</span>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1">
+            {specs.slice(0, 2).map((spec, idx) => (
+              <Badge key={idx} variant="secondary" className="text-[10px] px-1 h-4 font-medium uppercase tracking-tighter">
+                {spec}
+              </Badge>
+            ))}
           </div>
-        )}
-        <div className="flex flex-wrap gap-1">
-          {specs.map((spec, idx) => (
-            <Badge key={idx} variant="secondary" className="text-xs">
-              {spec}
-            </Badge>
-          ))}
         </div>
-        <div className="flex items-center justify-between pt-2 gap-2">
-          <span className="text-md font-bold text-primary">{formatIDR(Number(price))}</span>
-          <Button size="sm" className="rounded-sm" onClick={handleAddToCart}>
-            <ShoppingCart className="h-4 w-4" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-2">
+          <span className="text-sm sm:text-base font-black text-primary">{formatIDR(Number(price))}</span>
+          <Button size="sm" className="h-9 sm:h-8 w-full sm:w-auto rounded-lg text-xs gap-1.5" onClick={handleAddToCart}>
+            <ShoppingCart className="h-3.5 w-3.5" />
             Add
           </Button>
         </div>

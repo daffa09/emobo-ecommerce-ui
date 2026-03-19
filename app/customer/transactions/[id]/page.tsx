@@ -230,26 +230,33 @@ export default function OrderDetailPage() {
 
       {/* Visual Status Tracker */}
       {!isCancelled && (
-        <Card className="bg-slate-900/50 border-slate-800">
+        <Card className="bg-slate-900/50 border-slate-800 overflow-hidden">
           <CardContent className="pt-10 pb-12 px-6 md:px-12">
             <div className="relative">
-              {/* Connection Lines */}
-              <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-800 z-0" />
+              {/* Connection Lines (Desktop) */}
+              <div className="hidden md:block absolute top-5 left-0 w-full h-0.5 bg-slate-800 z-0" />
               <div
-                className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-1000 z-0"
+                className="hidden md:block absolute top-5 left-0 h-0.5 bg-primary transition-all duration-1000 z-0"
                 style={{ width: `${(currentStepIndex / (ORDER_STEPS.length - 1)) * 100}%` }}
               />
 
+              {/* Connection Lines (Mobile) */}
+              <div className="md:hidden absolute left-5 top-0 bottom-0 w-0.5 bg-slate-800 z-0" />
+              <div
+                className="md:hidden absolute left-5 top-0 w-0.5 bg-primary transition-all duration-1000 z-0"
+                style={{ height: `${(currentStepIndex / (ORDER_STEPS.length - 1)) * 100}%` }}
+              />
+
               {/* Steps */}
-              <div className="flex justify-between relative z-10">
+              <div className="flex flex-col md:flex-row justify-between relative z-10 gap-8 md:gap-0">
                 {ORDER_STEPS.map((step, idx) => {
                   const isCompleted = idx < currentStepIndex || order.status === "COMPLETED";
                   const isCurrent = idx === currentStepIndex && order.status !== "COMPLETED";
 
                   return (
-                    <div key={step.status} className="flex flex-col items-center text-center max-w-[120px]">
+                    <div key={step.status} className="flex md:flex-col items-center md:items-center text-left md:text-center md:max-w-[120px] gap-4 md:gap-0">
                       <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center border-4 transition-all duration-500",
+                        "w-10 h-10 rounded-full flex items-center justify-center border-4 transition-all duration-500 shrink-0",
                         isCompleted ? "bg-primary border-primary text-white" :
                           isCurrent ? "bg-slate-900 border-primary text-primary animate-pulse" :
                             "bg-slate-900 border-slate-800 text-slate-600"
@@ -262,11 +269,11 @@ export default function OrderDetailPage() {
                           <span className="text-xs font-bold">{idx + 1}</span>
                         )}
                       </div>
-                      <div className="mt-4">
+                      <div className="md:mt-4">
                         <p className={cn("text-xs font-black uppercase tracking-tighter", isCompleted || isCurrent ? "text-white" : "text-slate-600")}>
                           {step.label}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-medium mt-1 leading-tight hidden md:block">
+                        <p className="text-[10px] text-slate-500 font-medium mt-1 leading-tight">
                           {isCurrent ? step.description : isCompleted ? (idx === 3 ? "Delivered safe" : "Done") : "Next step"}
                         </p>
                       </div>
@@ -291,8 +298,8 @@ export default function OrderDetailPage() {
           <CardContent className="p-0">
             <div className="divide-y divide-slate-800">
               {order.items?.map((item) => (
-                <div key={item.id} className="flex gap-6 p-6 hover:bg-slate-800/20 transition-colors">
-                  <div className="h-24 w-24 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
+                <div key={item.id} className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 hover:bg-slate-800/20 transition-colors">
+                  <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
                     {item.product?.images[0] && (
                       <img
                         src={`${process.env.NEXT_PUBLIC_API_URL}${item.product.images[0]}`}
@@ -302,15 +309,15 @@ export default function OrderDetailPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <h3 className="font-bold text-white text-lg leading-tight truncate">{item.product?.name}</h3>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">SKU: {item.product?.sku}</p>
-                    <div className="flex items-center gap-4 mt-3">
+                    <h3 className="font-bold text-white text-base sm:text-lg leading-tight truncate">{item.product?.name}</h3>
+                    <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">SKU: {item.product?.sku}</p>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
                       <p className="text-sm font-black text-primary">{formatIDR(item.price || item.unitPrice)}</p>
-                      <span className="h-1 w-1 rounded-full bg-slate-700" />
-                      <p className="text-xs text-slate-400 font-bold">Qty: {item.quantity}</p>
+                      <span className="hidden sm:block h-1 w-1 rounded-full bg-slate-700" />
+                      <p className="text-[10px] sm:text-xs text-slate-400 font-bold">Qty: {item.quantity}</p>
                     </div>
                   </div>
-                  <div className="text-right flex flex-col justify-center">
+                  <div className="text-left sm:text-right flex flex-col justify-center pt-2 sm:pt-0 border-t border-slate-800/50 sm:border-0">
                     <p className="font-black text-white">{formatIDR((item.price || item.unitPrice) * item.quantity)}</p>
                   </div>
                 </div>
