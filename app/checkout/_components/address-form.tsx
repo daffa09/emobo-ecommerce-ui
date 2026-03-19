@@ -3,10 +3,12 @@ import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useForm } from "react-hook-form"
 import { fetchProvinces, fetchCities, calculateShippingCost, fetchUserProfile, type ShippingProvince, type ShippingCity, type ShippingCost } from "@/lib/api-service"
 import { toast } from "sonner"
-import { Loader2 } from "lucide-react"
+import { Loader2, Check, ChevronsUpDown } from "lucide-react"
 import { getCookie } from "@/lib/cookie-utils"
 import { cn } from "@/lib/utils"
 
@@ -32,6 +34,8 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
   const [loading, setLoading] = useState(false)
   const [loadingCost, setLoadingCost] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(true)
+  const [openProvince, setOpenProvince] = useState(false)
+  const [openCity, setOpenCity] = useState(false)
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AddressFormData>({
     defaultValues: {
@@ -203,33 +207,107 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">Province</label>
-          <Select onValueChange={(val) => setValue("provinceId", val)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Province" />
-            </SelectTrigger>
-            <SelectContent>
-              {provinces.map((p) => (
-                <SelectItem key={p.province_id} value={p.province_id}>
-                  {p.province}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openProvince} onOpenChange={setOpenProvince}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={openProvince}
+                className={cn(
+                  "w-full justify-between h-auto min-h-10 text-left font-normal bg-muted/20 border-zinc-800 hover:bg-muted/50 transition-colors",
+                  !provinceId && "text-muted-foreground"
+                )}
+              >
+                {provinceId
+                  ? provinces.find((p) => p.province_id === provinceId)?.province
+                  : "Select Province"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0 border-zinc-800 bg-zinc-950">
+              <Command className="bg-transparent">
+                <CommandInput placeholder="Search province..." className="h-9 focus:ring-0 border-none" />
+                <CommandList className="max-h-[200px] overflow-y-auto">
+                  <CommandEmpty>No province found.</CommandEmpty>
+                  <CommandGroup>
+                    {provinces.map((p) => (
+                      <CommandItem
+                        key={p.province_id}
+                        value={p.province}
+                        onSelect={() => {
+                          setValue("provinceId", p.province_id)
+                          setValue("cityId", "") // reset city
+                          setOpenProvince(false)
+                        }}
+                        className="cursor-pointer hover:bg-zinc-800/50 aria-selected:bg-zinc-800"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4 text-primary",
+                            p.province_id === provinceId ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {p.province}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">City/Regency</label>
-          <Select onValueChange={(val) => setValue("cityId", val)} disabled={!provinceId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select City" />
-            </SelectTrigger>
-            <SelectContent>
-              {cities.map((c) => (
-                <SelectItem key={c.city_id} value={c.city_id}>
-                  {c.type} {c.city_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openCity} onOpenChange={setOpenCity}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={openCity}
+                disabled={!provinceId}
+                className={cn(
+                  "w-full justify-between h-auto min-h-10 text-left font-normal bg-muted/20 border-zinc-800 hover:bg-muted/50 transition-colors disabled:opacity-50",
+                  !cityId && "text-muted-foreground"
+                )}
+              >
+                {cityId
+                  ? cities.find((c) => c.city_id === cityId)
+                    ? `${cities.find((c) => c.city_id === cityId)?.type} ${cities.find((c) => c.city_id === cityId)?.city_name}`
+                    : "Select City"
+                  : "Select City"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0 border-zinc-800 bg-zinc-950">
+              <Command className="bg-transparent">
+                <CommandInput placeholder="Search city..." className="h-9 focus:ring-0 border-none" />
+                <CommandList className="max-h-[200px] overflow-y-auto">
+                  <CommandEmpty>No city found.</CommandEmpty>
+                  <CommandGroup>
+                    {cities.map((c) => (
+                      <CommandItem
+                        key={c.city_id}
+                        value={`${c.type} ${c.city_name}`}
+                        onSelect={() => {
+                          setValue("cityId", c.city_id)
+                          setOpenCity(false)
+                        }}
+                        className="cursor-pointer hover:bg-zinc-800/50 aria-selected:bg-zinc-800"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4 text-primary",
+                            c.city_id === cityId ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {c.type} {c.city_name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

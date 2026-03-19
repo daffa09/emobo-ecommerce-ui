@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ProductCard } from "../../_components/product-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, LayoutGrid, LayoutList, Loader2, Star, Cpu, HardDrive, Filter } from "lucide-react";
@@ -11,9 +11,15 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CatalogFilters } from "./catalog-filters";
+import { useCart } from "@/lib/cart-context";
+import { toast } from "sonner";
+import { getImageUrl } from "@/lib/utils";
+import { getCookie } from "@/lib/cookie-utils";
 
 export function CatalogGrid() {
   const searchParams = useSearchParams();
+  const { addItem } = useCart();
+  const router = useRouter();
 
   // URL Params
   const brandParam = searchParams.get("brand");
@@ -29,7 +35,18 @@ export function CatalogGrid() {
   const [sortBy, setSortBy] = useState<"featured" | "price-low" | "price-high" | "newest">("featured");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const loaderRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 8;
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     async function loadProducts() {
@@ -51,8 +68,15 @@ export function CatalogGrid() {
         else if (sortBy === "newest") params.sortBy = "newest";
 
         const { products: data, total } = await fetchPublicProducts(params);
-        setProducts(data);
+        
+        if (currentPage === 1) {
+          setProducts(data);
+        } else {
+          setProducts(prev => [...prev, ...data]);
+        }
+        
         setTotalProducts(total);
+        setHasMore(currentPage * itemsPerPage < total);
       } catch (err) {
         console.error("Failed to fetch products:", err);
         setError("Gagal memuat produk. Coba lagi nanti bos!");
@@ -70,6 +94,25 @@ export function CatalogGrid() {
 
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
+  // Intersection Observer for Infinite Scroll
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore && !loading && isMobile) {
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [hasMore, loading, isMobile]);
+
+  useEffect(() => {
+    const option = {
+      root: null,
+      rootMargin: "200px",
+      threshold: 0,
+    };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 300, behavior: "smooth" });
@@ -81,6 +124,31 @@ export function CatalogGrid() {
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(price);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    // Check if user is authenticated
+    const token = getCookie("emobo-token");
+    if (!token) {
+      toast.error("Please login first", {
+        description: "You need to be logged in to add items to your cart.",
+      });
+      router.push("/login");
+      return;
+    }
+
+    addItem({
+      id: product.id,
+      sku: product.sku,
+      name: product.name,
+      price: product.price,
+      image: getImageUrl(product.images[0]),
+      weight: product.weight || 1500,
+    }, 1);
+
+    toast.success("Added to cart!", {
+      description: `1 item(s) added to your cart.`,
+    });
   };
 
   return (
@@ -171,13 +239,13 @@ export function CatalogGrid() {
         <>
           {viewMode === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
+              {products.map((product: Product) => (
                 <ProductCard
                   key={product.id}
                   id={product.id}
                   name={product.name}
                   price={product.price.toString()}
-                  image={product.images[0] || "/no-image.svg"}
+                  image={getImageUrl(product.images[0])}
                   rating={4.8}
                   reviews={Math.floor(Math.random() * 50) + 10}
                   specs={[product.brand, product.category]}
@@ -186,11 +254,11 @@ export function CatalogGrid() {
             </div>
           ) : (
             <div className="space-y-4">
-              {products.map((product) => (
+              {products.map((product: Product) => (
                 <div key={product.id} className="bg-white dark:bg-slate-900/50 rounded-3xl border border-border p-5 flex flex-col md:flex-row gap-8 hover:shadow-xl hover:shadow-primary/5 transition-all group overflow-hidden relative">
                   <div className="w-full md:w-64 h-48 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 relative">
                     <img
-                      src={product.images[0] || "/no-image.svg"}
+                      src={getImageUrl(product.images[0])}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
@@ -238,15 +306,22 @@ export function CatalogGrid() {
                     <Button asChild className="w-full rounded-xl bg-primary hover:bg-primary-dark shadow-lg shadow-primary/20">
                       <Link href={`/product/${product.id}`}>View Details</Link>
                     </Button>
-                    <Button variant="outline" className="w-full rounded-xl hover:bg-primary/5 hover:text-primary transition-all">Add to Cart</Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={product.stock === 0}
+                    >
+                      {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Pagination UI */}
-          {totalPages > 1 && (
+          {/* Pagination UI - Only for Desktop or when manual page change is needed */}
+          {totalPages > 1 && (!isMobile) && (
             <div className="flex justify-center items-center gap-3 pt-12">
               <Button
                 variant="outline"
@@ -259,20 +334,29 @@ export function CatalogGrid() {
               </Button>
 
               <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="icon"
-                    onClick={() => handlePageChange(page)}
-                    className={`h-11 w-11 rounded-xl transition-all font-bold ${currentPage === page
-                      ? "shadow-lg shadow-primary/25 scale-110"
-                      : "hover:border-primary hover:text-primary"
-                      }`}
-                  >
-                    {page}
-                  </Button>
-                ))}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  // Simple range logic for pagination
+                  let pageNum = i + 1;
+                  if (totalPages > 5 && currentPage > 3) {
+                    pageNum = currentPage - 3 + i + 1;
+                    if (pageNum > totalPages) pageNum = totalPages - (4 - i);
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`h-11 w-11 rounded-xl transition-all font-bold ${currentPage === pageNum
+                        ? "shadow-lg shadow-primary/25 scale-110"
+                        : "hover:border-primary hover:text-primary"
+                        }`}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
               </div>
 
               <Button
@@ -284,6 +368,20 @@ export function CatalogGrid() {
               >
                 <ChevronRight className="h-5 w-5" />
               </Button>
+            </div>
+          )}
+
+          {/* Infinite Scroll Trigger for Mobile - Intersection Target */}
+          {isMobile && (
+            <div ref={loaderRef} className="flex justify-center pt-12 pb-20">
+              {hasMore ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-xs font-bold text-primary uppercase tracking-widest animate-pulse">Loading more...</p>
+                </div>
+              ) : products.length > 0 ? (
+                <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">You've reached the end</p>
+              ) : null}
             </div>
           )}
         </>

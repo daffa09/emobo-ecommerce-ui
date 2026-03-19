@@ -10,7 +10,7 @@ export function CartButton() {
   const { itemCount } = useCart();
 
   return (
-    <Link href="/cart">
+    <Link href="/customer/cart">
       <Button variant="ghost" size="icon" className="relative hover:bg-white/5 transition-smooth rounded-lg">
         <ShoppingCart className="h-5 w-5 text-slate-300" />
         {itemCount > 0 && (

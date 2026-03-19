@@ -34,20 +34,26 @@ export function ProductSpecs({ product }: ProductSpecsProps) {
         <Card>
           <CardContent className="p-6">
             <div className="grid sm:grid-cols-2 gap-6">
-              {Object.entries(product.specifications || {}).map(([category, specs]: [string, any], index: number) => (
-                <div key={index} className="space-y-4">
-                  <h3 className="font-semibold text-lg capitalize">{category.replace(/([A-Z])/g, " $1").trim()}</h3>
-                  <div className="space-y-3 text-sm">
-                    {Object.entries(specs).map(([key, value]: [string, any]) => (
-                      <div key={key} className="flex justify-between">
-                        <span className="text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-                        <span className="font-medium text-right">{value}</span>
-                      </div>
-                    ))}
+              {typeof product.specifications === 'string' && product.specifications.trim() !== '' ? (
+                <div 
+                  className="col-span-2 prose prose-sm dark:prose-invert max-w-none tiptap-editor"
+                  dangerouslySetInnerHTML={{ __html: product.specifications }}
+                />
+              ) : typeof product.specifications === 'object' && product.specifications !== null && Object.keys(product.specifications).length > 0 ? (
+                Object.entries(product.specifications).map(([category, specs]: [string, any], index: number) => (
+                  <div key={index} className="space-y-4">
+                    <h3 className="font-semibold text-lg capitalize">{category.replace(/([A-Z])/g, " $1").trim()}</h3>
+                    <div className="space-y-3 text-sm">
+                      {Object.entries(specs).map(([key, value]: [string, any]) => (
+                        <div key={key} className="flex justify-between">
+                          <span className="text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
+                          <span className="font-medium text-right">{value}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-              {(!product.specifications || Object.keys(product.specifications).length === 0) && (
+                ))
+              ) : (
                 <div className="col-span-2 text-center text-muted-foreground py-8">
                   No specifications available for this product.
                 </div>

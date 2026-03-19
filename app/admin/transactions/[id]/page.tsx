@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
@@ -17,8 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2 } from "lucide-react";
-import { fetchOrderById, cancelOrder, type Order } from "@/lib/api-service";
+import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send } from "lucide-react";
+import { fetchOrderById, cancelOrder, updateOrderStatus, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
@@ -46,8 +47,35 @@ export default function OrderDetailPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isPaying, setIsPaying] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
+  const [trackingInput, setTrackingInput] = useState("");
+  const [isShipping, setIsShipping] = useState(false);
+
+  // Check if page is accessed by admin
+  const isAdmin = getCookie("emobo-role") === "ADMIN";
+
+  const handleMarkAsShipped = async () => {
+    if (!trackingInput.trim()) {
+      toast.error("Tracking number required", {
+        description: "Please enter a tracking number (no resi) to mark this order as shipped.",
+      });
+      return;
+    }
+    try {
+      setIsShipping(true);
+      await updateOrderStatus(orderId, "SHIPPED", trackingInput.trim());
+      toast.success("Order marked as Shipped!", {
+        description: `Tracking number ${trackingInput.trim()} has been saved.`,
+      });
+      // Reload the order data
+      const updated = await fetchOrderById(orderId);
+      setOrder(updated);
+      setTrackingInput("");
+    } catch (err: any) {
+      toast.error("Failed to update order", { description: err.message });
+    } finally {
+      setIsShipping(false);
+    }
+  };
 
   useEffect(() => {
     async function loadOrder() {
@@ -81,7 +109,7 @@ export default function OrderDetailPage() {
       } catch (error) {
         console.error("Failed to load order:", error);
         toast.error("Order not found");
-        router.push("/customer/transactions");
+        router.push("/admin/transactions");
       } finally {
         setLoading(false);
       }
@@ -89,80 +117,7 @@ export default function OrderDetailPage() {
     loadOrder();
   }, [orderId, router]);
 
-  const handlePayment = async () => {
-    if (!order || isPaying) return;
-    setIsPaying(true);
 
-    try {
-      const token = getCookie("emobo-token");
-
-      // 1. Get or create snap token
-      const payRes = await fetch(`${API_URL}/payments/${order.id}/create`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      const payData = await payRes.json();
-      if (!payRes.ok) throw new Error(payData.message);
-
-      const snapToken = payData.data.snapToken;
-
-      // 2. Trigger Midtrans Snap Popup
-      // @ts-ignore
-      window.snap.pay(snapToken, {
-        onSuccess: async (result: any) => {
-          toast.success("Payment Successful!");
-          // Verify on backend to update status immediately
-          try {
-            await fetch(`${API_URL}/payments/${order.id}/verify`, {
-              headers: { "Authorization": `Bearer ${token}` }
-            });
-          } catch (err) {
-            console.error("Verification error:", err);
-          }
-          window.location.reload();
-        },
-        onPending: async (result: any) => {
-          toast.info("Waiting for Payment...");
-          // Also verify/check for pending status
-          try {
-            await fetch(`${API_URL}/payments/${order.id}/verify`, {
-              headers: { "Authorization": `Bearer ${token}` }
-            });
-          } catch (err) { }
-          window.location.reload();
-        },
-        onError: (result: any) => {
-          toast.error("Payment Failed!");
-          setIsPaying(false);
-        },
-        onClose: () => {
-          setIsPaying(false);
-          // Refresh in case they actually paid but closed the popup
-          window.location.reload();
-        }
-      });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to trigger payment");
-      setIsPaying(false);
-    }
-  };
-
-  const handleCancel = async () => {
-    if (!order || isCancelling) return;
-
-    setIsCancelling(true);
-    try {
-      await cancelOrder(order.id);
-      toast.success("Order cancelled successfully");
-      window.location.reload();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to cancel order");
-    } finally {
-      setIsCancelling(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -338,58 +293,7 @@ export default function OrderDetailPage() {
                 </Badge>
               </div>
 
-              {order.status === "PENDING" && order.payment?.status !== "PAID" && (
-                <Button
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
-                  onClick={handlePayment}
-                  disabled={isPaying}
-                >
-                  {isPaying ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Pay Now
-                    </>
-                  )}
-                </Button>
-              )}
 
-              {order.status === "PENDING" && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
-                      disabled={isCancelling || isPaying}
-                    >
-                      {isCancelling ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Cancelling...
-                        </>
-                      ) : (
-                        "Cancel Order"
-                      )}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-slate-400">
-                        Are you sure you want to cancel this order? This will restore the product stock.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white">Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleCancel} className="bg-red-500 hover:bg-red-600 text-white border-0">Confirm Cancel</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
               {order.payment?.paymentMethod && (
                 <div className="flex justify-between items-center">
                   <p className="text-xs font-bold text-slate-500 uppercase">Method</p>
@@ -420,18 +324,60 @@ export default function OrderDetailPage() {
                 <p className="text-xs font-bold text-slate-500 uppercase">Service</p>
                 <p className="text-sm font-bold text-white">{order.shippingService}</p>
               </div>
-              {(order.trackingNo || order.trackingNumber) && (
+              {order.trackingNo ? (
                 <div>
                   <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
                   <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
-                    <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNo || order.trackingNumber}</p>
+                    <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNo}</p>
                     <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {
-                      navigator.clipboard.writeText((order.trackingNo || order.trackingNumber)!);
+                      navigator.clipboard.writeText(order.trackingNo!);
                       toast.success("Copied to clipboard");
                     }}>
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
                     </Button>
                   </div>
+                </div>
+              ) : (
+                order.trackingNumber ? (
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
+                    <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
+                      <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNumber}</p>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {
+                        navigator.clipboard.writeText(order.trackingNumber!);
+                        toast.success("Copied to clipboard");
+                      }}>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">No tracking number yet.</p>
+                )
+              )}
+
+              {/* Admin: Input untuk no resi */}
+              {isAdmin && order.status === "PROCESSING" && (
+                <div className="pt-2 border-t border-slate-700/50 space-y-3">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Mark as Shipped</p>
+                  <Input
+                    placeholder="Enter tracking number (no resi)..."
+                    value={trackingInput}
+                    onChange={(e) => setTrackingInput(e.target.value)}
+                    className="bg-slate-800/60 border-slate-600 text-white placeholder:text-slate-500 text-sm"
+                    onKeyDown={(e) => e.key === "Enter" && handleMarkAsShipped()}
+                  />
+                  <Button
+                    className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleMarkAsShipped}
+                    disabled={isShipping || !trackingInput.trim()}
+                  >
+                    {isShipping ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+                    ) : (
+                      <><Send className="h-4 w-4" /> Confirm Shipment</>  
+                    )}
+                  </Button>
                 </div>
               )}
             </CardContent>

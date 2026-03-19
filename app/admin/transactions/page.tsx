@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,7 @@ export default function AdminTransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [updatingOrder, setUpdatingOrder] = useState<number | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     loadOrders();
@@ -218,7 +220,7 @@ export default function AdminTransactionsPage() {
                           variant="ghost"
                           size="sm"
                           className="gap-2"
-                          onClick={() => window.open(`/customer/transactions/${order.id}`, '_blank')}
+                          onClick={() => router.push(`/admin/transactions/${order.id}`)}
                         >
                           <Eye className="h-4 w-4" />
                           View

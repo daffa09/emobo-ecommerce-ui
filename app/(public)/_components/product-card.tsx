@@ -8,8 +8,10 @@ import Link from "next/link";
 import { Star, ShoppingCart } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
-import { formatIDR } from "@/lib/utils";
+import { formatIDR, getImageUrl } from "@/lib/utils";
 import { useState } from "react";
+import { getCookie } from "@/lib/cookie-utils";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: number;
@@ -26,12 +28,22 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight }: ProductCardProps) {
   const { addItem } = useCart();
-
-  const [imgSrc, setImgSrc] = useState(image || "/no-image.svg");
+  const router = useRouter();
+  const [imgSrc, setImgSrc] = useState(getImageUrl(image));
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Check if user is authenticated
+    const token = getCookie("emobo-token");
+    if (!token) {
+      toast.error("Please login first", {
+        description: "You need to be logged in to add items to your cart.",
+      });
+      router.push("/login");
+      return;
+    }
 
     // Parse price string (e.g., "Rp 1.500.000" to 1500000)
     const numericPrice = parseInt(price.replace(/\D/g, ""));

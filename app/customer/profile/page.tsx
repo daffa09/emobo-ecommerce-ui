@@ -21,6 +21,7 @@ export default function CustomerProfilePage() {
   const [saving, setSaving] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -64,6 +65,7 @@ export default function CustomerProfilePage() {
       // Reload profile
       const data = await fetchUserProfile();
       setUser(data);
+      setIsEditing(false);
 
       // Update cookies to keep user info in sync
       const storedUser = getCookie("emobo-user");
@@ -171,6 +173,7 @@ export default function CustomerProfilePage() {
                 <Input
                   id="name"
                   required
+                  disabled={!isEditing}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
@@ -201,6 +204,7 @@ export default function CustomerProfilePage() {
               <Input
                 id="phone"
                 type="tel"
+                disabled={!isEditing}
                 placeholder="08123456789"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -211,22 +215,48 @@ export default function CustomerProfilePage() {
               <Label htmlFor="address">Address</Label>
               <Input
                 id="address"
+                disabled={!isEditing}
                 placeholder="Street address, city, postal code"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               />
             </div>
 
-            <Button type="submit" disabled={saving} className="gap-2">
-              {saving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
+            {!isEditing ? (
+              <Button type="button" onClick={() => setIsEditing(true)} className="gap-2">
+                Edit Profile
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button type="submit" disabled={saving} className="gap-2">
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Update Changes"
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  disabled={saving} 
+                  onClick={() => {
+                    setIsEditing(false);
+                    if (user) {
+                      setFormData({
+                        name: user.name || "",
+                        phone: user.phone || "",
+                        address: user.address || "",
+                      });
+                    }
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

@@ -13,3 +13,9 @@ export function formatIDR(amount: number) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function getImageUrl(url?: string): string {
+  if (!url) return "/no-image.svg";
+  if (url.startsWith("http")) return url;
+  return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}${url}`;
+}

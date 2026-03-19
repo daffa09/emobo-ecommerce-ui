@@ -2,7 +2,8 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar, NavItem } from "./dashboard-sidebar";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/lib/auth-service";
@@ -15,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Package } from "lucide-react";
 import { getCookie } from "@/lib/cookie-utils";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 
@@ -43,9 +44,11 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
     try {
       const { fetchNotifications } = await import("@/lib/api-service");
       const data = await fetchNotifications();
-      setNotifications(data);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
+      if (Array.isArray(data)) {
+        setNotifications(data);
+      }
+    } catch (error: any) {
+      console.error("Failed to fetch notifications:", error.message || error);
     }
   };
 
@@ -147,9 +150,9 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
                 </p>
               </div>
 
-              {/* Notification Button */}
-              <Sheet>
-                <SheetTrigger asChild>
+              {/* Notification Popover (Tokopedia Style) */}
+              <Popover>
+                <PopoverTrigger asChild>
                   <button className="relative w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-600 transition-all group">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -160,88 +163,109 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
                       </div>
                     )}
                   </button>
-                </SheetTrigger>
-                <SheetContent className="bg-black border-slate-800 text-slate-200 w-full sm:max-w-[400px] flex flex-col p-0">
-                  <div className="p-8 border-b border-slate-800">
-                    <SheetHeader>
-                      <SheetTitle className="text-white flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                          </svg>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-lg font-black tracking-tight leading-none">System Notifications</span>
-                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Real-time alerts</span>
-                        </div>
-                      </SheetTitle>
-                    </SheetHeader>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto px-6 py-8 space-y-4">
-                    {notifications.length > 0 ? (
-                      notifications.map((notif) => (
-                        <div
-                          key={notif.id}
-                          onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
-                          className={`group relative p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${notif.isRead
-                            ? "bg-slate-900/30 border-slate-800/50 opacity-60 hover:opacity-100"
-                            : "bg-slate-800/40 border-slate-700/50 hover:bg-slate-800 hover:border-primary/30 shadow-lg shadow-black/20"
-                            }`}
-                        >
-                          <div className="flex gap-4">
-                            <div className="flex-shrink-0">
-                              {getNotificationIcon(notif.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <p className={`text-[10px] font-black uppercase tracking-widest ${notif.type === "ORDER" ? "text-emerald-500" :
-                                  notif.type === "MESSAGE" ? "text-blue-500" :
-                                    notif.type === "CUSTOMER" ? "text-amber-500" :
-                                      "text-primary"
-                                  }`}>
-                                  {notif.type || "System Alert"}
-                                </p>
-                                <p className="text-[10px] text-slate-500 font-bold">
-                                  {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                              </div>
-                              <p className={`text-sm font-bold mb-1 leading-snug transition-colors ${notif.isRead ? "text-slate-400" : "text-white"}`}>
-                                {notif.title}
-                              </p>
-                              <p className={`text-xs font-medium leading-relaxed ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>
-                                {notif.message}
-                              </p>
-                            </div>
-                          </div>
-                          {!notif.isRead && (
-                            <div className="absolute top-5 right-5 w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center mb-4">
-                          <svg className="w-8 h-8 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                          </svg>
-                        </div>
-                        <p className="text-slate-400 font-bold">No notifications yet</p>
-                        <p className="text-xs text-slate-600 mt-1">We'll alert you when something happens.</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-6 border-t border-slate-800 bg-slate-900/20">
-                    <button
-                      onClick={() => setNotifications(notifications.map(n => ({ ...n, isRead: true })))}
-                      className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all border border-slate-700 hover:text-white"
-                    >
-                      Mark all as read
+                </PopoverTrigger>
+                <PopoverContent className="w-[380px] p-0 bg-slate-900 border-slate-800 shadow-2xl shadow-black/50" align="end" sideOffset={8}>
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Notifikasi</h3>
+                    <button className="text-slate-500 hover:text-white transition-colors">
+                      <Settings className="w-4 h-4" />
                     </button>
                   </div>
-                </SheetContent>
-              </Sheet>
+
+                  <Tabs defaultValue="transactions" className="w-full">
+                    <TabsList className="w-full h-11 bg-transparent border-b border-slate-800 rounded-none p-0">
+                      <TabsTrigger 
+                        value="transactions" 
+                        className="flex-1 h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold transition-all"
+                      >
+                        Transaksi
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="updates" 
+                        className="flex-1 h-full rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold transition-all"
+                      >
+                        Update
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="transactions" className="m-0 max-h-[400px] overflow-y-auto custom-scrollbar">
+                      {notifications.filter(n => n.type === "ORDER").length > 0 ? (
+                        <div className="divide-y divide-slate-800/50">
+                          {notifications.filter(n => n.type === "ORDER").map((notif) => (
+                            <div
+                              key={notif.id}
+                              onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+                              className={`p-4 flex gap-3 transition-colors cursor-pointer hover:bg-slate-800/40 ${!notif.isRead ? "bg-primary/5" : ""}`}
+                            >
+                              <div className="shrink-0 mt-0.5">
+                                {getNotificationIcon(notif.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start">
+                                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter mb-0.5">Info &bull; {new Date(notif.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+                                  {!notif.isRead && <div className="w-2 h-2 bg-primary rounded-full" />}
+                                </div>
+                                <p className={`text-xs font-black leading-snug mb-1 ${notif.isRead ? "text-slate-300" : "text-white"}`}>{notif.title}</p>
+                                <p className={`text-[11px] leading-relaxed line-clamp-2 ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>{notif.message}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-12 flex flex-col items-center justify-center text-center px-6">
+                          <Package className="w-10 h-10 text-slate-800 mb-3" />
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Belum ada transaksi</p>
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="updates" className="m-0 max-h-[400px] overflow-y-auto custom-scrollbar">
+                      {notifications.filter(n => n.type !== "ORDER").length > 0 ? (
+                        <div className="divide-y divide-slate-800/50">
+                          {notifications.filter(n => n.type !== "ORDER").map((notif) => (
+                            <div
+                              key={notif.id}
+                              onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+                              className={`p-4 flex gap-3 transition-colors cursor-pointer hover:bg-slate-800/40 ${!notif.isRead ? "bg-primary/5" : ""}`}
+                            >
+                              <div className="shrink-0 mt-0.5">
+                                {getNotificationIcon(notif.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start">
+                                  <p className="text-[10px] font-bold text-primary uppercase tracking-tighter mb-0.5">Update &bull; {new Date(notif.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</p>
+                                  {!notif.isRead && <div className="w-2 h-2 bg-primary rounded-full" />}
+                                </div>
+                                <p className={`text-xs font-black leading-snug mb-1 ${notif.isRead ? "text-slate-300" : "text-white"}`}>{notif.title}</p>
+                                <p className={`text-[11px] leading-relaxed line-clamp-2 ${notif.isRead ? "text-slate-500" : "text-slate-400"}`}>{notif.message}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-12 flex flex-col items-center justify-center text-center px-6">
+                          <Settings className="w-10 h-10 text-slate-800 mb-3" />
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Belum ada update</p>
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between p-3 border-t border-slate-800 bg-slate-900 overflow-hidden">
+                    <button 
+                      onClick={() => setNotifications(notifications.map(n => ({ ...n, isRead: true })))}
+                      className="text-[11px] font-black text-primary hover:text-primary/80 transition-colors uppercase tracking-tight"
+                    >
+                      Tandai semua dibaca
+                    </button>
+                    <button className="text-[11px] font-black text-primary hover:text-primary/80 transition-colors uppercase tracking-tight">
+                      Lihat selengkapnya
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               {/* Profile Dropdown */}
               {user && !hideHeaderProfile && (

@@ -4,13 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import type { Product } from "@/lib/api-service";
+import { getImageUrl } from "@/lib/utils";
 
 interface ProductImagesProps {
   product: Product;
 }
 
 export function ProductImages({ product }: ProductImagesProps) {
-  const [images, setImages] = useState(product.images.length > 0 ? product.images : ["/no-image.svg"]);
+  const [images, setImages] = useState(product.images.length > 0 ? product.images.map(img => getImageUrl(img)) : ["/no-image.svg"]);
   const [selectedImage, setSelectedImage] = useState(0);
 
   const handleImageError = (index: number) => {

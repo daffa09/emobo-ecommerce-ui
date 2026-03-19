@@ -53,7 +53,12 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 container-emobo py-10">
-          <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">Shopping Cart</h1>
+            <Link href="/customer/catalog">
+              <Button variant="outline">Back to Catalog</Button>
+            </Link>
+          </div>
 
           <div className="max-w-2xl mx-auto">
             <Card>
@@ -63,7 +68,7 @@ export default function CartPage() {
                 <p className="text-muted-foreground mb-6">
                   Looks like you haven't added any items to your cart yet.
                 </p>
-                <Link href="/catalog">
+                <Link href="/customer/catalog">
                   <Button size="lg">Browse Products</Button>
                 </Link>
               </CardContent>
@@ -77,7 +82,12 @@ export default function CartPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 container-emobo py-10">
-        <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Shopping Cart</h1>
+          <Link href="/customer/catalog" className="hidden sm:block">
+            <Button variant="outline">Back to Catalog</Button>
+          </Link>
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Cart Items */}
@@ -132,9 +142,9 @@ export default function CartPage() {
                   {checking ? "Checking..." : "Proceed to Checkout"}
                 </Button>
 
-                <Link href="/catalog" className="block">
+                <Link href="/customer/catalog" className="block">
                   <Button variant="outline" className="w-full">
-                    Continue Shopping
+                    Back to Catalog
                   </Button>
                 </Link>
               </CardContent>

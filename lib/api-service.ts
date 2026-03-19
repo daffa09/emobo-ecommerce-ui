@@ -171,8 +171,15 @@ function getAuthHeaders(): HeadersInit {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Request failed" }));
-    const errorMessage = error.message || `HTTP ${response.status}: ${response.statusText}`;
+    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      if (errorData && errorData.message) {
+        errorMessage = errorData.message;
+      }
+    } catch (e) {
+      // response is not JSON, fallback to HTTP status
+    }
 
     // Handle expired or invalid token automatically
     if (
@@ -238,7 +245,7 @@ export async function fetchAllProducts(): Promise<Product[]> {
   return handleResponse<Product[]>(response);
 }
 
-export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt">): Promise<Product> {
+export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">): Promise<Product> {
   const response = await fetch(`${API_URL}/products`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -401,11 +408,11 @@ export async function fetchAllOrders(): Promise<Order[]> {
   return handleResponse<Order[]>(response);
 }
 
-export async function updateOrderStatus(orderId: number, status: string): Promise<Order> {
+export async function updateOrderStatus(orderId: number, status: string, trackingNo?: string): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
     method: "PUT",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, ...(trackingNo !== undefined ? { trackingNo } : {}) }),
   });
   return handleResponse<Order>(response);
 }

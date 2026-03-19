@@ -8,8 +8,10 @@ import { Star, ShoppingCart, Heart, Share2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
-import { formatIDR } from "@/lib/utils";
+import { formatIDR, getImageUrl } from "@/lib/utils";
 import type { Product } from "@/lib/api-service";
+import { getCookie } from "@/lib/cookie-utils";
+import { useRouter } from "next/navigation";
 
 interface ProductInfoProps {
   product: Product;
@@ -18,14 +20,25 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const router = useRouter();
 
   const handleAddToCart = () => {
+    // Check if user is authenticated
+    const token = getCookie("emobo-token");
+    if (!token) {
+      toast.error("Please login first", {
+        description: "You need to be logged in to add items to your cart.",
+      });
+      router.push("/login");
+      return;
+    }
+
     addItem({
       id: product.id,
       sku: product.sku,
       name: product.name,
       price: product.price,
-      image: product.images[0] || "/placeholder-laptop.jpg",
+      image: getImageUrl(product.images[0]),
       weight: product.weight || 1500, // Default 1.5kg if missing
     }, quantity);
 

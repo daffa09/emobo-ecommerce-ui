@@ -12,6 +12,7 @@ import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createProduct } from "@/lib/api-service";
 import { getCookie } from "@/lib/cookie-utils";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 const BRANDS = ["ASUS", "Lenovo", "Apple", "HP", "Dell", "Acer", "MSI", "Razer"];
 
@@ -112,16 +113,6 @@ export default function NewProductPage() {
       setUploadingImages(false);
 
       // Create product
-      let specifications = {};
-      try {
-        specifications = JSON.parse(formData.specs);
-      } catch (e) {
-        toast.error("Invalid JSON in specifications");
-        setLoading(false);
-        setUploadingImages(false);
-        return;
-      }
-
       await createProduct({
         sku: formData.sku,
         name: formData.name,
@@ -131,7 +122,7 @@ export default function NewProductPage() {
         stock: parseInt(formData.stock),
         description: formData.description,
         images: imageUrls,
-        specifications: specifications,
+        specifications: formData.specs,
         condition: formData.condition,
         warranty: formData.warranty,
         weight: parseInt(formData.weight) || 1500,
@@ -330,16 +321,23 @@ export default function NewProductPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="specs" className="text-zinc-300">Specifications (JSON Format)</Label>
-              <Textarea
-                id="specs"
-                rows={6}
-                placeholder='{"Performance": {"Processor": "i7-1355U", "RAM": "16GB"}, "Display": {"Size": "14 inch"}}'
-                value={formData.specs}
-                onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
-                className="bg-zinc-800/50 border-zinc-700 font-mono text-sm"
+              <div className="flex justify-between items-center">
+                <Label htmlFor="specs" className="text-zinc-300">Specifications</Label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 hover:text-white"
+                  onClick={() => setFormData({ ...formData, specs: `<h2>Performance</h2><ul><li><strong>Processor:</strong> </li><li><strong>Graphics:</strong> </li><li><strong>RAM:</strong> </li></ul><h2>Display</h2><ul><li><strong>Size:</strong> </li><li><strong>Resolution:</strong> </li></ul><h2>Storage</h2><ul><li><strong>Capacity:</strong> </li></ul>` })}
+                >
+                  Fill Template
+                </Button>
+              </div>
+              <RichTextEditor
+                content={formData.specs}
+                onChange={(html) => setFormData({ ...formData, specs: html })}
+                className="mt-2"
               />
-              <p className="text-xs text-muted-foreground">Enter specifications as valid JSON.</p>
             </div>
           </CardContent>
         </Card>
