@@ -3,8 +3,17 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { type Product } from "@/lib/api-service";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  newArrival?: Product | null;
+}
+
+export function HeroSection({ newArrival }: HeroSectionProps) {
+  const displayImage = newArrival?.images?.[0] || "/lenovo-thinkpad-laptop.jpg";
+  const displayName = newArrival?.name || "Zenbook Duo 2026";
+  const productLink = newArrival ? `/products/${newArrival.id}` : "/catalog";
+
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-slate-950">
       {/* Dynamic Background Elements */}
@@ -55,8 +64,8 @@ export function HeroSection() {
               <div className="absolute inset-0 bg-linear-to-tr from-primary/10 to-transparent pointer-events-none" />
               <div className="relative h-full w-full rounded-lg overflow-hidden">
                 <Image
-                  src="/lenovo-thinkpad-laptop.jpg"
-                  alt="Featured High Performance Laptop"
+                  src={displayImage}
+                  alt={displayName}
                   fill
                   className="object-cover transform hover:scale-110 transition-smooth duration-700"
                 />
@@ -64,20 +73,21 @@ export function HeroSection() {
             </div>
 
             {/* Floating Info Badge */}
-            <div className="absolute -bottom-6 -left-6 glass p-6 rounded-lg border-white/10 shadow-2xl animate-float">
+            <Link href={productLink} className="absolute -bottom-6 -left-6 glass p-6 rounded-lg border-white/10 shadow-2xl animate-float block transition-smooth hover:scale-105 hover:border-primary/50 group">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
                   <div className="w-3 h-3 rounded-full bg-primary animate-ping" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 uppercase tracking-widest font-bold">New Arrival</p>
-                  <p className="text-white font-bold">Zenbook Duo 2026</p>
+                  <p className="text-white font-bold group-hover:text-primary transition-colors">{displayName}</p>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </div>
     </section>
   );
 }
+

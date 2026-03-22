@@ -3,12 +3,23 @@ import { CategoriesSection } from "./_components/categories-section";
 import { FeaturedProductsSection } from "./_components/featured-products-section";
 import { BrandsSection } from "./_components/brands-section";
 import { FeaturesSection } from "./_components/features-section";
-import { PerformanceAnalytics } from "./_components/performance-analytics";
+import { fetchPublicProducts } from "@/lib/api-service";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch the latest product for the Hero section
+  let newArrival = null;
+  try {
+    const response = await fetchPublicProducts({ limit: 1, sortBy: "newest" });
+    if (response.products && response.products.length > 0) {
+      newArrival = response.products[0];
+    }
+  } catch (error) {
+    console.error("Failed to fetch new arrival:", error);
+  }
+
   return (
     <div className="flex flex-col gap-0">
-      <HeroSection />
+      <HeroSection newArrival={newArrival} />
       <div className="bg-slate-50">
         <CategoriesSection />
       </div>
@@ -25,3 +36,4 @@ export default function HomePage() {
     </div>
   );
 }
+

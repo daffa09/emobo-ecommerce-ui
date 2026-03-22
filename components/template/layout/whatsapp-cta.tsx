@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle } from "lucide-react";
+import Image from "next/image";
 import { fetchAdminContact } from "@/lib/api-service";
 import { cn } from "@/lib/utils";
 
@@ -34,10 +34,16 @@ export function WhatsAppCTA({ variant = "floating" }: WhatsAppCTAProps) {
         href={waLink}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all group"
+        className="relative w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:border-emerald-500/50 transition-all group"
         title="Chat with us"
       >
-        <MessageCircle className="w-5 h-5 fill-current" />
+        <Image 
+          src="/ic_wa.png" 
+          alt="WhatsApp" 
+          width={20} 
+          height={20} 
+          className="w-5 h-5 object-contain"
+        />
         <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
       </a>
     );
@@ -59,9 +65,16 @@ export function WhatsAppCTA({ variant = "floating" }: WhatsAppCTAProps) {
       <div className="relative">
         <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-25 group-hover:opacity-40" />
         <div className="relative w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-[0_0_30px_rgba(16,185,129,0.4)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95 border-4 border-black">
-          <MessageCircle className="w-7 h-7 fill-current" />
+          <Image 
+            src="/ic_wa.png" 
+            alt="WhatsApp" 
+            width={32} 
+            height={32} 
+            className="w-8 h-8 object-contain"
+          />
         </div>
       </div>
     </a>
   );
 }
+
