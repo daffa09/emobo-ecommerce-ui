@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Search, Eye, Package } from "lucide-react";
+import { Loader2, Search, Eye, Package, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchAllOrders, updateOrderStatus, type Order } from "@/lib/api-service";
 import { formatIDR } from "@/lib/utils";
 import { toast } from "sonner";
@@ -42,6 +42,8 @@ export default function AdminTransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [updatingOrder, setUpdatingOrder] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   const router = useRouter();
 
   useEffect(() => {
@@ -68,7 +70,12 @@ export default function AdminTransactionsPage() {
     }
 
     setFilteredOrders(filtered);
+    setCurrentPage(1);
   }, [searchQuery, statusFilter, orders]);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / ITEMS_PER_PAGE));
 
   async function loadOrders() {
     try {
@@ -161,7 +168,7 @@ export default function AdminTransactionsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders.map((order) => (
+                  {paginatedOrders.map((order) => (
                     <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/30">
                       <TableCell className="font-mono text-sm text-zinc-300">
                         #{order.id}
@@ -230,6 +237,39 @@ export default function AdminTransactionsPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          
+          {filteredOrders.length > 0 && totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4 px-2">
+              <div className="text-sm text-zinc-400">
+                Showing <span className="text-white font-medium">{startIndex + 1}</span> to <span className="text-white font-medium">{Math.min(startIndex + ITEMS_PER_PAGE, filteredOrders.length)}</span> of <span className="text-white font-medium">{filteredOrders.length}</span> entries
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300 gap-1"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </Button>
+                <div className="flex items-center px-4 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 text-sm font-medium text-zinc-300">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300 gap-1"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>

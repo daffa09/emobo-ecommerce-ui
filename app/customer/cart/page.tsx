@@ -141,12 +141,6 @@ export default function CartPage() {
                 >
                   {checking ? "Checking..." : "Proceed to Checkout"}
                 </Button>
-
-                <Link href="/customer/catalog" className="block">
-                  <Button variant="outline" className="w-full">
-                    Back to Catalog
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
           </div>

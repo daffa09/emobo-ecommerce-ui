@@ -254,8 +254,8 @@ export function CatalogGrid() {
                   name={product.name}
                   price={product.price.toString()}
                   image={getImageUrl(product.images[0])}
-                  rating={4.8}
-                  reviews={Math.floor(Math.random() * 50) + 10}
+                  rating={product.rating || 0}
+                  reviews={product.reviewsCount || 0}
                   specs={[product.brand, product.category]}
                 />
               ))}
@@ -283,9 +283,9 @@ export function CatalogGrid() {
                         <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-1 text-yellow-500">
                             <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm font-bold">4.8</span>
+                            <span className="text-sm font-bold">{product.rating || 0}</span>
                           </div>
-                          <span className="text-sm text-muted-foreground whitespace-nowrap">24 Reviews</span>
+                          <span className="text-sm text-muted-foreground whitespace-nowrap">{product.reviewsCount || 0} Reviews</span>
                           <span className="text-sm font-bold text-primary">{product.category}</span>
                         </div>
                       </div>

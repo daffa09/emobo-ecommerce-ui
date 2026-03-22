@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { CartItem } from "@/lib/cart-context";
+import Link from "next/link";
 
 interface CartItemCardProps {
   item: CartItem;
@@ -25,17 +26,19 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
     <Card>
       <CardContent className="p-4">
         <div className="flex gap-4">
-          <div className="relative h-24 w-24 rounded-md overflow-hidden bg-muted shrink-0">
+          <Link href={`/products/${item.id}`} className="relative h-24 w-24 rounded-md overflow-hidden bg-muted shrink-0 block hover:opacity-80 transition-opacity">
             <Image
               src={item.image}
               alt={item.name}
               fill
               className="object-cover"
             />
-          </div>
+          </Link>
 
           <div className="flex-1 space-y-2">
-            <h3 className="font-semibold line-clamp-2">{item.name}</h3>
+            <Link href={`/products/${item.id}`} className="hover:text-primary transition-colors inline-block">
+              <h3 className="font-semibold line-clamp-2">{item.name}</h3>
+            </Link>
             <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>
             <p className="text-lg font-bold text-primary">
               {formatPrice(item.price)}

@@ -11,12 +11,17 @@ interface OrderItem {
 interface OrderSummaryProps {
   items: OrderItem[]
   shippingCost?: number
-  tax?: number
 }
 
-export function OrderSummary({ items, shippingCost = 0, tax = 0 }: OrderSummaryProps) {
+export function OrderSummary({ items, shippingCost = 0 }: OrderSummaryProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const total = subtotal + (shippingCost || 0) + (tax || 0)
+  
+  // Get rates from env or use defaults
+  const ppnRate = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11
+  const appFeeAmount = process.env.NEXT_PUBLIC_APP_FEE ? parseInt(process.env.NEXT_PUBLIC_APP_FEE) : 1000
+
+  const tax = Math.round(subtotal * (ppnRate / 100))
+  const total = subtotal + shippingCost + tax + appFeeAmount
 
   return (
     <div className="bg-surface rounded-xl p-6 space-y-6">
@@ -49,12 +54,14 @@ export function OrderSummary({ items, shippingCost = 0, tax = 0 }: OrderSummaryP
           </span>
           <span className="text-foreground">{shippingCost > 0 ? formatIDR(shippingCost) : "-"}</span>
         </div>
-        {tax > 0 && (
-          <div className="flex justify-between text-sm">
-            <span className="text-muted">Tax</span>
-            <span className="text-foreground">{formatIDR(tax)}</span>
-          </div>
-        )}
+        <div className="flex justify-between text-sm">
+          <span className="text-muted">Tax (PPN {ppnRate}%)</span>
+          <span className="text-foreground">{formatIDR(tax)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted">App Fee</span>
+          <span className="text-foreground">{formatIDR(appFeeAmount)}</span>
+        </div>
       </div>
 
       <div className="border-t border-border pt-4 flex justify-between items-center">

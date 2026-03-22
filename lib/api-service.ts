@@ -22,6 +22,8 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  rating?: number;
+  reviewsCount?: number;
 }
 
 export interface Review {
@@ -57,10 +59,13 @@ export interface Order {
   phone: string;
   trackingNo: string | null;
   trackingNumber?: string | null;
+  taxAmount?: number;
+  appFee?: number;
   createdAt: string;
   updatedAt: string;
   items?: OrderItem[];
   payment?: Payment;
+  reviews?: any[];
   user?: {
     name: string | null;
     email: string;
@@ -359,11 +364,26 @@ export async function createOrder(data: {
   return handleResponse<Order>(response);
 }
 
-export async function fetchUserOrders(): Promise<Order[]> {
-  const response = await fetch(`${API_URL}/orders`, {
+export async function fetchUserOrders(params?: {
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ orders: Order[]; total: number }> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+  if (params?.offset) queryParams.append("offset", params.offset.toString());
+
+  const url = `${API_URL}/orders${queryParams.toString() ? `?${queryParams}` : ""}`;
+  const response = await fetch(url, {
     headers: getAuthHeaders(),
   });
-  return handleResponse<Order[]>(response);
+  
+  const data = await handleResponse<any>(response);
+  if (Array.isArray(data)) {
+    return { orders: data, total: data.length };
+  }
+  return { orders: data.orders || [], total: data.total || 0 };
 }
 
 export async function fetchOrderById(id: number): Promise<Order> {

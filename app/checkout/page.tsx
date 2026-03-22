@@ -96,7 +96,7 @@ export default function CheckoutPage() {
 
       const orderId = orderData.data.id
 
-      // 2. Create Payment & Get Snap Token
+      // 2. Create Payment & Get Redirect URL
       const payRes = await fetch(`${API_URL}/payments/${orderId}/create`, {
         method: "POST",
         headers: {
@@ -106,31 +106,15 @@ export default function CheckoutPage() {
       const payData = await payRes.json()
       if (!payRes.ok) throw new Error(payData.message)
 
-      const snapToken = payData.data.snapToken
+      const redirectUrl = payData.data?.redirectUrl || payData.data?.payment?.redirectUrl
 
-      // 3. Embed Midtrans Snap in container (not popup)
-      // @ts-ignore
-      window.snap.embed(snapToken, {
-        embedId: 'snap-container',
-        onSuccess: (result: any) => {
-          toast.success("Payment Successful!")
-          clearCart()
-          window.location.href = "/customer/transactions"
-        },
-        onPending: (result: any) => {
-          toast.info("Waiting for Payment...")
-          clearCart()
-          window.location.href = "/customer/transactions"
-        },
-        onError: (result: any) => {
-          toast.error("Payment Failed!")
-          setIsProcessing(false)
-        },
-        onClose: () => {
-          setIsProcessing(false)
-          setActiveStep("address")
-        }
-      })
+      if (redirectUrl) {
+        clearCart()
+        const finalUrl = redirectUrl.startsWith('http') ? redirectUrl : `https://${redirectUrl}`
+        window.location.href = finalUrl
+      } else {
+        throw new Error("Payment link not found")
+      }
 
     } catch (err: any) {
       toast.error(err.message)
@@ -234,11 +218,9 @@ export default function CheckoutPage() {
 
                 {/* Step 2: Payment - Persisted visibility toggle */}
                 <div className={activeStep === "payment" ? "w-full" : "hidden"}>
-                  <div className="flex flex-col items-center w-full bg-white dark:bg-white min-h-[900px]">
-                    <div
-                      id="snap-container"
-                      className="w-full min-h-[700px] md:min-h-[900px] border-0 overflow-hidden"
-                    />
+                  <div className="flex flex-col items-center justify-center w-full bg-slate-900 rounded-xl min-h-[400px] border border-slate-800">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                    <p className="text-slate-400 animate-pulse font-medium">Redirecting to Flip Payment...</p>
                   </div>
                 </div>
               </div>

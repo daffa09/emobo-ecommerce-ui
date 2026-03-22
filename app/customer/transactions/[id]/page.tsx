@@ -23,6 +23,16 @@ import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
 import { API_URL } from "@/lib/auth-service";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Star } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -49,6 +59,10 @@ export default function OrderDetailPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     async function loadOrder() {
@@ -56,12 +70,10 @@ export default function OrderDetailPage() {
         const data = await fetchOrderById(orderId);
         setOrder(data);
 
-        // If we're returning from Midtrans with success params, but order is still PENDING
-        const searchParams = new URLSearchParams(window.location.search);
-        const transactionStatus = searchParams.get('transaction_status');
-
-        if (data.status === "PENDING" && transactionStatus) {
-          console.log("Verifying payment with status:", transactionStatus);
+        // Always try to verify payment status if it is still PENDING on page load
+        // This handles cases where Flip redirect doesn't have query params
+        if (data.status === "PENDING") {
+          console.log("Verifying payment status with Flip...");
           const token = getCookie("emobo-token");
 
           try {
@@ -107,43 +119,15 @@ export default function OrderDetailPage() {
       const payData = await payRes.json();
       if (!payRes.ok) throw new Error(payData.message);
 
-      const snapToken = payData.data.snapToken;
+      const redirectUrl = payData.data.redirectUrl;
 
-      // 2. Trigger Midtrans Snap Popup
-      // @ts-ignore
-      window.snap.pay(snapToken, {
-        onSuccess: async (result: any) => {
-          toast.success("Payment Successful!");
-          // Verify on backend to update status immediately
-          try {
-            await fetch(`${API_URL}/payments/${order.id}/verify`, {
-              headers: { "Authorization": `Bearer ${token}` }
-            });
-          } catch (err) {
-            console.error("Verification error:", err);
-          }
-          window.location.reload();
-        },
-        onPending: async (result: any) => {
-          toast.info("Waiting for Payment...");
-          // Also verify/check for pending status
-          try {
-            await fetch(`${API_URL}/payments/${order.id}/verify`, {
-              headers: { "Authorization": `Bearer ${token}` }
-            });
-          } catch (err) { }
-          window.location.reload();
-        },
-        onError: (result: any) => {
-          toast.error("Payment Failed!");
-          setIsPaying(false);
-        },
-        onClose: () => {
-          setIsPaying(false);
-          // Refresh in case they actually paid but closed the popup
-          window.location.reload();
-        }
-      });
+      // Redirect to Flip Payment Link
+      if (redirectUrl) {
+        const finalUrl = redirectUrl.startsWith('http') ? redirectUrl : `https://${redirectUrl}`;
+        window.location.href = finalUrl;
+      } else {
+        throw new Error("Payment link not found");
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to trigger payment");
       setIsPaying(false);
@@ -178,6 +162,38 @@ export default function OrderDetailPage() {
       toast.error(err.message || "Failed to confirm order");
     } finally {
       setIsConfirming(false);
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!order) return;
+    setSubmittingReview(true);
+    try {
+      const token = getCookie("emobo-token");
+      for (const item of order.items || []) {
+        await fetch(`${API_URL}/reviews`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            orderId: order.id,
+            productId: item.productId,
+            rating,
+            comment
+          })
+        });
+      }
+      toast.success("Review sent successfully!");
+      setIsReviewOpen(false);
+      setOrder({ ...order, reviews: [{ id: 999, rating, comment }] } as any);
+      setComment("");
+      setRating(0);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -327,12 +343,24 @@ export default function OrderDetailPage() {
           <div className="p-6 bg-slate-900/50 border-t border-slate-800 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Subtotal</span>
-              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost)}</span>
+              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost - (order.taxAmount || 0) - (order.appFee || 0))}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Shipping Cost</span>
               <span className="text-white font-bold">{formatIDR(order.shippingCost)}</span>
             </div>
+            {(order.taxAmount ?? 0) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400 font-medium">Tax (PPN)</span>
+                <span className="text-white font-bold">{formatIDR(order.taxAmount!)}</span>
+              </div>
+            )}
+            {(order.appFee ?? 0) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400 font-medium">App Fee</span>
+                <span className="text-white font-bold">{formatIDR(order.appFee!)}</span>
+              </div>
+            )}
             <Separator className="bg-slate-800" />
             <div className="flex justify-between items-center pt-2">
               <span className="text-white font-black uppercase tracking-tighter">Grand Total</span>
@@ -426,6 +454,40 @@ export default function OrderDetailPage() {
                   <p className="text-xs font-medium text-slate-300">
                     {new Date(order.payment.paidAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </p>
+                </div>
+              )}
+
+              {/* Review Button or Display Review for COMPLETED orders */}
+              {order.status === "COMPLETED" && (
+                <div className="pt-4 mt-2 border-t border-slate-800/50">
+                  {order.reviews && order.reviews.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Your Rating</p>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star
+                              key={s}
+                              className={`w-4 h-4 ${s <= order.reviews![0].rating ? "fill-yellow-400 text-yellow-400" : "text-slate-700"}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      {order.reviews[0].comment && (
+                        <div className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                          <p className="text-sm text-slate-300 italic">"{order.reviews[0].comment}"</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Button
+                      className="w-full bg-primary hover:bg-primary-dark text-black font-black"
+                      onClick={() => setIsReviewOpen(true)}
+                    >
+                      <Star className="mr-2 h-4 w-4 fill-current" />
+                      Rate Products
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -524,6 +586,44 @@ export default function OrderDetailPage() {
           </Card>
         </div >
       </div >
+
+      {/* Review Dialog Modal */}
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Write a Review</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Share your experience using the products in this order.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  className={`size-10 cursor-pointer transition-colors ${rating > 0 && s <= rating ? "fill-yellow-400 text-yellow-400" : "text-slate-700"}`}
+                  onClick={() => setRating(s)}
+                />
+              ))}
+            </div>
+            <Textarea
+              placeholder="What do you think about the products?"
+              className="bg-slate-800 border-slate-700 text-white min-h-[120px]"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsReviewOpen(false)} className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
+              Cancel
+            </Button>
+            <Button onClick={handleReviewSubmit} disabled={submittingReview || rating === 0} className="bg-primary hover:bg-primary-dark text-black font-bold">
+              {submittingReview ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</> : "Submit Review"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div >
   );
 }

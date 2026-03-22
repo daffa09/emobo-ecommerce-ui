@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send } from "lucide-react";
+import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send, MessageCircle } from "lucide-react";
 import { fetchOrderById, cancelOrder, updateOrderStatus, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -258,12 +258,24 @@ export default function OrderDetailPage() {
           <div className="p-6 bg-slate-900/50 border-t border-slate-800 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Subtotal</span>
-              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost)}</span>
+              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost - (order.taxAmount || 0) - (order.appFee || 0))}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Shipping Cost</span>
               <span className="text-white font-bold">{formatIDR(order.shippingCost)}</span>
             </div>
+            {(order.taxAmount ?? 0) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400 font-medium">Tax (PPN)</span>
+                <span className="text-white font-bold">{formatIDR(order.taxAmount!)}</span>
+              </div>
+            )}
+            {(order.appFee ?? 0) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400 font-medium">App Fee</span>
+                <span className="text-white font-bold">{formatIDR(order.appFee!)}</span>
+              </div>
+            )}
             <Separator className="bg-slate-800" />
             <div className="flex justify-between items-center pt-2">
               <span className="text-white font-black uppercase tracking-tighter">Grand Total</span>
@@ -391,7 +403,8 @@ export default function OrderDetailPage() {
                 Delivery Address
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-3">
+            <CardContent className="p-4 space-y-3 flex flex-col justify-between h-full">
+              <div className="flex-1">
               <div>
                 <p className="text-sm font-black text-white mb-1">
                   {order.shippingAddress?.fullName || order.shippingAddr?.fullName || '-'}
@@ -405,6 +418,24 @@ export default function OrderDetailPage() {
                 {order.shippingAddress?.city || order.shippingAddr?.city || '-'}, {order.shippingAddress?.province || order.shippingAddr?.province || '-'}<br />
                 {order.shippingAddress?.postalCode || order.shippingAddr?.postalCode || '-'}
               </p>
+              </div>
+              
+              {isAdmin && (order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone) && (
+                <div className="pt-3 border-t border-slate-700/50 mt-auto">
+                  <Button 
+                    className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => {
+                      const phoneStr = order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone || '';
+                      const cleaned = phoneStr.replace(/\D/g, '');
+                      const waNumber = cleaned.startsWith('0') ? '62' + cleaned.substring(1) : cleaned;
+                      window.open(`https://wa.me/${waNumber}`, '_blank');
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Contact Customer
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div >

@@ -150,7 +150,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
             {/* Right: Date, Notification & Profile */}
             <div className="ml-auto flex items-center gap-2 sm:gap-4">
               {/* WhatsApp CTA */}
-              <WhatsAppCTA variant="header" />
+              {(!user || user.role !== "ADMIN") && <WhatsAppCTA variant="header" />}
 
               {/* Notification Popover ... */}
               <div className="hidden lg:flex flex-col items-end">

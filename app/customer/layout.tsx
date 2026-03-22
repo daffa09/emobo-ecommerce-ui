@@ -10,7 +10,6 @@ const customerNavItems: any[] = [
   { name: "Dashboard", href: "/customer", iconName: "Dashboard" },
   { name: "Browse Catalog", href: "/customer/catalog", iconName: "Catalog" },
   { name: "My Cart", href: "/customer/cart", iconName: "Cart" },
-  { name: "My Profile", href: "/customer/profile", iconName: "Profile" },
   { name: "Order History", href: "/customer/transactions", iconName: "History" },
 ];
 

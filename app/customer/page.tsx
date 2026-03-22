@@ -32,13 +32,13 @@ export default function CustomerDashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [ordersData, profileData, productsData] = await Promise.all([
+        const [ordersResponse, profileData, productsData] = await Promise.all([
           fetchUserOrders(),
           fetchUserProfile(),
           fetchTopSellingProducts(4)
         ]);
 
-        setOrders(ordersData);
+        setOrders(ordersResponse.orders);
         setProfile(profileData);
         setRecommendedProducts(productsData);
       } catch (error) {
@@ -295,8 +295,8 @@ export default function CustomerDashboardPage() {
               name={product.name}
               price={product.price.toString()}
               image={getImageUrl(product.images[0])}
-              rating={4.8}
-              reviews={Math.floor(Math.random() * 50) + 10}
+              rating={product.rating || 0}
+              reviews={product.reviewsCount || 0}
               specs={[product.brand, product.category]}
             />
           ))}

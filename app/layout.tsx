@@ -59,11 +59,6 @@ export default function RootLayout({
               <main className="flex-1">{children}</main>
             </div>
             <Toaster position="top-right" />
-            <Script
-              src="https://app.sandbox.midtrans.com/snap/snap.js"
-              data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
-              strategy="afterInteractive"
-            />
           </CartProvider>
         </ThemeProvider>
         <Analytics />
