@@ -7,8 +7,9 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8)
 ![shadcn/ui](https://img.shields.io/badge/shadcn/ui-latest-black)
+![Docker](https://img.shields.io/badge/Docker-supported-blue)
 
-Modern, responsive e-commerce frontend built with Next.js 16, React 19, and Tailwind CSS.
+Modern, responsive e-commerce frontend built with Next.js 16, React 19, Tailwind CSS, and Docker.
 
 </div>
 
@@ -79,6 +80,7 @@ Modern, responsive e-commerce frontend built with Next.js 16, React 19, and Tail
 | **Icons** | Lucide React |
 | **Notifications** | Sonner |
 | **Theme** | next-themes |
+| **Container** | Docker |
 
 ---
 
@@ -163,6 +165,18 @@ npm run dev
 ```
 
 Application will start at `http://localhost:3000`
+
+### Running with Docker
+
+1. **Build the image**
+```bash
+docker build -t emobo-ui .
+```
+
+2. **Run the container**
+```bash
+docker run -p 3000:3000 --env-file .env.local emobo-ui
+```
 
 ---
 
@@ -528,7 +542,28 @@ npm run build
 
 ---
 
+---
+
+## 🔄 CI/CD
+
+This project uses **GitHub Actions** for continuous integration and delivery.
+
+- **Build & Push**: Triggered on push to `main` branch.
+- **Workflow**: `.github/workflows/docker-build.yml`
+- **Docker Hub**: Automatically pushes image to `daffa09/emobo-ecommerce-ui:latest`.
+
+---
+
 ## 🚀 Deployment
+
+### Docker Compose (Full Setup)
+
+For a complete setup with API and Gateway, use the `docker-compose.yml` located in the `deployments/` folder:
+
+```bash
+cd deployments
+docker compose up -d
+```
 
 ### Vercel (Recommended)
 

@@ -55,12 +55,12 @@
     "input-otp": "1.4.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.454.0",
-    "next": "16.0.3",
+    "next": "16.0.10",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
-    "react": "19.2.0",
+    "react": "19.2.4",
     "react-day-picker": "9.8.0",
-    "react-dom": "19.2.0",
+    "react-dom": "19.2.4",
     "react-hook-form": "latest",
     "react-intersection-observer": "^10.0.3",
     "react-leaflet": "^5.0.0",
@@ -78,14 +78,14 @@
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^22",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "ts-jest": "^29.4.6",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5"
+    "typescript": "^5.7.3"
   }
 }
