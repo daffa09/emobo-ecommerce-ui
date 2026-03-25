@@ -10,8 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { OrderSummary } from "@/app/checkout/_components/order-summary"
-import { AddressForm } from "@/app/checkout/_components/address-form"
+import { OrderSummary } from "./_components/order-summary"
+import { AddressForm } from "./_components/address-form"
 import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
 import { API_URL } from "@/lib/auth-service"
@@ -137,7 +137,7 @@ export default function CheckoutPage() {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/cart">Cart</Link>
+                <Link href="/customer/cart">Cart</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

@@ -68,6 +68,13 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
         if (profile.name) setValue("fullName", profile.name)
         if (profile.phone) setValue("phone", profile.phone)
         if (profile.address) setValue("address", profile.address)
+        if (profile.provinceId) setValue("provinceId", profile.provinceId)
+        if (profile.cityId) {
+          // Note: cityId requires cities to be loaded, but it should happen automatically
+          // because provinceId change triggers the cities fetch, and cityId will match
+          // once cities are loaded, as long as it's set in the form state.
+          setValue("cityId", profile.cityId)
+        }
       } catch (error) {
         console.error("Failed to fetch user profile:", error)
         // Don't show error - user can fill manually

@@ -137,6 +137,8 @@ export interface Customer {
   image?: string;
   address?: string;
   addressNotes?: string;
+  provinceId?: string;
+  cityId?: string;
   latitude?: number | null;
   longitude?: number | null;
   role: "ADMIN" | "CUSTOMER";

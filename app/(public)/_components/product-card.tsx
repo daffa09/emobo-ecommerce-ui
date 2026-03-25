@@ -106,11 +106,17 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-2">
-          <span className="text-sm sm:text-base font-black text-primary">{formatIDR(Number(price))}</span>
-          <Button size="sm" className="h-9 sm:h-8 w-full sm:w-auto rounded-lg text-xs gap-1.5" onClick={handleAddToCart}>
+        <div className="pt-1 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm sm:text-base font-black text-primary">{formatIDR(Number(price))}</span>
+          </div>
+          <Button 
+            size="sm" 
+            className="w-full h-8 sm:h-9 rounded-lg text-[11px] sm:text-xs gap-2 font-bold shadow-sm shadow-primary/10" 
+            onClick={handleAddToCart}
+          >
             <ShoppingCart className="h-3.5 w-3.5" />
-            Add
+            Add to Cart
           </Button>
         </div>
       </CardContent>

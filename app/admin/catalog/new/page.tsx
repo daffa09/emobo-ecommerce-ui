@@ -32,7 +32,7 @@ export default function NewProductPage() {
     description: "",
     condition: "NEW",
     warranty: "",
-    weight: "2000",
+    weight: "2",
     specs: "{}",
   });
 
@@ -125,7 +125,7 @@ export default function NewProductPage() {
         specifications: formData.specs,
         condition: formData.condition,
         warranty: formData.warranty,
-        weight: parseInt(formData.weight) || 1500,
+        weight: Math.round(parseFloat(formData.weight) * 1000) || 1500,
       });
 
       toast.success("Product created successfully!");
@@ -263,12 +263,13 @@ export default function NewProductPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="weight" className="text-zinc-300">Weight (grams)</Label>
+                <Label htmlFor="weight" className="text-zinc-300">Weight (kg)</Label>
                 <Input
                   id="weight"
                   type="number"
                   min="0"
-                  placeholder="2000"
+                  step="0.01"
+                  placeholder="2"
                   value={formData.weight}
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                   className="bg-zinc-800/50 border-zinc-700"

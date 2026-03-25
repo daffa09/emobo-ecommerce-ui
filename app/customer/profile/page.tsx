@@ -8,11 +8,15 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Lock, LogOut, MapPin, Pencil } from "lucide-react";
-import { fetchUserProfile, updateUserProfile, type Customer } from "@/lib/api-service";
+import { fetchUserProfile, updateUserProfile, fetchProvinces, fetchCities, type Customer, type ShippingProvince, type ShippingCity } from "@/lib/api-service";
 import { logoutUser } from "@/lib/auth-service";
 import { toast } from "sonner";
 import { getCookie, setCookie } from "@/lib/cookie-utils";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
@@ -53,9 +57,17 @@ export default function CustomerProfilePage() {
     phone: "",
     address: "",
     addressNotes: "",
+    provinceId: "",
+    cityId: "",
     latitude: null as number | null,
     longitude: null as number | null,
   });
+
+  const [provinces, setProvinces] = useState<ShippingProvince[]>([]);
+  const [cities, setCities] = useState<ShippingCity[]>([]);
+  const [openProvince, setOpenProvince] = useState(false);
+  const [openCity, setOpenCity] = useState(false);
+  const [loadingLocations, setLoadingLocations] = useState(false);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -73,6 +85,8 @@ export default function CustomerProfilePage() {
           phone: data.phone || "",
           address: data.address || "",
           addressNotes: data.addressNotes || "",
+          provinceId: data.provinceId || "",
+          cityId: data.cityId || "",
           latitude: data.latitude ?? null,
           longitude: data.longitude ?? null,
         });
@@ -85,6 +99,37 @@ export default function CustomerProfilePage() {
     }
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    async function loadProvinces() {
+      try {
+        const data = await fetchProvinces();
+        setProvinces(data);
+      } catch (error) {
+        console.error("Failed to fetch provinces:", error);
+      }
+    }
+    loadProvinces();
+  }, []);
+
+  useEffect(() => {
+    async function loadCities() {
+      if (!formData.provinceId) {
+        setCities([]);
+        return;
+      }
+      try {
+        setLoadingLocations(true);
+        const data = await fetchCities(formData.provinceId);
+        setCities(data);
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
+      } finally {
+        setLoadingLocations(false);
+      }
+    }
+    loadCities();
+  }, [formData.provinceId]);
 
   const handleLocationPick = useCallback((location: PickedLocation) => {
     setPendingLocation(location);
@@ -297,6 +342,119 @@ export default function CustomerProfilePage() {
                 </div>
               </div>
 
+              {/* Province & City Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Province</Label>
+                  <Popover open={isEditing && openProvince} onOpenChange={setOpenProvince}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        disabled={!isEditing}
+                        className={cn(
+                          "w-full justify-between font-normal bg-muted/20 border-zinc-800",
+                          !formData.provinceId && "text-muted-foreground",
+                          !isEditing && "opacity-100 cursor-default bg-muted"
+                        )}
+                      >
+                        {formData.provinceId
+                          ? provinces.find((p) => p.province_id === formData.provinceId)?.province
+                          : "Select Province"}
+                        {isEditing && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      </Button>
+                    </PopoverTrigger>
+                    {isEditing && (
+                      <PopoverContent className="w-[300px] p-0 border-zinc-800 bg-zinc-950">
+                        <Command className="bg-transparent">
+                          <CommandInput placeholder="Search province..." className="h-9" />
+                          <CommandList className="max-h-[200px] overflow-y-auto">
+                            <CommandEmpty>No province found.</CommandEmpty>
+                            <CommandGroup>
+                              {provinces.map((p) => (
+                                <CommandItem
+                                  key={p.province_id}
+                                  value={p.province}
+                                  onSelect={() => {
+                                    setFormData({ ...formData, provinceId: p.province_id, cityId: "" });
+                                    setOpenProvince(false);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4 text-primary",
+                                      p.province_id === formData.provinceId ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {p.province}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>City/Regency</Label>
+                  <Popover open={isEditing && openCity} onOpenChange={setOpenCity}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        disabled={!isEditing || !formData.provinceId}
+                        className={cn(
+                          "w-full justify-between font-normal bg-muted/20 border-zinc-800",
+                          !formData.cityId && "text-muted-foreground",
+                          (!isEditing || !formData.provinceId) && "opacity-100 cursor-default bg-muted"
+                        )}
+                      >
+                        {formData.cityId
+                          ? cities.find((c) => c.city_id === formData.cityId)
+                            ? `${cities.find((c) => c.city_id === formData.cityId)?.type} ${cities.find((c) => c.city_id === formData.cityId)?.city_name}`
+                            : "Select City"
+                          : "Select City"}
+                        {isEditing && <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      </Button>
+                    </PopoverTrigger>
+                    {isEditing && (
+                      <PopoverContent className="w-[300px] p-0 border-zinc-800 bg-zinc-950">
+                        <Command className="bg-transparent">
+                          <CommandInput placeholder="Search city..." className="h-9" />
+                          <CommandList className="max-h-[200px] overflow-y-auto">
+                            <CommandEmpty>{loadingLocations ? "Loading..." : "No city found."}</CommandEmpty>
+                            <CommandGroup>
+                              {cities.map((c) => (
+                                <CommandItem
+                                  key={c.city_id}
+                                  value={`${c.type} ${c.city_name}`}
+                                  onSelect={() => {
+                                    setFormData({ ...formData, cityId: c.city_id });
+                                    setOpenCity(false);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4 text-primary",
+                                      c.city_id === formData.cityId ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {c.type} {c.city_name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="addressNotes">Additional Details</Label>
                 <Input
@@ -348,6 +506,8 @@ export default function CustomerProfilePage() {
                         phone: user.phone || "",
                         address: user.address || "",
                         addressNotes: user.addressNotes || "",
+                        provinceId: user.provinceId || "",
+                        cityId: user.cityId || "",
                         latitude: user.latitude ?? null,
                         longitude: user.longitude ?? null,
                       });

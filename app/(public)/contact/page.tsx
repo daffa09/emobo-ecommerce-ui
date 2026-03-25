@@ -22,7 +22,7 @@ export default function ContactPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-primary" />
-                <p>123 Gadget Street, Tech City, 12345</p>
+                <p>Depok, Jawa Barat, Indonesia</p>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-primary" />
@@ -39,8 +39,17 @@ export default function ContactPage() {
               <CardTitle>Store Location</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
-                Map Placeholder
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15859.907952876114!2d106.821915!3d-6.3960132!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69eba3246ebbb5%3A0x6b80dd85526cd1b5!2sJl.%20Margonda%20Raya%2C%20Kota%20Depok%2C%20Jawa%20Barat!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0"
+                ></iframe>
               </div>
             </CardContent>
           </Card>

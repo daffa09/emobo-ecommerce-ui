@@ -32,10 +32,10 @@ export default function CartPage() {
         });
         return;
       }
-      router.push("/checkout");
+      router.push("/customer/checkout");
     } catch (error) {
       // If not logged in or other error, let middleware handle or redirect to login
-      router.push("/checkout");
+      router.push("/customer/checkout");
     } finally {
       setChecking(false);
     }
@@ -53,12 +53,7 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1 container-emobo py-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold">Shopping Cart</h1>
-            <Link href="/customer/catalog" className="w-full sm:w-auto">
-              <Button variant="outline" className="w-full sm:w-auto">Back to Catalog</Button>
-            </Link>
-          </div>
 
           <div className="max-w-2xl mx-auto">
             <Card>
@@ -84,9 +79,6 @@ export default function CartPage() {
       <main className="flex-1 container-emobo py-10">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Shopping Cart</h1>
-          <Link href="/customer/catalog" className="hidden sm:block">
-            <Button variant="outline">Back to Catalog</Button>
-          </Link>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">

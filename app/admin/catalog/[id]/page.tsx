@@ -57,7 +57,7 @@ export default function EditProductPage() {
           description: data.description || "",
           condition: data.condition || "NEW",
           warranty: data.warranty || "",
-          weight: (data.weight || 2000).toString(),
+          weight: (data.weight ? data.weight / 1000 : 2).toString(),
           specs: typeof data.specifications === 'string' ? data.specifications : (data.specifications ? JSON.stringify(data.specifications, null, 2) : ""),
         });
         setExistingImages(data.images);
@@ -171,7 +171,7 @@ export default function EditProductPage() {
         specifications: formData.specs,
         condition: formData.condition,
         warranty: formData.warranty,
-        weight: parseInt(formData.weight) || 1500,
+        weight: Math.round(parseFloat(formData.weight) * 1000) || 1500,
       });
 
       toast.success("Product updated successfully!");
@@ -360,12 +360,13 @@ export default function EditProductPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="weight" className="text-zinc-300">Weight (grams)</Label>
+                <Label htmlFor="weight" className="text-zinc-300">Weight (kg)</Label>
                 <Input
                   id="weight"
                   type="number"
                   min="0"
-                  placeholder="2000"
+                  step="0.01"
+                  placeholder="2"
                   value={formData.weight}
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                   className="bg-zinc-800/50 border-zinc-700"
