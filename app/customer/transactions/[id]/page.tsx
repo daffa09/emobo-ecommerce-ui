@@ -330,7 +330,7 @@ export default function OrderDetailPage() {
                     <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-3">
                       <p className="text-sm font-black text-primary">{formatIDR(item.price || item.unitPrice)}</p>
                       <span className="hidden sm:block h-1 w-1 rounded-full bg-slate-700" />
-                      <p className="text-[10px] sm:text-xs text-slate-400 font-bold">Qty: {item.quantity}</p>
+                      <p className="text-[10px] sm:text-xs text-white font-bold">Qty: {item.quantity}</p>
                     </div>
                   </div>
                   <div className="text-left sm:text-right flex flex-col justify-center pt-2 sm:pt-0 border-t border-slate-800/50 sm:border-0">

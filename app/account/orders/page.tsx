@@ -1,12 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { OrderTimeline } from "@/app/checkout/_components/order-timeline"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Package, Download, Star } from "lucide-react"
-import Link from "next/link"
+import { Download, Star } from "lucide-react"
 import { API_URL } from "@/lib/auth-service"
 import { formatIDR } from "@/lib/utils"
 import { toast } from "sonner"
@@ -162,7 +160,7 @@ export default function OrdersPage() {
                       <div key={item.id} className="flex justify-between items-center text-sm">
                         <div>
                           <p className="font-medium text-foreground">{item.product.name}</p>
-                          <p className="text-muted">Qty: {item.quantity}</p>
+                          <p className="text-foreground">Qty: {item.quantity}</p>
                         </div>
                         <p className="font-semibold">{formatIDR(item.unitPrice)}</p>
                       </div>

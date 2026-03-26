@@ -17,7 +17,7 @@ export default function CatalogPage() {
       <section className="bg-linear-to-br from-primary/10 via-primary/5 to-background py-12">
         <div className="container-emobo">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-3">Laptop Catalog</h1>
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3">Our Products</h1>
             <p className="text-muted-foreground">
               Browse our extensive collection of premium laptops from top brands
             </p>

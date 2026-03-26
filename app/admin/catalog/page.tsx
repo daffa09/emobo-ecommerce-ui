@@ -143,7 +143,7 @@ export default function AdminCatalogPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Manage Catalog</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Manage Products</h1>
         <Link href="/admin/catalog/new">
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
@@ -155,7 +155,7 @@ export default function AdminCatalogPage() {
       <div className="bg-zinc-900/50 p-4 sm:p-5 rounded-2xl border border-zinc-800/50 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div className="flex-1">
           <h2 className="text-xl font-bold text-white">
-            {searchQuery ? `Results for "${searchQuery}"` : "Product Catalog"}
+            {searchQuery ? `Results for "${searchQuery}"` : "Our Products"}
           </h2>
           <p className="text-sm text-zinc-400">
             Total <span className="font-bold text-primary">{totalProducts}</span> items

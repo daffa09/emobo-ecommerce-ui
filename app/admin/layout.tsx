@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 const adminNavItems: any[] = [
   { name: "Dashboard", href: "/admin", iconName: "Dashboard" },
   { name: "Manage Products", href: "/admin/catalog", iconName: "Catalog" },
+  { name: "Manage Customers", href: "/admin/customers", iconName: "Customers" },
   { name: "Sales Reports", href: "/admin/reports", iconName: "Reports" },
   { name: "Manage Orders", href: "/admin/transactions", iconName: "Transactions" },
 ];

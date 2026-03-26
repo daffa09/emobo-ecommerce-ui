@@ -167,7 +167,7 @@ export function CatalogGrid() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold dark:text-white">
-              {searchParam ? `Results for "${searchParam}"` : "Laptop Catalog"}
+              {searchParam ? `Results for "${searchParam}"` : "Our Products"}
             </h2>
             <p className="text-sm text-muted-foreground">
               Showing <span className="font-bold text-primary">{products.length}</span> of <span className="font-medium text-foreground dark:text-slate-300">{totalProducts}</span> items

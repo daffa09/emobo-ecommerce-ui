@@ -36,7 +36,7 @@ export function OrderSummary({ items, shippingCost = 0 }: OrderSummaryProps) {
           <div key={item.id} className="flex justify-between items-center">
             <div>
               <p className="font-medium text-foreground">{item.name}</p>
-              <p className="text-sm text-muted">Qty: {item.quantity}</p>
+              <p className="text-sm text-foreground">Qty: {item.quantity}</p>
             </div>
             <p className="font-semibold text-foreground">{formatIDR(item.price * item.quantity)}</p>
           </div>

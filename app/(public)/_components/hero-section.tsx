@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { type Product } from "@/lib/api-service";
+import { getImageUrl } from "@/lib/utils";
 
 interface HeroSectionProps {
   newArrival?: Product | null;
@@ -40,7 +41,7 @@ export function HeroSection({ newArrival }: HeroSectionProps) {
             <div className="flex flex-wrap gap-5 pt-4">
               <Link href="/catalog">
                 <Button size="lg" className="h-14 px-10 text-lg font-bold rounded-lg gap-2 shadow-lg shadow-primary/20 transition-smooth hover:scale-105">
-                  Explore Catalog <ArrowRight className="h-5 w-5" />
+                  Explore Products <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
 
@@ -64,7 +65,7 @@ export function HeroSection({ newArrival }: HeroSectionProps) {
               <div className="absolute inset-0 bg-linear-to-tr from-primary/10 to-transparent pointer-events-none" />
               <div className="relative h-full w-full rounded-lg overflow-hidden">
                 <Image
-                  src={displayImage}
+                  src={getImageUrl(displayImage)}
                   alt={displayName}
                   fill
                   className="object-cover transform hover:scale-110 transition-smooth duration-700"

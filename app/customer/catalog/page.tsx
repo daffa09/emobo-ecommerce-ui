@@ -7,7 +7,7 @@ export default function CustomerCatalogPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Browse Catalog</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Browse Products</h1>
         <p className="text-muted-foreground mt-1">Find your perfect laptop from our collection.</p>
       </div>
 
