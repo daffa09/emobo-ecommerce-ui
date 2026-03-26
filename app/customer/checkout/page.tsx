@@ -80,7 +80,7 @@ export default function CheckoutPage() {
     const isProduction = process.env.NEXT_PUBLIC_FLIP_IS_PRODUCTION === "true"
 
     if (total > 10000000 && !isProduction) {
-      toast.error("Transaksi di atas 10jt pada mode development tidak bisa, brok!")
+      toast.error("For security reasons, transactions in development mode are limited to 10 million IDR.")
       return
     }
 

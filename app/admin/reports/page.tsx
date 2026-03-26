@@ -72,7 +72,7 @@ export default function AdminReportsPage() {
                   <Button
                     onClick={printReport}
                     disabled={loading}
-                    className="w-full bg-primary hover:bg-primary/90 text-black font-black h-11 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+                    className="w-full bg-white hover:bg-zinc-200 text-black font-black h-11 rounded-xl shadow-lg shadow-white/10 transition-all active:scale-[0.98]"
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     {loading ? "PREPARING..." : "PRINT REPORT"}

@@ -45,21 +45,21 @@ export function OrderSummary({ items, shippingCost = 0 }: OrderSummaryProps) {
 
       <div className="border-t border-border pt-4 space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted">Subtotal</span>
+          <span className="text-foreground">Subtotal</span>
           <span className="text-foreground">{formatIDR(subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm items-center gap-2">
-          <span className="flex items-center gap-1 text-muted">
+          <span className="flex items-center gap-1 text-foreground">
             <Truck className="w-4 h-4" /> Shipping
           </span>
           <span className="text-foreground">{shippingCost > 0 ? formatIDR(shippingCost) : "-"}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted">Tax (PPN {ppnRate}%)</span>
+          <span className="text-foreground">Tax (PPN {ppnRate}%)</span>
           <span className="text-foreground">{formatIDR(tax)}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted">App Fee</span>
+          <span className="text-foreground">App Fee</span>
           <span className="text-foreground">{formatIDR(appFeeAmount)}</span>
         </div>
       </div>

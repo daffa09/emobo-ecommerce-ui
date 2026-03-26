@@ -140,7 +140,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 lg:gap-4">
-          {user && <CartButton />}
+          {user && user.role !== "ADMIN" && <CartButton />}
           <div className="h-6 w-px bg-border hidden sm:block" />
           {user ? (
             <DropdownMenu>
