@@ -167,6 +167,24 @@ export interface ContactMessage {
   createdAt: string;
 }
 
+export interface PurchaseOrderItem {
+  id: number;
+  purchaseOrderId: number;
+  productId: number;
+  quantity: number;
+  product?: Product;
+}
+
+export interface PurchaseOrder {
+  id: number;
+  receiptUrl: string;
+  totalItemsOnReceipt: number;
+  notes: string | null;
+  items: PurchaseOrderItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -593,4 +611,45 @@ export async function sendContactMessage(data: Omit<ContactMessage, "id" | "crea
     body: JSON.stringify(data),
   });
   return handleResponse<ContactMessage>(response);
+}
+// ============================================
+// PURCHASE ORDER API (Admin Only)
+// ============================================
+
+export async function fetchPurchaseOrders(): Promise<PurchaseOrder[]> {
+  const response = await fetch(`${API_URL}/purchase-order`, {
+    headers: getAuthHeaders(),
+  });
+  const data = await handleResponse<any>(response);
+  return data.purchaseOrders || [];
+}
+
+export async function createPurchaseOrder(data: {
+  receiptUrl: string;
+  totalItemsOnReceipt: number;
+  notes?: string;
+  items: Array<{ productId: number; quantity: number }>;
+}): Promise<PurchaseOrder> {
+  const response = await fetch(`${API_URL}/purchase-order`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<PurchaseOrder>(response);
+}
+
+export async function uploadDocument(file: File): Promise<{ url: string; filename: string }> {
+  const formData = new FormData();
+  formData.append("document", file);
+
+  const token = getCookie("emobo-token");
+  const response = await fetch(`${API_URL}/upload/document`, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+
+  return handleResponse<{ url: string; filename: string }>(response);
 }

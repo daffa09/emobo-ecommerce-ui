@@ -164,6 +164,17 @@
   p {
     @apply leading-relaxed text-balance;
   }
+
+  /* Hide number input spinners */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 @layer utilities {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { LucideIcon, LogOut, ChevronRight, LayoutDashboard, Package, Users, FileText, CreditCard, User, History, Loader2, ShoppingCart } from "lucide-react";
+import { LucideIcon, LogOut, ChevronRight, LayoutDashboard, Package, Users, FileText, CreditCard, User, History, Loader2, ShoppingCart, FilePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fetchUserProfile } from "@/lib/api-service";
 import {
@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-export type IconType = "Dashboard" | "Catalog" | "Users" | "Reports" | "Transactions" | "Profile" | "History" | "Cart";
+export type IconType = "Dashboard" | "Catalog" | "Users" | "Reports" | "Transactions" | "Profile" | "History" | "Cart" | "PurchaseOrder";
 
 export const IconMap: Record<IconType, LucideIcon> = {
   Dashboard: LayoutDashboard,
@@ -31,6 +31,7 @@ export const IconMap: Record<IconType, LucideIcon> = {
   Profile: User,
   History: History,
   Cart: ShoppingCart,
+  PurchaseOrder: FilePlus,
 };
 
 export interface NavItem {

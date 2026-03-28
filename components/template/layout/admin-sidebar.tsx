@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { LayoutDashboard, Package, Users, FileText, CreditCard, LogOut, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Package, Users, FileText, CreditCard, LogOut, ChevronRight, FilePlus } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,6 +25,7 @@ const sidebarItems = [
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Reports", href: "/admin/reports", icon: FileText },
   { name: "Transactions", href: "/admin/transactions", icon: CreditCard },
+  { name: "Purchase Order", href: "/admin/purchase-order", icon: FilePlus },
 ];
 
 export function AdminSidebar() {
