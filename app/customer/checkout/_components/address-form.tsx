@@ -320,7 +320,7 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <div>
           <label className="text-sm font-medium text-foreground block mb-2">Courier</label>
           <Select onValueChange={(val) => setValue("courier", val)} defaultValue="jne">
@@ -347,14 +347,26 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
             }}
             disabled={loadingCost || shippingOptions.length === 0}
           >
-            <SelectTrigger>
-              <SelectValue placeholder={loadingCost ? "Loading shipping costs..." : shippingOptions.length === 0 ? "Select city & courier first" : "Select Service"} />
+            <SelectTrigger className="w-full overflow-hidden">
+              <SelectValue
+                placeholder={loadingCost ? "Loading shipping costs..." : shippingOptions.length === 0 ? "Select city & courier first" : "Select Service"}
+                className="truncate"
+              />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              className="w-(--radix-select-trigger-width) max-w-[calc(100vw-2rem)]"
+              position="popper"
+              side="bottom"
+              sideOffset={4}
+            >
               {shippingOptions.map((opt) => (
-                <SelectItem key={opt.service} value={opt.service}>
-                  {opt.service} ({opt.description}) - Rp {opt.cost[0].value.toLocaleString('id-ID')}
-                  {opt.cost[0].etd && ` - ${opt.cost[0].etd} days`}
+                <SelectItem key={opt.service} value={opt.service} className="whitespace-normal">
+                  <span className="font-medium">{opt.service}</span>
+                  {" "}({opt.description}){" "}
+                  <span className="text-primary font-semibold">Rp {opt.cost[0].value.toLocaleString('id-ID')}</span>
+                  {opt.cost[0].etd && (
+                    <span className="text-muted-foreground text-xs"> · {opt.cost[0].etd} days</span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -102,47 +102,56 @@ export default function AdminCustomersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCustomers.map((customer) => (
-                    <TableRow key={customer.id} className="border-zinc-800 hover:bg-zinc-800/30">
-                      <TableCell className="font-mono text-sm text-zinc-300">
-                        #{customer.id}
-                      </TableCell>
-                      <TableCell className="font-medium text-white">
-                        {customer.name}
-                      </TableCell>
-                      <TableCell className="text-zinc-300">
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          {customer.email}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-zinc-300">
-                        {customer.phone ? (
+                  {filteredCustomers.map((customer) => {
+                    const phone = customer.phone || (customer as any).phoneNumber || (customer as any).mobile || "-";
+                    const address = customer.address || (customer as any).addressLine1 || (customer as any).streetAddress || (customer as any).fullAddress || "-";
+                    const role = (customer.role || "CUSTOMER").toUpperCase();
+
+                    return (
+                      <TableRow key={customer.id} className="border-zinc-800 hover:bg-zinc-800/30">
+                        <TableCell className="font-mono text-sm text-zinc-300">
+                          #{customer.id}
+                        </TableCell>
+                        <TableCell className="font-medium text-white">
+                          {customer.name || "N/A"}
+                        </TableCell>
+                        <TableCell className="text-zinc-300">
                           <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            {customer.phone}
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            {customer.email}
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-zinc-300 max-w-xs truncate">
-                        {customer.address ? (
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="truncate">{customer.address}</span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={customer.role === "ADMIN" ? "default" : "secondary"}>
-                          {customer.role}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className="text-zinc-300">
+                          {phone !== "-" ? (
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-muted-foreground" />
+                              {phone}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-zinc-300 max-w-xs">
+                          {address !== "-" ? (
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="truncate">{address}</span>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={role === "ADMIN" ? "default" : "secondary"}
+                            className={role === "ADMIN" ? "bg-primary text-black" : "bg-zinc-800 text-zinc-400"}
+                          >
+                            {role}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

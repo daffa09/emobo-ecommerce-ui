@@ -78,7 +78,7 @@ export function FeaturedProductsSection({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products.map((product, i) => (
-              <div key={product.id} className="animate-in fade-in slide-in-from-bottom duration-700" style={{ animationDelay: `${i * 100}ms` }}>
+              <div key={product.id} className="animate-in fade-in slide-in-from-bottom duration-700 h-full" style={{ animationDelay: `${i * 100}ms` }}>
                 <ProductCard
                   id={product.id}
                   name={product.name}
@@ -87,6 +87,7 @@ export function FeaturedProductsSection({
                   rating={0}
                   reviews={0}
                   specs={[product.brand]}
+                  isNew={sortBy === "newest"}
                 />
               </div>
             ))}

@@ -92,8 +92,12 @@ export default function ProductDetailPage() {
       {/* Product Details */}
       <div className="container-emobo py-8 lg:py-12">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          <ProductImages product={product} />
-          <ProductInfo product={product} />
+          <div className="min-w-0 overflow-hidden">
+            <ProductImages product={product} />
+          </div>
+          <div className="min-w-0 overflow-hidden">
+            <ProductInfo product={product} />
+          </div>
         </div>
 
         {/* Tabs Section */}

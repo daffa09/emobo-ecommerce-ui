@@ -1,11 +1,7 @@
-import { DashboardShell } from "@/components/template/layout/dashboard-shell";
-import { LayoutDashboard, Package, Users, FileText, CreditCard } from "lucide-react";
-import { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard | Emobo",
-  description: "Manage your store, products, and customers.",
-};
+import { DashboardShell } from "@/components/template/layout/dashboard-shell";
+import { usePathname } from "next/navigation";
 
 const adminNavItems: any[] = [
   { name: "Dashboard", href: "/admin", iconName: "Dashboard" },
@@ -17,10 +13,15 @@ const adminNavItems: any[] = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isPrintPage = pathname === "/admin/reports/print";
+
+  if (isPrintPage) {
+    return <div className="bg-white min-h-screen text-black">{children}</div>;
+  }
+
   return (
-    <DashboardShell
-      navItems={adminNavItems}
-    >
+    <DashboardShell navItems={adminNavItems}>
       {children}
     </DashboardShell>
   );

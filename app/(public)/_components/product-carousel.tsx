@@ -63,15 +63,16 @@ export function ProductCarousel({ title, subtitle, products, loading }: ProductC
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {products.map((product) => (
-            <div key={product.id} className="min-w-[280px] md:min-w-[300px] snap-center">
+            <div key={product.id} className="min-w-[280px] md:min-w-[300px] snap-center h-full">
               <ProductCard
                 id={product.id}
                 name={product.name}
                 price={product.price.toString()}
                 image={product.images[0] || "/no-image.svg"}
-                rating={4.5}
+                rating={0}
                 reviews={0}
                 specs={[product.brand]}
+                isNew={false}
               />
             </div>
           ))}

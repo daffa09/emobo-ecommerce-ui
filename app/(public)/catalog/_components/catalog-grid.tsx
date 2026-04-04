@@ -246,20 +246,22 @@ export function CatalogGrid() {
       ) : products.length > 0 ? (
         <>
           {viewMode === "grid" ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
-              {products.map((product: Product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  price={product.price.toString()}
-                  image={getImageUrl(product.images[0])}
-                  rating={product.rating || 0}
-                  reviews={product.reviewsCount || 0}
-                  specs={[product.brand, product.category]}
-                />
-              ))}
-            </div>
+             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 items-stretch">
+               {products.map((product: Product) => (
+                 <div key={product.id} className="h-full">
+                   <ProductCard
+                     id={product.id}
+                     name={product.name}
+                     price={product.price.toString()}
+                     image={getImageUrl(product.images[0])}
+                     rating={product.rating || 0}
+                     reviews={product.reviewsCount || 0}
+                     specs={[product.brand, product.category]}
+                     isNew={sortBy === "newest"}
+                   />
+                 </div>
+               ))}
+             </div>
           ) : (
             <div className="space-y-4">
               {products.map((product: Product) => (
@@ -280,14 +282,16 @@ export function CatalogGrid() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <Link href={`/product/${product.id}`} className="text-2xl font-bold hover:text-primary transition-colors line-clamp-1">{product.name}</Link>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div className="flex items-center gap-1 text-yellow-500">
-                            <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm font-bold">{product.rating || 0}</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground whitespace-nowrap">{product.reviewsCount || 0} Reviews</span>
-                          <span className="text-sm font-bold text-primary">{product.category}</span>
-                        </div>
+                         {(product.rating ?? 0) > 0 && (
+                           <div className="flex items-center gap-4 mt-2">
+                             <div className="flex items-center gap-1 text-yellow-500">
+                               <Star className="w-4 h-4 fill-current" />
+                               <span className="text-sm font-bold">{product.rating || 0}</span>
+                             </div>
+                             <span className="text-sm text-muted-foreground whitespace-nowrap">{product.reviewsCount || 0} Reviews</span>
+                             <span className="text-sm font-bold text-primary">{product.category}</span>
+                           </div>
+                         )}
                       </div>
                       <div className="text-right hidden sm:block">
                         <p className="text-2xl font-black text-primary">{formatPrice(product.price)}</p>

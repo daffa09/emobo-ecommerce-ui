@@ -18,12 +18,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send, MessageCircle } from "lucide-react";
+import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send, MessageCircle, Download } from "lucide-react";
 import { fetchOrderById, cancelOrder, updateOrderStatus, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
 import { API_URL } from "@/lib/auth-service";
+import Image from "next/image";
+import { generateOrderReceipt } from "@/lib/pdf-service";
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
@@ -49,6 +51,7 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [trackingInput, setTrackingInput] = useState("");
   const [isShipping, setIsShipping] = useState(false);
+  const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
 
   // Check if page is accessed by admin
   const isAdmin = getCookie("emobo-role") === "ADMIN";
@@ -74,6 +77,20 @@ export default function OrderDetailPage() {
       toast.error("Failed to update order", { description: err.message });
     } finally {
       setIsShipping(false);
+    }
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!order) return;
+    try {
+      setIsDownloadingReceipt(true);
+      await generateOrderReceipt(order);
+      toast.success("Receipt downloaded!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to generate receipt");
+    } finally {
+      setIsDownloadingReceipt(false);
     }
   };
 
@@ -286,6 +303,57 @@ export default function OrderDetailPage() {
 
         {/* Right Column: Info */}
         <div className="space-y-6">
+          {/* Quick Actions & Contact */}
+          {isAdmin && (
+            <Card className="bg-slate-900/30 border-slate-800 overflow-hidden shadow-lg shadow-emerald-500/5">
+              <CardHeader className="bg-emerald-500/5 py-4 border-b border-emerald-500/10">
+                <CardTitle className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-widest">
+                  <Send className="h-4 w-4 text-emerald-500" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                {/* Contact WhatsApp */}
+                {(order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone) && (
+                  <Button
+                    className="w-full gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black h-12 rounded-xl transition-all active:scale-[0.98]"
+                    onClick={() => {
+                      const phoneStr = order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone || '';
+                      const cleaned = phoneStr.replace(/\D/g, '');
+                      const waNumber = cleaned.startsWith('0') ? '62' + cleaned.substring(1) : cleaned;
+                      window.open(`https://wa.me/${waNumber}`, '_blank');
+                    }}
+                  >
+                    <div className="relative w-5 h-5 shrink-0">
+                      <Image
+                        src="/ic_wa.png"
+                        alt="WhatsApp"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    Contact Customer
+                  </Button>
+                )}
+
+                {/* Download Receipt for Admin */}
+                {order.payment?.status === "PAID" && (
+                  <Button
+                    onClick={handleDownloadReceipt}
+                    disabled={isDownloadingReceipt}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black h-12 rounded-xl gap-2 transition-all active:scale-[0.98]"
+                  >
+                    {isDownloadingReceipt ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</>
+                    ) : (
+                      <><Download className="h-4 w-4" /> Download Receipt</>
+                    )}
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Payment Card */}
           <Card className="bg-slate-900/30 border-slate-800 overflow-hidden">
             <CardHeader className="bg-slate-800/30 py-4 border-b border-slate-700/50">
@@ -380,14 +448,14 @@ export default function OrderDetailPage() {
                     onKeyDown={(e) => e.key === "Enter" && handleMarkAsShipped()}
                   />
                   <Button
-                    className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 rounded-xl"
                     onClick={handleMarkAsShipped}
                     disabled={isShipping || !trackingInput.trim()}
                   >
                     {isShipping ? (
-                      <><Loader2 className="h-4 v-4 animate-spin" /> Saving...</>
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
                     ) : (
-                      <><Send className="h-4 w-4" /> Confirm Shipping</>  
+                      <><Send className="h-4 w-4" /> Confirm Shipping</>
                     )}
                   </Button>
                 </div>
@@ -403,8 +471,7 @@ export default function OrderDetailPage() {
                 Delivery Address
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-3 flex flex-col justify-between h-full">
-              <div className="flex-1">
+            <CardContent className="p-4 space-y-3">
               <div>
                 <p className="text-sm font-black text-white mb-1">
                   {order.shippingAddress?.fullName || order.shippingAddr?.fullName || '-'}
@@ -413,34 +480,16 @@ export default function OrderDetailPage() {
                   {order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone}
                 </p>
               </div>
-              <p className="text-xs font-medium text-slate-300 leading-relaxed">
+              <p className="text-xs font-medium text-slate-300 leading-relaxed uppercase tracking-tight">
                 {order.shippingAddress?.address || order.shippingAddr?.address || '-'}<br />
                 {order.shippingAddress?.city || order.shippingAddr?.city || '-'}, {order.shippingAddress?.province || order.shippingAddr?.province || '-'}<br />
                 {order.shippingAddress?.postalCode || order.shippingAddr?.postalCode || '-'}
               </p>
-              </div>
-              
-              {isAdmin && (order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone) && (
-                <div className="pt-3 border-t border-slate-700/50 mt-auto">
-                  <Button 
-                    className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-                    onClick={() => {
-                      const phoneStr = order.shippingAddress?.phone || order.shippingAddr?.phone || order.phone || '';
-                      const cleaned = phoneStr.replace(/\D/g, '');
-                      const waNumber = cleaned.startsWith('0') ? '62' + cleaned.substring(1) : cleaned;
-                      window.open(`https://wa.me/${waNumber}`, '_blank');
-                    }}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    Contact Customer
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
-        </div >
-      </div >
-    </div >
+        </div>
+      </div>
+    </div>
   );
 }
 

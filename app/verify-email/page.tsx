@@ -36,7 +36,7 @@ function VerifyEmailContent() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-border shadow-xl p-10 md:p-16 space-y-8">
+      <div className="max-w-md w-full bg-white rounded-3xl border border-border shadow-xl p-10 md:p-16 space-y-8 text-slate-900">
         <Link href="/" className="inline-block mb-4">
           <div className="text-3xl font-black text-slate-900 tracking-tighter italic">
             EMOBO<span className="text-primary italic">.</span>
@@ -49,8 +49,8 @@ function VerifyEmailContent() {
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Verifying...</h1>
-              <p className="text-muted-foreground">Please wait, we are verifying your data.</p>
+              <h1 className="text-3xl font-bold text-slate-900">Verifying...</h1>
+              <p className="text-slate-500">Please wait, we are verifying your data.</p>
             </div>
           </div>
         )}
@@ -63,9 +63,9 @@ function VerifyEmailContent() {
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Success!</h1>
-              <p className="text-muted-foreground text-lg">
-                Your email has been confirmed. You can now login and start shopping for premium laptops.
+              <h1 className="text-3xl font-extrabold text-slate-900">🎉 Email Confirmed!</h1>
+              <p className="text-slate-600 text-base leading-relaxed">
+                Your email has been confirmed successfully. You can now login and start shopping for premium laptops!
               </p>
             </div>
             <Button asChild className="w-full bg-primary hover:bg-primary-dark transition-smooth h-12 text-lg font-bold shadow-lg shadow-primary/20">

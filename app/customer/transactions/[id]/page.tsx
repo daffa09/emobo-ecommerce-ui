@@ -17,12 +17,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2 } from "lucide-react";
+import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Download } from "lucide-react";
 import { fetchOrderById, cancelOrder, confirmOrderReceived, type Order } from "@/lib/api-service";
 import { formatIDR, cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
 import { API_URL } from "@/lib/auth-service";
+import { generateOrderReceipt } from "@/lib/pdf-service";
 import {
   Dialog,
   DialogContent,
@@ -62,7 +63,22 @@ export default function OrderDetailPage() {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  const handleDownloadReceipt = async () => {
+    if (!order) return;
+    setIsDownloadingReceipt(true);
+    try {
+      await generateOrderReceipt(order);
+      toast.success("Receipt downloaded!");
+    } catch (err) {
+      console.error("Failed to generate receipt:", err);
+      toast.error("Failed to generate receipt");
+    } finally {
+      setIsDownloadingReceipt(false);
+    }
+  };
 
   useEffect(() => {
     async function loadOrder() {
@@ -380,6 +396,7 @@ export default function OrderDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4">
+              {/* Status Row */}
               <div className="flex justify-between items-center">
                 <p className="text-xs font-bold text-slate-500 uppercase">Status</p>
                 <Badge
@@ -390,58 +407,75 @@ export default function OrderDetailPage() {
                 </Badge>
               </div>
 
+              {/* Buttons for Pending Payment */}
               {order.status === "PENDING" && order.payment?.status !== "PAID" && (
+                <div className="space-y-3">
+                  <Button
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
+                    onClick={handlePayment}
+                    disabled={isPaying}
+                  >
+                    {isPaying ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Pay Now
+                      </>
+                    )}
+                  </Button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
+                        disabled={isCancelling || isPaying}
+                      >
+                        {isCancelling ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Cancelling...
+                          </>
+                        ) : (
+                          "Cancel Order"
+                        )}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-400">
+                          Are you sure you want to cancel this order? This will restore the product stock.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white">Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCancel} className="bg-red-500 hover:bg-red-600 text-white border-0">Confirm Cancel</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
+
+              {/* Download Receipt Button - Prominent Placement */}
+              {order.payment?.status === "PAID" && (
                 <Button
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-black py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
-                  onClick={handlePayment}
-                  disabled={isPaying}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-6 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-300 active:scale-[0.98] gap-2 mb-2"
+                  onClick={handleDownloadReceipt}
+                  disabled={isDownloadingReceipt}
                 >
-                  {isPaying ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
+                  {isDownloadingReceipt ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Generating Receipt...</>
                   ) : (
-                    <>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Pay Now
-                    </>
+                    <><Download className="h-5 w-5" /> Download Receipt</>
                   )}
                 </Button>
               )}
 
-              {order.status === "PENDING" && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300"
-                      disabled={isCancelling || isPaying}
-                    >
-                      {isCancelling ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Cancelling...
-                        </>
-                      ) : (
-                        "Cancel Order"
-                      )}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-slate-400">
-                        Are you sure you want to cancel this order? This will restore the product stock.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700 hover:text-white">Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleCancel} className="bg-red-500 hover:bg-red-600 text-white border-0">Confirm Cancel</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
               {order.payment?.paymentMethod && (
                 <div className="flex justify-between items-center">
                   <p className="text-xs font-bold text-slate-500 uppercase">Method</p>
@@ -481,10 +515,10 @@ export default function OrderDetailPage() {
                     </div>
                   ) : (
                     <Button
-                      className="w-full bg-primary hover:bg-primary-dark text-black font-black"
+                      className="w-full bg-primary hover:bg-primary-dark text-white font-black"
                       onClick={() => setIsReviewOpen(true)}
                     >
-                      <Star className="mr-2 h-4 w-4 fill-current" />
+                      <Star className="mr-2 h-4 w-4 fill-white text-white" />
                       Rate Products
                     </Button>
                   )}
@@ -617,7 +651,7 @@ export default function OrderDetailPage() {
             <Button variant="outline" onClick={() => setIsReviewOpen(false)} className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
               Cancel
             </Button>
-            <Button onClick={handleReviewSubmit} disabled={submittingReview || rating === 0} className="bg-primary hover:bg-primary-dark text-black font-bold">
+            <Button onClick={handleReviewSubmit} disabled={submittingReview || rating === 0} className="bg-primary hover:bg-primary-dark text-white font-bold">
               {submittingReview ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</> : "Submit Review"}
             </Button>
           </DialogFooter>

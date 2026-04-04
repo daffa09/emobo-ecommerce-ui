@@ -68,11 +68,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const reviewCount = 0; // TODO: Get from reviews
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 overflow-hidden">
       {/* Title & Rating */}
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl lg:text-4xl font-bold">
+          <h1 className="text-2xl lg:text-4xl font-bold wrap-break-word min-w-0">
             {product.name}
           </h1>
         </div>
@@ -96,9 +96,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <Separator />
 
       {/* Price */}
-      <div className="space-y-2">
-        <div className="flex items-baseline gap-3">
-          <span className="text-4xl font-bold text-primary">{formatIDR(product.price)}</span>
+      <div className="space-y-2 min-w-0 overflow-hidden">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <span className="text-3xl lg:text-4xl font-bold text-primary truncate max-w-full">{formatIDR(product.price)}</span>
           <Badge variant="secondary" className="text-xs">SKU: {product.sku}</Badge>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -126,7 +126,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {product.description && (
         <div className="space-y-2">
           <h3 className="font-semibold">Description:</h3>
-          <p className="text-sm text-muted-foreground">{product.description}</p>
+          <p className="text-sm text-muted-foreground wrap-break-word">{product.description}</p>
         </div>
       )}
 

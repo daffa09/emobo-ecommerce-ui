@@ -24,9 +24,10 @@ interface ProductCardProps {
   specs: string[];
   sku?: string;
   weight?: number;
+  isNew?: boolean;
 }
 
-export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight, isNew }: ProductCardProps) {
   const { addItem } = useCart();
   const router = useRouter();
   const [imgSrc, setImgSrc] = useState(getImageUrl(image));
@@ -63,63 +64,90 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-all border-border/50">
-      <Link href={`/products/${id}`}>
-        <div className="relative">
-          {discount && (
-            <Badge className="absolute top-2 left-2 z-10 bg-red-500 text-[10px] px-1.5 h-5">
-              {discount} OFF
-            </Badge>
-          )}
-          <div className="relative aspect-4/3 bg-muted/30 overflow-hidden">
-            <Image
-              src={imgSrc}
-              alt={name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={() => setImgSrc("/no-image.svg")}
-            />
-          </div>
+    <Card className="group h-full flex flex-col overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 border-border/40 hover:-translate-y-1.5 bg-card/50 backdrop-blur-sm">
+      <Link href={`/products/${id}`} className="block relative">
+        {/* Discount Badge */}
+        {discount && (
+          <Badge className="absolute top-3 left-3 z-20 bg-red-500 hover:bg-red-600 border-0 text-[10px] font-black px-2 h-5 shadow-lg shadow-red-500/30 uppercase tracking-tighter">
+            {discount} OFF
+          </Badge>
+        )}
+        
+        {/* SKU/Brand Mini Tag - Top Right */}
+        <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+           <Badge variant="outline" className="bg-black/40 backdrop-blur-md text-white border-0 text-[9px] px-1.5 h-4 font-mono">
+             #{id}
+           </Badge>
+        </div>
+
+        <div className="relative aspect-4/3 bg-slate-900/40 overflow-hidden shrink-0">
+          <Image
+            src={imgSrc}
+            alt={name}
+            fill
+            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            onError={() => setImgSrc("/no-image.svg")}
+          />
+          {/* subtle overlay on hover */}
+          <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
       </Link>
-      <CardContent className="p-3 space-y-2">
-        <Link href={`/products/${id}`}>
-          <h3 className="text-sm font-bold line-clamp-2 min-h-[40px] leading-tight hover:text-primary transition-colors">
+
+      <CardContent className="p-4 flex-1 flex flex-col space-y-3">
+        {/* Brand & Category row above Title */}
+        <div className="flex flex-wrap gap-1.5 items-center">
+          {specs.slice(0, 2).map((spec, idx) => (
+            <Badge 
+              key={idx} 
+              variant="outline" 
+              className="text-[9px] px-2 h-4.5 border-primary/20 bg-primary/5 text-primary-foreground/70 font-black uppercase tracking-widest"
+            >
+              {spec}
+            </Badge>
+          ))}
+        </div>
+
+        <Link href={`/products/${id}`} className="flex-1">
+          <h3 className="text-sm font-black line-clamp-2 leading-snug text-white hover:text-primary transition-colors decoration-primary/30 group-hover:underline underline-offset-4">
             {name}
           </h3>
         </Link>
         
-        <div className="flex items-center justify-between">
-          {rating > 0 && (
-            <div className="flex items-center gap-1 text-[11px]">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span className="font-bold">{rating}</span>
-              <span className="text-muted-foreground">({reviews})</span>
+        {/* Rating & Metadata Row */}
+        <div className="flex items-center gap-3 py-1 border-y border-border/10">
+          {rating > 0 ? (
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+              <span className="text-[11px] font-black text-white">{rating.toFixed(1)}</span>
+              <span className="text-[10px] text-slate-500 font-bold">({reviews})</span>
             </div>
+          ) : (
+            <div className="h-3" /> // Maintain height even without rating
           )}
-          <div className="flex flex-wrap gap-1">
-            {specs.slice(0, 2).map((spec, idx) => (
-              <Badge key={idx} variant="secondary" className="text-[10px] px-1 h-4 font-medium uppercase tracking-tighter">
-                {spec}
-              </Badge>
-            ))}
-          </div>
+          {rating > 0 && <div className="h-3 w-px bg-border/20" />}
+          {isNew && (
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">New Arrival</div>
+          )}
         </div>
 
-        <div className="pt-1 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm sm:text-base font-black text-primary">{formatIDR(Number(price))}</span>
+        <div className="pt-1 flex flex-col gap-3 mt-auto">
+          <div className="flex items-baseline gap-1">
+            <span className="text-lg font-black text-primary tracking-tighter">
+              {formatIDR(Number(price))}
+            </span>
           </div>
+          
           <Button 
             size="sm" 
-            className="w-full h-8 sm:h-9 rounded-lg text-[11px] sm:text-xs gap-2 font-bold shadow-sm shadow-primary/10" 
+            className="w-full h-10 rounded-xl bg-primary hover:bg-primary-dark text-white font-black text-xs gap-2 shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]" 
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            Add to Cart
+            <ShoppingCart className="h-4 w-4" />
+            Add to Bag
           </Button>
         </div>
       </CardContent>
     </Card>
+
   );
 }
