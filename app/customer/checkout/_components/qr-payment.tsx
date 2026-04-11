@@ -25,7 +25,7 @@ export function QRPayment({ amount, status = "waiting", onConfirm }: QRPaymentPr
 
         <div className="space-y-2">
           <p className="text-lg font-semibold">Amount Due</p>
-          <p className="text-3xl font-bold text-primary">${amount.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-primary">Rp {amount.toLocaleString()}</p>
         </div>
       </div>
 

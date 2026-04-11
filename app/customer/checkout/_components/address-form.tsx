@@ -363,7 +363,7 @@ export function AddressForm({ onSubmit, totalWeight }: AddressFormProps) {
                 <SelectItem key={opt.service} value={opt.service} className="whitespace-normal">
                   <span className="font-medium">{opt.service}</span>
                   {" "}({opt.description}){" "}
-                  <span className="text-primary font-semibold">Rp {opt.cost[0].value.toLocaleString('id-ID')}</span>
+                  <span className="text-primary font-semibold">Rp {opt.cost[0].value.toLocaleString('en-US')}</span>
                   {opt.cost[0].etd && (
                     <span className="text-muted-foreground text-xs"> · {opt.cost[0].etd} days</span>
                   )}

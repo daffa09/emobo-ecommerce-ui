@@ -43,14 +43,19 @@ export default function AdminDashboardPage() {
 
   const stats = [
     {
-      title: "Total Revenue",
-      val: formatIDR(report?.totalRevenue || 0),
-      icon: <div className="font-bold text-emerald-500">Rp</div>,
+      title: "Total Sales",
+      val: formatIDR(report?.totalSales || 0),
+      icon: <div className="font-bold text-blue-500">Rp</div>,
+    },
+    {
+      title: "Total Profit",
+      val: formatIDR(report?.totalProfit || 0),
+      icon: <div className="font-bold text-emerald-500">+$</div>,
     },
     {
       title: "Total Customers",
       val: report?.totalCustomers?.toString() || "0",
-      icon: <Users className="w-5 h-5 text-blue-500" />,
+      icon: <Users className="w-5 h-5 text-zinc-400" />,
     },
     {
       title: "Total Orders",
@@ -73,7 +78,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 grid-cols-2 lg:grid-cols-5">
         {stats.map((stat, i) => (
           <div key={i} className="group bg-zinc-900/50 p-6 rounded-xl border border-zinc-800/50 transition-smooth hover:border-zinc-700/50 hover:bg-zinc-900 shadow-lg">
             <div className="flex items-center justify-between mb-4">

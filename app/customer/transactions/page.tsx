@@ -178,7 +178,7 @@ export default function CustomerTransactionsPage() {
                         <span className="text-xs text-muted-foreground">Order #{order.id}</span>
                         <span className="text-xs text-muted-foreground">•</span>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(order.createdAt).toLocaleDateString("id-ID", {
+                          {new Date(order.createdAt).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "short",
                             day: "numeric",

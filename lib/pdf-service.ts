@@ -199,13 +199,12 @@ export async function generateOrderReceipt(order: Order): Promise<void> {
   y = (doc as any).lastAutoTable.finalY + 8;
 
   // ─── PRICING SUMMARY ──────────────────────────────────────────────────────────
-  const subtotal = order.totalAmount - order.shippingCost - (order.taxAmount || 0) - (order.appFee || 0);
+  const subtotal = order.totalAmount - order.shippingCost - (order.appFee || 0);
 
   const summaryItems: [string, string][] = [
     ["Subtotal", formatIDR(subtotal)],
     ["Shipping Cost", formatIDR(order.shippingCost)],
   ];
-  if ((order.taxAmount ?? 0) > 0) summaryItems.push(["Tax (PPN 11%)", formatIDR(order.taxAmount!)]);
   if ((order.appFee ?? 0) > 0) summaryItems.push(["App Fee", formatIDR(order.appFee!)]);
 
   const summaryBoxWidth = 80;

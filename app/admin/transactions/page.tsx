@@ -187,7 +187,7 @@ export default function AdminTransactionsPage() {
                           <span className="text-sm">{order.shippingService}</span>
                           {(order.trackingNumber || order.trackingNo) && (
                             <span className="text-xs text-muted-foreground">
-                              No Resi: {order.trackingNumber || order.trackingNo}
+                              Tracking Number: {order.trackingNumber || order.trackingNo}
                             </span>
                           )}
                         </div>

@@ -73,14 +73,10 @@ export default function CheckoutPage() {
 
     // 0. Check for 10jt limit in development
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const ppnRate = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11
     const appFeeAmount = process.env.NEXT_PUBLIC_APP_FEE ? parseInt(process.env.NEXT_PUBLIC_APP_FEE) : 1000
-    const tax = Math.round(subtotal * (ppnRate / 100))
-    const total = subtotal + shippingInfo.cost + tax + appFeeAmount
-    const isProduction = process.env.NEXT_PUBLIC_FLIP_IS_PRODUCTION === "true"
-
-    if (total > 10000000 && !isProduction) {
-      toast.error("For security reasons, transactions in development mode are limited to 10 million IDR.")
+    const total = subtotal + shippingInfo.cost + appFeeAmount
+    if (total > 10000000) {
+      toast.error("Transactions over 10 million IDR cannot be processed via QRIS at this time. Please contact support.")
       return
     }
 

@@ -57,9 +57,9 @@ export function SalesChartSection() {
     <section className="py-16 bg-muted/30">
       <div className="container px-4 mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Produk Paling Laris</h2>
+          <h2 className="text-3xl font-bold mb-4">Best Selling Products</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Cek laptop yang paling banyak dibeli oleh pelanggan kami. Jangan sampai kehabisan!
+            Check out our most popular laptops. Don't miss out!
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export function SalesChartSection() {
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
-                <Bar dataKey="sold" name="Total Terjual" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="sold" name="Total Sold" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}

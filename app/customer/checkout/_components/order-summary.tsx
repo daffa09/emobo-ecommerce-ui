@@ -17,11 +17,9 @@ export function OrderSummary({ items, shippingCost = 0 }: OrderSummaryProps) {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   
   // Get rates from env or use defaults
-  const ppnRate = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11
   const appFeeAmount = process.env.NEXT_PUBLIC_APP_FEE ? parseInt(process.env.NEXT_PUBLIC_APP_FEE) : 1000
 
-  const tax = Math.round(subtotal * (ppnRate / 100))
-  const total = subtotal + shippingCost + tax + appFeeAmount
+  const total = subtotal + shippingCost + appFeeAmount
 
   return (
     <div className="bg-surface rounded-xl p-6 space-y-6">
@@ -54,10 +52,7 @@ export function OrderSummary({ items, shippingCost = 0 }: OrderSummaryProps) {
           </span>
           <span className="text-foreground">{shippingCost > 0 ? formatIDR(shippingCost) : "-"}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-foreground">Tax (PPN {ppnRate}%)</span>
-          <span className="text-foreground">{formatIDR(tax)}</span>
-        </div>
+
         <div className="flex justify-between text-sm">
           <span className="text-foreground">App Fee</span>
           <span className="text-foreground">{formatIDR(appFeeAmount)}</span>

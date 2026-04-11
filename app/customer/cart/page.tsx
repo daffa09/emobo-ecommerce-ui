@@ -19,6 +19,14 @@ export default function CartPage() {
 
   const handleCheckoutClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    if (totalPrice > 10000000) {
+      toast.error("Transaction Rejected", {
+        description: "Transactions over 10 million IDR cannot proceed due to QRIS Sandbox limits. Please contact support.",
+      });
+      return;
+    }
+
     try {
       setChecking(true);
       const profile = await fetchUserProfile();
@@ -108,10 +116,6 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-foreground">Shipping</span>
-                    <span>Calculated at checkout</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-foreground">Tax</span>
                     <span>Calculated at checkout</span>
                   </div>
                 </div>

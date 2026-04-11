@@ -359,18 +359,12 @@ export default function OrderDetailPage() {
           <div className="p-6 bg-slate-900/50 border-t border-slate-800 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Subtotal</span>
-              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost - (order.taxAmount || 0) - (order.appFee || 0))}</span>
+              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost - (order.appFee || 0))}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-400 font-medium">Shipping Cost</span>
               <span className="text-white font-bold">{formatIDR(order.shippingCost)}</span>
             </div>
-            {(order.taxAmount ?? 0) > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-400 font-medium">Tax (PPN)</span>
-                <span className="text-white font-bold">{formatIDR(order.taxAmount!)}</span>
-              </div>
-            )}
             {(order.appFee ?? 0) > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400 font-medium">App Fee</span>
@@ -542,7 +536,7 @@ export default function OrderDetailPage() {
               </div>
               {(order.trackingNo || order.trackingNumber) && (
                 <div>
-                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">No Resi</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase mb-2">Tracking Number</p>
                   <div className="bg-slate-800/80 p-2 rounded-lg border border-slate-700 flex items-center justify-between">
                     <p className="text-xs font-mono font-bold text-primary tracking-widest">{order.trackingNo || order.trackingNumber}</p>
                     <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-white" onClick={() => {

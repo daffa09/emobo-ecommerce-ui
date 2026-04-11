@@ -12,8 +12,10 @@ interface SalesReportData {
     date: string;
     customer: string;
     totalAmount: number;
+    profit: number;
   }[];
   totalSales: number;
+  totalProfit: number;
   period: { startDate: string | null; endDate: string | null };
 }
 
@@ -204,6 +206,7 @@ export default function PrintReportPage() {
                   <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 800, textTransform: "uppercase", fontSize: 9, letterSpacing: "0.1em" }}>Order ID</th>
                   <th style={{ padding: "10px 12px", textAlign: "left", fontWeight: 800, textTransform: "uppercase", fontSize: 9, letterSpacing: "0.1em" }}>Customer</th>
                   <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 800, textTransform: "uppercase", fontSize: 9, letterSpacing: "0.1em" }}>Total Amount</th>
+                  <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 800, textTransform: "uppercase", fontSize: 9, letterSpacing: "0.1em" }}>Est. Profit</th>
                 </tr>
               </thead>
               <tbody>
@@ -216,16 +219,22 @@ export default function PrintReportPage() {
                     <td style={{ padding: "9px 12px", textAlign: "right", fontWeight: 700 }}>
                       Rp {order.totalAmount.toLocaleString("id-ID")}
                     </td>
+                    <td style={{ padding: "9px 12px", textAlign: "right", fontWeight: 700, color: "#16a34a" }}>
+                      Rp {order.profit.toLocaleString("id-ID")}
+                    </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr style={{ borderTop: "2px solid #000", background: "#f8fafc" }}>
                   <td colSpan={4} style={{ padding: "12px 12px", textAlign: "right", fontWeight: 900, textTransform: "uppercase", fontSize: 11, letterSpacing: "0.05em" }}>
-                    Total Revenue
+                    Grand Total
                   </td>
                   <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 900, fontSize: 14, color: accentColor }}>
                     Rp {salesData.totalSales.toLocaleString("id-ID")}
+                  </td>
+                  <td style={{ padding: "12px 12px", textAlign: "right", fontWeight: 900, fontSize: 14, color: "#16a34a" }}>
+                    Rp {salesData.totalProfit.toLocaleString("id-ID")}
                   </td>
                 </tr>
               </tfoot>

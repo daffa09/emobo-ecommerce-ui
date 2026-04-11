@@ -27,6 +27,7 @@ export function CatalogGrid() {
   const searchParam = searchParams.get("search");
   const minPriceParam = searchParams.get("minPrice");
   const maxPriceParam = searchParams.get("maxPrice");
+  const conditionParam = searchParams.get("condition");
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -69,6 +70,7 @@ export function CatalogGrid() {
         if (searchParam) params.search = searchParam;
         if (minPriceParam) params.minPrice = Number(minPriceParam);
         if (maxPriceParam) params.maxPrice = Number(maxPriceParam);
+        if (conditionParam) params.condition = conditionParam;
 
         if (sortBy === "price-low") params.sortBy = "price_asc";
         else if (sortBy === "price-high") params.sortBy = "price_desc";
@@ -92,7 +94,7 @@ export function CatalogGrid() {
       }
     }
     loadProducts();
-  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy, currentPage, isMobile]);
+  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, conditionParam, sortBy, currentPage, isMobile]);
 
   // Reset page when filters or view mode change
   useEffect(() => {
@@ -100,7 +102,7 @@ export function CatalogGrid() {
     if (!isMobile) {
       setProducts([]); // Clear products when switching to desktop to ensure fresh load
     }
-  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, sortBy, isMobile]);
+  }, [brandParam, categoryParam, searchParam, minPriceParam, maxPriceParam, conditionParam, sortBy, isMobile]);
 
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
@@ -256,7 +258,7 @@ export function CatalogGrid() {
                      image={getImageUrl(product.images[0])}
                      rating={product.rating || 0}
                      reviews={product.reviewsCount || 0}
-                     specs={[product.brand, product.category]}
+                     specs={[product.brand, product.category, product.condition === "SECOND" ? "Second" : "New"]}
                      isNew={sortBy === "newest"}
                    />
                  </div>
@@ -290,6 +292,7 @@ export function CatalogGrid() {
                              </div>
                              <span className="text-sm text-muted-foreground whitespace-nowrap">{product.reviewsCount || 0} Reviews</span>
                              <span className="text-sm font-bold text-primary">{product.category}</span>
+                             <span className="text-sm font-bold text-muted-foreground">• {product.condition === "SECOND" ? "Second" : "New"}</span>
                            </div>
                          )}
                       </div>

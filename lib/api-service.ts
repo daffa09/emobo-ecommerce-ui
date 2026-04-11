@@ -8,8 +8,10 @@ import { getCookie, clearAuthCookies } from "./cookie-utils";
 export interface Product {
   id: number;
   sku: string;
+  serialNumber: string | null;
   name: string;
   price: number;
+  buyPrice: number;
   brand: string;
   category: string;
   description: string | null;
@@ -37,6 +39,27 @@ export interface Review {
   user?: {
     name: string | null;
     email: string;
+  };
+}
+
+export interface SalesReport {
+  totalSales: number;
+  totalProfit: number;
+  orders: {
+    id: number;
+    date: string;
+    customer: string;
+    totalAmount: number;
+    profit: number;
+    items: {
+      productName: string;
+      quantity: number;
+      price: number;
+    }[];
+  }[];
+  period: {
+    startDate: string | null;
+    endDate: string | null;
   };
 }
 

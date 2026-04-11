@@ -26,15 +26,19 @@ export default function EditProductPage() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
 
+  const PPN_RATE = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11;
+
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     sku: "",
+    serialNumber: "",
     name: "",
     brand: "",
     price: "",
+    buyPrice: "",
     stock: "",
     description: "",
     condition: "NEW",
@@ -43,6 +47,10 @@ export default function EditProductPage() {
     specs: "{}",
   });
 
+  const finalPricePreview = formData.price 
+    ? Math.round(parseFloat(formData.price) * (1 + PPN_RATE / 100))
+    : 0;
+
   useEffect(() => {
     async function loadProduct() {
       try {
@@ -50,9 +58,12 @@ export default function EditProductPage() {
         setProduct(data);
         setFormData({
           sku: data.sku,
+          serialNumber: data.serialNumber || "",
           name: data.name,
           brand: data.brand,
-          price: data.price.toString(),
+          // Convert Retail Price back to Base Price for editing
+          price: Math.round(data.price / (1 + PPN_RATE / 100)).toString(),
+          buyPrice: data.buyPrice.toString(),
           stock: data.stock.toString(),
           description: data.description || "",
           condition: data.condition || "NEW",
@@ -162,9 +173,11 @@ export default function EditProductPage() {
       // Update product
       await updateProduct(productId, {
         sku: formData.sku,
+        serialNumber: formData.serialNumber || null,
         name: formData.name,
         brand: formData.brand,
         price: parseFloat(formData.price),
+        buyPrice: parseInt(formData.buyPrice) || 0,
         stock: parseInt(formData.stock),
         description: formData.description,
         images: allImages,
@@ -274,6 +287,17 @@ export default function EditProductPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="serialNumber" className="text-zinc-300">Serial Number</Label>
+                <Input
+                  id="serialNumber"
+                  placeholder="e.g., SN12345678"
+                  value={formData.serialNumber}
+                  onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="brand" className="text-zinc-300">Brand</Label>
                 <Select
                   value={formData.brand}
@@ -287,6 +311,22 @@ export default function EditProductPage() {
                     {BRANDS.map(brand => (
                       <SelectItem key={brand} value={brand}>{brand}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
+                <Select
+                  value={formData.condition}
+                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                  required
+                >
+                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="SECOND">Second</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -305,7 +345,21 @@ export default function EditProductPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price" className="text-zinc-300">Price (IDR)</Label>
+                <Label htmlFor="buyPrice" className="text-zinc-300">Buy Price / Modal (IDR)</Label>
+                <Input
+                  id="buyPrice"
+                  type="number"
+                  required
+                  min="0"
+                  placeholder="12000000"
+                  value={formData.buyPrice}
+                  onChange={(e) => setFormData({ ...formData, buyPrice: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700 font-bold text-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price" className="text-zinc-300">Base Sell Price (Before PPN)</Label>
                 <Input
                   id="price"
                   type="number"
@@ -316,6 +370,9 @@ export default function EditProductPage() {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   className="bg-zinc-800/50 border-zinc-700"
                 />
+                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">
+                  Retail Price (Inc. {PPN_RATE}% PPN): <span className="text-primary">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(finalPricePreview)}</span>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -332,23 +389,7 @@ export default function EditProductPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
-                <Select
-                  value={formData.condition}
-                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
-                >
-                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
-                    <SelectValue placeholder="Select condition" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="USED">Used</SelectItem>
-                    <SelectItem value="REFURBISHED">Refurbished</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="warranty" className="text-zinc-300">Warranty</Label>
                 <Input

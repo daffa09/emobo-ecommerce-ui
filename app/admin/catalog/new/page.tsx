@@ -23,18 +23,26 @@ export default function NewProductPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+  const PPN_RATE = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11;
+
   const [formData, setFormData] = useState({
     sku: "",
+    serialNumber: "",
     name: "",
     brand: "",
     price: "",
-    stock: "",
+    buyPrice: "",
+    stock: "1",
     description: "",
-    condition: "NEW",
+    condition: "USED",
     warranty: "",
     weight: "2",
     specs: "{}",
   });
+
+  const finalPricePreview = formData.price 
+    ? Math.round(parseFloat(formData.price) * (1 + PPN_RATE / 100))
+    : 0;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -115,10 +123,12 @@ export default function NewProductPage() {
       // Create product
       await createProduct({
         sku: formData.sku,
+        serialNumber: formData.serialNumber || null,
         name: formData.name,
         brand: formData.brand,
         category: "Laptop", // Default category
         price: parseFloat(formData.price),
+        buyPrice: parseInt(formData.buyPrice) || 0,
         stock: parseInt(formData.stock),
         description: formData.description,
         images: imageUrls,
@@ -205,6 +215,17 @@ export default function NewProductPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="serialNumber" className="text-zinc-300">Serial Number</Label>
+                <Input
+                  id="serialNumber"
+                  placeholder="e.g., SN12345678"
+                  value={formData.serialNumber}
+                  onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="brand" className="text-zinc-300">Brand</Label>
                 <Select
                   value={formData.brand}
@@ -218,6 +239,22 @@ export default function NewProductPage() {
                     {BRANDS.map(brand => (
                       <SelectItem key={brand} value={brand}>{brand}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
+                <Select
+                  value={formData.condition}
+                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                  required
+                >
+                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
+                     <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="SECOND">Second</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -235,23 +272,6 @@ export default function NewProductPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
-                <Select
-                  value={formData.condition}
-                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
-                >
-                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
-                    <SelectValue placeholder="Select condition" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="USED">Used</SelectItem>
-                    <SelectItem value="REFURBISHED">Refurbished</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="warranty" className="text-zinc-300">Warranty</Label>
                 <Input
@@ -275,11 +295,24 @@ export default function NewProductPage() {
                   className="bg-zinc-800/50 border-zinc-700"
                 />
               </div>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price" className="text-zinc-300">Price (IDR)</Label>
+                <Label htmlFor="buyPrice" className="text-zinc-300">Buy Price / Modal (IDR)</Label>
+                <Input
+                  id="buyPrice"
+                  type="number"
+                  required
+                  min="0"
+                  placeholder="12000000"
+                  value={formData.buyPrice}
+                  onChange={(e) => setFormData({ ...formData, buyPrice: e.target.value })}
+                  className="bg-zinc-800/50 border-zinc-700 font-bold text-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price" className="text-zinc-300">Base Sell Price (Before PPN)</Label>
                 <Input
                   id="price"
                   type="number"
@@ -291,6 +324,9 @@ export default function NewProductPage() {
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   className="bg-zinc-800/50 border-zinc-700"
                 />
+                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">
+                  Retail Price (Inc. {PPN_RATE}% PPN): <span className="text-primary">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(finalPricePreview)}</span>
+                </div>
               </div>
 
               <div className="space-y-2">

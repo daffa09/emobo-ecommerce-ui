@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 
 const brands = ["Lenovo", "ASUS", "HP", "Acer", "Dell", "MSI"];
 const categories = ["Gaming", "Business", "Ultrabook", "2-in-1"];
+const conditions = ["NEW", "SECOND"];
 
 export function CatalogFilters() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export function CatalogFilters() {
   // Multi-select states
   const selectedBrands = searchParams.get("brand")?.split(",") || [];
   const selectedCategories = searchParams.get("category")?.split(",") || [];
+  const selectedConditions = searchParams.get("condition")?.split(",") || [];
 
   // Update URL function
   const updateFilters = (updates: Record<string, string | null>) => {
@@ -47,8 +49,8 @@ export function CatalogFilters() {
     });
   };
 
-  const handleCheckboxChange = (type: "brand" | "category", value: string, checked: boolean) => {
-    const current = type === "brand" ? selectedBrands : selectedCategories;
+  const handleCheckboxChange = (type: "brand" | "category" | "condition", value: string, checked: boolean) => {
+    const current = type === "brand" ? selectedBrands : type === "category" ? selectedCategories : selectedConditions;
     let updated;
 
     if (checked) {
@@ -81,7 +83,7 @@ export function CatalogFilters() {
       <Card className="border-border dark:bg-slate-900/50 backdrop-blur-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-lg font-bold">Filters</CardTitle>
-          {(search || minPrice || maxPrice || selectedBrands.length > 0 || selectedCategories.length > 0) && (
+          {(search || minPrice || maxPrice || selectedBrands.length > 0 || selectedCategories.length > 0 || selectedConditions.length > 0) && (
             <Button
               variant="ghost"
               size="sm"
@@ -93,6 +95,8 @@ export function CatalogFilters() {
           )}
         </CardHeader>
         <CardContent className="space-y-6">
+          <Separator className="opacity-50" />
+
           {/* Search */}
           <div className="space-y-3">
             <Label className="text-sm font-bold opacity-70">Search</Label>
@@ -134,6 +138,29 @@ export function CatalogFilters() {
 
           <Separator className="opacity-50" />
 
+          {/* Conditions */}
+          <div className="space-y-4">
+            <Label className="text-sm font-bold opacity-70">Condition</Label>
+            <div className="space-y-3">
+              {conditions.map((condition) => (
+                <div key={condition} className="flex items-center space-x-3 group">
+                  <Checkbox
+                    id={`condition-${condition}`}
+                    className="rounded-md h-5 w-5 data-[state=checked]:bg-primary"
+                    checked={selectedConditions.includes(condition)}
+                    onCheckedChange={(checked) => handleCheckboxChange("condition", condition, !!checked)}
+                  />
+                  <Label
+                    htmlFor={`condition-${condition}`}
+                    className="text-sm font-medium cursor-pointer group-hover:text-primary transition-colors flex-1"
+                  >
+                    {condition === "NEW" ? "New" : "Second"}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Category */}
           <div className="space-y-4">
             <Label className="text-sm font-bold opacity-70">Category</Label>
@@ -159,7 +186,6 @@ export function CatalogFilters() {
 
           <Separator className="opacity-50" />
 
-          {/* Brands */}
           <div className="space-y-4">
             <Label className="text-sm font-bold opacity-70">Brands</Label>
             <div className="space-y-3">
@@ -181,6 +207,7 @@ export function CatalogFilters() {
               ))}
             </div>
           </div>
+
         </CardContent>
       </Card>
     </div>
