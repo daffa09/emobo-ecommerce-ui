@@ -9,8 +9,8 @@ import Link from "next/link";
 
 interface CartItemCardProps {
   item: CartItem;
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemove: (id: number) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
+  onRemove: (id: string) => void;
 }
 
 export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {

@@ -106,13 +106,13 @@ export function DashboardSidebar({ items, roleName: initialRoleName, roleDescrip
                       className={cn(
                         "h-12 rounded-lg transition-smooth group",
                         isCollapsed ? "px-0 justify-center w-full" : "px-4",
-                        isActive
-                          ? "bg-slate-800 text-white shadow-lg border border-slate-700 hover:bg-slate-700"
-                          : "hover:bg-slate-800/50 text-slate-400 hover:text-white"
+                          isActive
+                            ? "bg-primary/10 text-primary shadow-lg border border-primary/20 hover:bg-primary/20"
+                            : "hover:bg-white/5 text-slate-400 hover:text-white"
                       )}
                     >
                       <Link href={item.href} className={cn(isCollapsed && "justify-center w-full")}>
-                        <Icon className={cn("h-5 w-5", isActive ? "text-white" : "text-slate-500 group-hover:text-white")} />
+                        <Icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-slate-500 group-hover:text-white")} />
                         {!isCollapsed && <span className="font-medium">{item.name}</span>}
                         {!isCollapsed && isActive && <ChevronRight className="ml-auto w-4 h-4 text-white/50" />}
                       </Link>

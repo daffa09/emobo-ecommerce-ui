@@ -41,7 +41,7 @@ export default function AdminTransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [updatingOrder, setUpdatingOrder] = useState<number | null>(null);
+  const [updatingOrder, setUpdatingOrder] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
@@ -91,7 +91,7 @@ export default function AdminTransactionsPage() {
     }
   }
 
-  async function handleStatusChange(orderId: number, newStatus: string) {
+  async function handleStatusChange(orderId: string, newStatus: string) {
     try {
       setUpdatingOrder(orderId);
       await updateOrderStatus(orderId, newStatus);
@@ -111,7 +111,7 @@ export default function AdminTransactionsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-white">Orders Management</h1>
       </div>
 
-      <Card className="bg-zinc-900/50 border-zinc-800/50">
+      <Card className="glass-card border-white/5">
         <CardHeader>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -157,7 +157,7 @@ export default function AdminTransactionsPage() {
             <div className="rounded-md border border-zinc-800 overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-800 hover:bg-zinc-800/50">
+                  <TableRow className="border-white/10 hover:bg-white/5">
                     <TableHead className="text-zinc-400">Order ID</TableHead>
                     <TableHead className="text-zinc-400">Customer</TableHead>
                     <TableHead className="text-zinc-400">Total</TableHead>
@@ -169,7 +169,7 @@ export default function AdminTransactionsPage() {
                 </TableHeader>
                 <TableBody>
                   {paginatedOrders.map((order) => (
-                    <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/30">
+                    <TableRow key={order.id} className="border-white/5 hover:bg-white/5 transition-smooth">
                       <TableCell className="font-mono text-sm text-zinc-300">
                         #{order.id}
                       </TableCell>

@@ -10,16 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Upload, X, Image as ImageIcon, Save } from "lucide-react";
 import { toast } from "sonner";
-import { fetchProductById, updateProduct, type Product } from "@/lib/api-service";
+import { fetchProductById, updateProduct, type Product, fetchBrands, fetchConditions, Brand, Condition } from "@/lib/api-service";
 import { getCookie } from "@/lib/cookie-utils";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
-const BRANDS = ["ASUS", "Lenovo", "Apple", "HP", "Dell", "Acer", "MSI", "Razer"];
 
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
-  const productId = parseInt(params.id as string);
+  const productId = params.id as string;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,16 +31,19 @@ export default function EditProductPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
+
   const [formData, setFormData] = useState({
     sku: "",
     serialNumber: "",
     name: "",
-    brand: "",
+    brandId: "",
     price: "",
     buyPrice: "",
     stock: "",
     description: "",
-    condition: "NEW",
+    conditionId: "",
     warranty: "",
     weight: "2000",
     specs: "{}",
@@ -52,21 +54,27 @@ export default function EditProductPage() {
     : 0;
 
   useEffect(() => {
-    async function loadProduct() {
+    async function loadData() {
       try {
-        const data = await fetchProductById(productId);
+        const [data, b, c] = await Promise.all([
+          fetchProductById(productId),
+          fetchBrands(),
+          fetchConditions()
+        ]);
+        setBrands(b);
+        setConditions(c);
         setProduct(data);
         setFormData({
           sku: data.sku,
           serialNumber: data.serialNumber || "",
           name: data.name,
-          brand: data.brand,
+          brandId: data.brandId || (data as any).brand, // fallback
           // Convert Retail Price back to Base Price for editing
           price: Math.round(data.price / (1 + PPN_RATE / 100)).toString(),
           buyPrice: data.buyPrice.toString(),
           stock: data.stock.toString(),
           description: data.description || "",
-          condition: data.condition || "NEW",
+          conditionId: data.conditionId || (data as any).condition, // fallback
           warranty: data.warranty || "",
           weight: (data.weight ? data.weight / 1000 : 2).toString(),
           specs: typeof data.specifications === 'string' ? data.specifications : (data.specifications ? JSON.stringify(data.specifications, null, 2) : ""),
@@ -80,8 +88,8 @@ export default function EditProductPage() {
         setLoading(false);
       }
     }
-    loadProduct();
-  }, [productId, router]);
+    loadData();
+  }, [productId, router, PPN_RATE]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -175,14 +183,14 @@ export default function EditProductPage() {
         sku: formData.sku,
         serialNumber: formData.serialNumber || null,
         name: formData.name,
-        brand: formData.brand,
+        brandId: formData.brandId,
         price: parseFloat(formData.price),
         buyPrice: parseInt(formData.buyPrice) || 0,
         stock: parseInt(formData.stock),
         description: formData.description,
         images: allImages,
         specifications: formData.specs,
-        condition: formData.condition,
+        conditionId: formData.conditionId,
         warranty: formData.warranty,
         weight: Math.round(parseFloat(formData.weight) * 1000) || 1500,
       });
@@ -300,16 +308,16 @@ export default function EditProductPage() {
               <div className="space-y-2">
                 <Label htmlFor="brand" className="text-zinc-300">Brand</Label>
                 <Select
-                  value={formData.brand}
-                  onValueChange={(value) => setFormData({ ...formData, brand: value })}
+                  value={formData.brandId}
+                  onValueChange={(value) => setFormData({ ...formData, brandId: value })}
                   required
                 >
                   <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {BRANDS.map(brand => (
-                      <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                    {brands.map(b => (
+                      <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -317,16 +325,17 @@ export default function EditProductPage() {
               <div className="space-y-2">
                 <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
                 <Select
-                  value={formData.condition}
-                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                  value={formData.conditionId}
+                  onValueChange={(value) => setFormData({ ...formData, conditionId: value })}
                   required
                 >
                   <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="SECOND">Second</SelectItem>
+                    {conditions.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

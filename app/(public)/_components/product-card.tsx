@@ -14,7 +14,7 @@ import { getCookie } from "@/lib/cookie-utils";
 import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
-  id: number;
+  id: string;
   name: string;
   price: string;
   image: string;

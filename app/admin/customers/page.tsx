@@ -62,7 +62,7 @@ export default function AdminCustomersPage() {
         <h1 className="text-3xl font-bold tracking-tight text-white">Customers</h1>
       </div>
 
-      <Card className="bg-zinc-900/50 border-zinc-800/50">
+      <Card className="glass-card border-white/5">
         <CardHeader>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <CardTitle className="text-white">All Customers ({filteredCustomers.length})</CardTitle>
@@ -92,7 +92,7 @@ export default function AdminCustomersPage() {
             <div className="rounded-md border border-zinc-800">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-zinc-800 hover:bg-zinc-800/50">
+                  <TableRow className="border-white/10 hover:bg-white/5">
                     <TableHead className="text-zinc-400">ID</TableHead>
                     <TableHead className="text-zinc-400">Name</TableHead>
                     <TableHead className="text-zinc-400">Email</TableHead>
@@ -108,7 +108,7 @@ export default function AdminCustomersPage() {
                     const role = (customer.role || "CUSTOMER").toUpperCase();
 
                     return (
-                      <TableRow key={customer.id} className="border-zinc-800 hover:bg-zinc-800/30">
+                      <TableRow key={customer.id} className="border-white/5 hover:bg-white/5 transition-smooth">
                         <TableCell className="font-mono text-sm text-zinc-300">
                           #{customer.id}
                         </TableCell>

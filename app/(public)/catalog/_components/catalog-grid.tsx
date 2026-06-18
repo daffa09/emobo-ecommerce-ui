@@ -258,7 +258,7 @@ export function CatalogGrid() {
                      image={getImageUrl(product.images[0])}
                      rating={product.rating || 0}
                      reviews={product.reviewsCount || 0}
-                     specs={[product.brand, product.category, product.condition === "SECOND" ? "Second" : "New"]}
+                     specs={[product.brand?.name, product.category, product.condition?.name]}
                      isNew={sortBy === "newest"}
                    />
                  </div>
@@ -277,7 +277,7 @@ export function CatalogGrid() {
                         (e.target as HTMLImageElement).src = "/no-image.svg";
                       }}
                     />
-                    <Badge className="absolute top-3 left-3 bg-primary/90 backdrop-blur-md">{product.brand}</Badge>
+                    <Badge className="absolute top-3 left-3 bg-primary/90 backdrop-blur-md">{product.brand?.name}</Badge>
                   </div>
 
                   <div className="flex-1 flex flex-col pt-2">
@@ -292,7 +292,7 @@ export function CatalogGrid() {
                              </div>
                              <span className="text-sm text-muted-foreground whitespace-nowrap">{product.reviewsCount || 0} Reviews</span>
                              <span className="text-sm font-bold text-primary">{product.category}</span>
-                             <span className="text-sm font-bold text-muted-foreground">• {product.condition === "SECOND" ? "Second" : "New"}</span>
+                             <span className="text-sm font-bold text-muted-foreground">• {product.condition?.name === "SECOND" ? "Second" : "New"}</span>
                            </div>
                          )}
                       </div>

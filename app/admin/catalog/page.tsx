@@ -27,7 +27,7 @@ export default function AdminCatalogPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isMobile, setIsMobile] = useState(false);
@@ -152,7 +152,7 @@ export default function AdminCatalogPage() {
         </Link>
       </div>
 
-      <div className="bg-zinc-900/50 p-4 sm:p-5 rounded-2xl border border-zinc-800/50 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-6">
+      <div className="glass-card p-4 sm:p-5 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div className="flex-1">
           <h2 className="text-xl font-bold text-white">
             {searchQuery ? `Results for "${searchQuery}"` : "Our Products"}
@@ -203,7 +203,7 @@ export default function AdminCatalogPage() {
           <p className="text-zinc-400 font-medium animate-pulse">Loading products data...</p>
         </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-20 bg-zinc-900/30 rounded-3xl border border-dashed border-zinc-800/50">
+        <div className="text-center py-20 glass-card border-dashed border-white/10">
           <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Search className="w-10 h-10 text-primary opacity-20" />
           </div>
@@ -216,7 +216,7 @@ export default function AdminCatalogPage() {
           {viewMode === "grid" ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
               {products.map((product) => (
-                <Card key={product.id} className="group overflow-hidden bg-zinc-900/50 border-zinc-800 hover:shadow-xl hover:border-zinc-700 transition-all flex flex-col">
+                <Card key={product.id} className="group overflow-hidden glass hover:shadow-2xl hover:border-primary/50 hover:bg-white/5 transition-all flex flex-col border-white/5">
                   <div className="relative aspect-16/11 bg-zinc-800/50 overflow-hidden">
                     <img
                       src={getImageUrl(product.images?.[0])}
@@ -227,7 +227,7 @@ export default function AdminCatalogPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <Badge className="absolute top-3 left-3 bg-zinc-900/90 backdrop-blur-md text-white border-zinc-700">
-                      {product.brand}
+                      {product.brand?.name || "No Brand"}
                     </Badge>
                   </div>
                   <CardContent className="p-3 sm:p-4 flex flex-col flex-1 space-y-2.5">
@@ -287,7 +287,7 @@ export default function AdminCatalogPage() {
           ) : (
             <div className="space-y-4">
               {products.map((product) => (
-                <div key={product.id} className="bg-zinc-900/50 rounded-3xl border border-zinc-800 p-5 flex flex-col md:flex-row gap-6 hover:shadow-xl hover:border-zinc-700 transition-all group overflow-hidden">
+                <div key={product.id} className="glass rounded-3xl border border-white/5 p-5 flex flex-col md:flex-row gap-6 hover:shadow-2xl hover:border-primary/50 hover:bg-white/5 transition-all group overflow-hidden">
                   <div className="w-full md:w-48 h-40 rounded-2xl overflow-hidden bg-zinc-800/50 shrink-0 relative">
                     <img
                       src={getImageUrl(product.images?.[0])}
@@ -298,7 +298,7 @@ export default function AdminCatalogPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <Badge className="absolute top-3 left-3 bg-zinc-900/90 backdrop-blur-md text-white border-zinc-700">
-                      {product.brand}
+                      {product.brand?.name || "No Brand"}
                     </Badge>
                   </div>
 

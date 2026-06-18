@@ -80,14 +80,14 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-6 grid-cols-2 lg:grid-cols-5">
         {stats.map((stat, i) => (
-          <div key={i} className="group bg-zinc-900/50 p-6 rounded-xl border border-zinc-800/50 transition-smooth hover:border-zinc-700/50 hover:bg-zinc-900 shadow-lg">
+          <div key={i} className="group glass-card p-6 transition-smooth hover:border-primary/50 hover:shadow-primary/10 hover:-translate-y-1">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center group-hover:bg-primary/20 transition-smooth">
                 {stat.icon}
               </div>
             </div>
             <div>
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-1.5">{stat.title}</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{stat.title}</p>
               <p className="text-3xl font-black tracking-tight text-white leading-none">{stat.val}</p>
             </div>
           </div>
@@ -96,8 +96,8 @@ export default function AdminDashboardPage() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-zinc-900/50 p-8 rounded-2xl border border-zinc-800/50 relative overflow-hidden group shadow-lg">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-primary/10 transition-smooth" />
+          <div className="glass-card p-8 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-primary/20 transition-smooth" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-1.5 h-6 bg-primary rounded-full shadow-lg shadow-primary/40" />
@@ -106,9 +106,9 @@ export default function AdminDashboardPage() {
               <div className="space-y-4">
                 {recentOrders.length > 0 ? (
                   recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-black/40 border border-zinc-800/50 hover:bg-black/60 transition-smooth">
+                    <div key={order.id} className="flex items-center justify-between p-4 rounded-xl glass hover:bg-white/5 transition-smooth">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-zinc-500">
+                        <div className="w-10 h-10 rounded-lg bg-black/50 flex items-center justify-center text-slate-400">
                           <Package className="w-5 h-5" />
                         </div>
                         <div>
@@ -132,8 +132,8 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/50 overflow-hidden relative group shadow-lg">
-            <div className="p-6 border-b border-zinc-800/50 bg-white/5">
+          <div className="glass-card overflow-hidden relative group">
+            <div className="p-6 border-b border-white/10 bg-white/5">
               <div className="flex items-center gap-3">
                 <Target className="w-5 h-5 text-primary" />
                 <h4 className="text-lg font-black text-white tracking-tight">Quick Actions</h4>
@@ -147,9 +147,9 @@ export default function AdminDashboardPage() {
                   { name: "View Customers", href: "/admin/customers" },
                   { name: "Sales Reports", href: "/admin/reports" }
                 ].map((action, i) => (
-                  <Link key={i} href={action.href} className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-white/5 transition-smooth group border border-transparent hover:border-zinc-800/50 text-left">
-                    <span className="text-sm font-bold text-zinc-400 group-hover:text-white">{action.name}</span>
-                    <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-white group-hover:translate-x-1 transition-smooth" />
+                  <Link key={i} href={action.href} className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-white/10 transition-smooth group border border-transparent hover:border-primary/30 text-left">
+                    <span className="text-sm font-bold text-slate-400 group-hover:text-white">{action.name}</span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-primary group-hover:translate-x-1 transition-smooth" />
                   </Link>
                 ))}
               </div>

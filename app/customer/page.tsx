@@ -297,7 +297,7 @@ export default function CustomerDashboardPage() {
               image={getImageUrl(product.images[0])}
               rating={product.rating || 0}
               reviews={product.reviewsCount || 0}
-              specs={[product.brand, product.category]}
+              specs={[product.brand?.name, product.category]}
             />
           ))}
         </div>

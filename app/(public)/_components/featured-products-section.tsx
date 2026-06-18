@@ -86,7 +86,7 @@ export function FeaturedProductsSection({
                   image={product.images[0] || "/no-image.svg"}
                   rating={0}
                   reviews={0}
-                  specs={[product.brand]}
+                  specs={[product.brand?.name]}
                   isNew={sortBy === "newest"}
                 />
               </div>

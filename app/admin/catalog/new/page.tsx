@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
-import { createProduct } from "@/lib/api-service";
+import { createProduct, fetchBrands, fetchConditions, Brand, Condition } from "@/lib/api-service";
 import { getCookie } from "@/lib/cookie-utils";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -22,6 +22,18 @@ export default function NewProductPage() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
+
+  useEffect(() => {
+    Promise.all([fetchBrands(), fetchConditions()]).then(([b, c]) => {
+      setBrands(b);
+      setConditions(c);
+      if (b.length > 0) setFormData(prev => ({ ...prev, brandId: b[0].id }));
+      if (c.length > 0) setFormData(prev => ({ ...prev, conditionId: c[0].id }));
+    }).catch(console.error);
+  }, []);
 
   const PPN_RATE = process.env.NEXT_PUBLIC_PPN_RATE ? parseInt(process.env.NEXT_PUBLIC_PPN_RATE) : 11;
 
@@ -29,12 +41,12 @@ export default function NewProductPage() {
     sku: "",
     serialNumber: "",
     name: "",
-    brand: "",
+    brandId: "",
     price: "",
     buyPrice: "",
     stock: "1",
     description: "",
-    condition: "USED",
+    conditionId: "",
     warranty: "",
     weight: "2",
     specs: "{}",
@@ -125,7 +137,7 @@ export default function NewProductPage() {
         sku: formData.sku,
         serialNumber: formData.serialNumber || null,
         name: formData.name,
-        brand: formData.brand,
+        brandId: formData.brandId,
         category: "Laptop", // Default category
         price: parseFloat(formData.price),
         buyPrice: parseInt(formData.buyPrice) || 0,
@@ -133,7 +145,7 @@ export default function NewProductPage() {
         description: formData.description,
         images: imageUrls,
         specifications: formData.specs,
-        condition: formData.condition,
+        conditionId: formData.conditionId,
         warranty: formData.warranty,
         weight: Math.round(parseFloat(formData.weight) * 1000) || 1500,
       });
@@ -228,16 +240,16 @@ export default function NewProductPage() {
               <div className="space-y-2">
                 <Label htmlFor="brand" className="text-zinc-300">Brand</Label>
                 <Select
-                  value={formData.brand}
-                  onValueChange={(value) => setFormData({ ...formData, brand: value })}
+                  value={formData.brandId}
+                  onValueChange={(value) => setFormData({ ...formData, brandId: value })}
                   required
                 >
                   <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BRANDS.map(brand => (
-                      <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                    {brands.map(b => (
+                      <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -245,16 +257,17 @@ export default function NewProductPage() {
               <div className="space-y-2">
                 <Label htmlFor="condition" className="text-zinc-300">Condition</Label>
                 <Select
-                  value={formData.condition}
-                  onValueChange={(value) => setFormData({ ...formData, condition: value })}
+                  value={formData.conditionId}
+                  onValueChange={(value) => setFormData({ ...formData, conditionId: value })}
                   required
                 >
                   <SelectTrigger className="bg-zinc-800/50 border-zinc-700">
                      <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="NEW">New</SelectItem>
-                    <SelectItem value="SECOND">Second</SelectItem>
+                    {conditions.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

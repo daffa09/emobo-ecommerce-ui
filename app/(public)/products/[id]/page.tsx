@@ -12,7 +12,7 @@ import { fetchProductById, fetchProductReviews, fetchPublicProducts, type Produc
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const productId = parseInt(params.id as string);
+  const productId = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -35,7 +35,7 @@ export default function ProductDetailPage() {
         // Fetch related products based on the loaded product
         if (productData) {
           const [similarRes, otherRes] = await Promise.all([
-            fetchPublicProducts({ brand: productData.brand, limit: 12 }), // Fetch slightly more to account for filtering current product
+            fetchPublicProducts({ brandId: productData.brandId, limit: 12 }), // Fetch slightly more to account for filtering current product
             fetchPublicProducts({ limit: 20 }) // Fetch more to filter out current brand
           ]);
 
@@ -48,7 +48,7 @@ export default function ProductDetailPage() {
 
           // Filter other brand products: different brand
           const filteredOther = otherRes.products
-            .filter(p => p.brand !== productData.brand)
+            .filter(p => p.brandId !== productData.brandId)
             .slice(0, 10);
 
           setOtherBrandProducts(filteredOther);
@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
             <ProductCarousel
               title={
                 <span className="flex items-center gap-2">
-                  More from {product.brand}
+                  More from {product.brand?.name}
                 </span>
               }
               products={similarProducts}

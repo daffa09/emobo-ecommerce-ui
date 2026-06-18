@@ -185,7 +185,11 @@ export default function OrdersPage() {
                           Write Review
                         </Button>
                       )}
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(`/account/orders/${order.id}/invoice`, '_blank')}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         Invoice
                       </Button>

@@ -61,7 +61,7 @@ export default function PurchaseOrderPage() {
   const [receiptUrl, setReceiptUrl] = useState("");
   const [totalItemsOnReceipt, setTotalItemsOnReceipt] = useState<number>(0);
   const [notes, setNotes] = useState("");
-  const [selectedItems, setSelectedItems] = useState<Array<{ product: Product; quantity: number }>>([]);
+  const [selectedItems, setSelectedItems] = useState<Array<{ product: Product; qty: number }>>([]);
   
   // Product Search State
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +71,7 @@ export default function PurchaseOrderPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const totalInputQty = useMemo(() => {
-    return selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+    return selectedItems.reduce((sum, item) => sum + item.qty, 0);
   }, [selectedItems]);
 
   const isQtyMismatch = totalInputQty !== totalItemsOnReceipt;
@@ -145,19 +145,19 @@ export default function PurchaseOrderPage() {
       toast.error("Product already in the list");
       return;
     }
-    setSelectedItems(prev => [...prev, { product, quantity: 1 }]);
+    setSelectedItems(prev => [...prev, { product, qty: 1 }]);
     setSearchQuery("");
     setSearchResults([]);
   };
 
-  const removeItem = (productId: number) => {
+  const removeItem = (productId: string) => {
     setSelectedItems(prev => prev.filter(item => item.product.id !== productId));
   };
 
-  const updateQuantity = (productId: number, qty: number) => {
+  const updateQuantity = (productId: string, qty: number) => {
     if (qty < 1) return;
     setSelectedItems(prev => prev.map(item => 
-      item.product.id === productId ? { ...item, quantity: qty } : item
+      item.product.id === productId ? { ...item, qty: qty } : item
     ));
   };
 
@@ -172,7 +172,7 @@ export default function PurchaseOrderPage() {
         notes: notes || undefined,
         items: selectedItems.map(item => ({
           productId: item.product.id,
-          quantity: item.quantity
+          qty: item.qty
         }))
       });
 
@@ -292,7 +292,7 @@ export default function PurchaseOrderPage() {
                                 <img src={getImageUrl(product.images?.[0])} className="w-10 h-10 rounded object-cover border border-zinc-700" alt="" />
                                 <div>
                                   <p className="text-sm font-bold text-white leading-tight">{product.name}</p>
-                                  <p className="text-[10px] text-zinc-500 font-mono uppercase">{product.sku} • {product.brand}</p>
+                                  <p className="text-[10px] text-zinc-500 font-mono uppercase">{product.sku} • {product.brand?.name}</p>
                                 </div>
                               </div>
                               <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/10">
@@ -355,7 +355,7 @@ export default function PurchaseOrderPage() {
                               <div className="flex items-center justify-center gap-2">
                                 <Input 
                                   inputMode="numeric"
-                                  value={item.quantity === 0 ? "" : item.quantity}
+                                  value={item.qty === 0 ? "" : item.qty}
                                   onChange={(e) => {
                                     const val = e.target.value;
                                     if (val === "" || /^\d+$/.test(val)) {
@@ -578,13 +578,13 @@ export default function PurchaseOrderPage() {
                     ) : (
                       purchaseOrders.map((po) => (
                         <TableRow key={po.id} className="border-zinc-800/40 hover:bg-white/5 transition-colors group">
-                          <TableCell className="px-6 font-mono text-xs text-primary font-bold">#PO-{po.id.toString().padStart(4, '0')}</TableCell>
+                          <TableCell className="px-6 font-mono text-xs text-primary font-bold">#PO-{po.id.substring(0, 8).toUpperCase()}</TableCell>
                           <TableCell className="text-zinc-300 text-xs">{format(new Date(po.createdAt), "dd MMM yyyy, HH:mm")}</TableCell>
                           <TableCell className="text-center">
                             <Badge variant="secondary" className="bg-zinc-800 text-zinc-100 font-bold border-zinc-700">
-                              {po.items.reduce((sum, i) => sum + i.quantity, 0)} Pcs
+                              {po.items.reduce((sum, i) => sum + i.qty, 0)} Pcs
                             </Badge>
-                            {po.items.reduce((sum, i) => sum + i.quantity, 0) !== po.totalItemsOnReceipt && (
+                            {po.items.reduce((sum, i) => sum + i.qty, 0) !== po.totalItemsOnReceipt && (
                               <Badge className="ml-2 bg-amber-500/20 text-amber-500 border-amber-500/30 text-[9px] h-4">Mismatch</Badge>
                             )}
                           </TableCell>
@@ -613,7 +613,7 @@ export default function PurchaseOrderPage() {
                                <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl">
                                  <DialogHeader>
                                    <DialogTitle className="flex items-center gap-2">
-                                     Purchase Order Detail <Badge className="font-mono">#PO-{po.id}</Badge>
+                                     Purchase Order Detail <Badge className="font-mono">#PO-{po.id.substring(0, 8).toUpperCase()}</Badge>
                                    </DialogTitle>
                                    <DialogDescription className="text-zinc-500">
                                       Recorded on {format(new Date(po.createdAt), "eeee, dd MMMM yyyy HH:mm 'WIB'")}
@@ -630,7 +630,7 @@ export default function PurchaseOrderPage() {
                                          </div>
                                          <div className="flex justify-between items-center">
                                             <span>Total Validated:</span>
-                                            <span className="font-bold text-primary">{po.items.reduce((sum, i) => sum + i.quantity, 0)} Pcs</span>
+                                            <span className="font-bold text-primary">{po.items.reduce((sum, i) => sum + i.qty, 0)} Pcs</span>
                                          </div>
                                       </div>
                                       <div className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
@@ -669,7 +669,7 @@ export default function PurchaseOrderPage() {
                                               <TableRow key={item.id} className="border-zinc-800/50 h-10">
                                                 <TableCell className="py-2 text-[11px] font-bold">{item.product?.name || "Unknown Product"}</TableCell>
                                                 <TableCell className="py-2 text-[11px] text-center font-mono opacity-60 uppercase">{item.product?.sku || "-"}</TableCell>
-                                                <TableCell className="py-2 text-right px-4 text-[11px] font-black">{item.quantity} pcs</TableCell>
+                                                <TableCell className="py-2 text-right px-4 text-[11px] font-black">{item.qty} pcs</TableCell>
                                               </TableRow>
                                             ))}
                                           </TableBody>

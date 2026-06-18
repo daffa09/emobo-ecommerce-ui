@@ -5,20 +5,32 @@ import { getCookie, clearAuthCookies } from "./cookie-utils";
 // TYPE DEFINITIONS
 // ============================================
 
+export interface Brand {
+  id: string;
+  name: string;
+}
+
+export interface Condition {
+  id: string;
+  name: string;
+}
+
 export interface Product {
-  id: number;
+  id: string;
   sku: string;
   serialNumber: string | null;
   name: string;
   price: number;
   buyPrice: number;
-  brand: string;
+  brandId: string;
+  brand: Brand;
   category: string;
   description: string | null;
   stock: number;
   images: string[];
   specifications: any; // JSON
-  condition: string;
+  conditionId: string;
+  condition: Condition;
   warranty: string | null;
   weight: number;
   createdAt: string;
@@ -29,10 +41,10 @@ export interface Product {
 }
 
 export interface Review {
-  id: number;
-  orderId: number;
-  productId: number;
-  userId: number;
+  id: string;
+  orderId: string;
+  productId: string;
+  userId: string;
   rating: number;
   comment: string | null;
   createdAt: string;
@@ -46,7 +58,7 @@ export interface SalesReport {
   totalSales: number;
   totalProfit: number;
   orders: {
-    id: number;
+    id: string;
     date: string;
     customer: string;
     totalAmount: number;
@@ -64,8 +76,8 @@ export interface SalesReport {
 }
 
 export interface Order {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   totalAmount: number;
   shippingCost: number;
   shippingService: string | null;
@@ -96,9 +108,9 @@ export interface Order {
 }
 
 export interface OrderItem {
-  id: number;
-  orderId: number;
-  productId: number;
+  id: string;
+  orderId: string;
+  productId: string;
   quantity: number;
   unitPrice: number;
   price?: number;
@@ -106,8 +118,8 @@ export interface OrderItem {
 }
 
 export interface Payment {
-  id: number;
-  orderId: number;
+  id: string;
+  orderId: string;
   provider: string;
   providerId: string | null;
   snapToken: string | null;
@@ -149,11 +161,11 @@ export interface SalesReport {
   totalCustomers: number;
   totalProducts: number;
   salesByMonth?: Array<{ month: string; revenue: number; orders: number }>;
-  topProducts?: Array<{ productId: number; productName: string; totalSales: number }>;
+  topProducts?: Array<{ productId: string; productName: string; totalSales: number }>;
 }
 
 export interface Customer {
-  id: number;
+  id: string;
   email: string;
   name: string | null;
   phone?: string;
@@ -170,8 +182,8 @@ export interface Customer {
 }
 
 export interface Notification {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   title: string;
   message: string;
   type: string;
@@ -181,7 +193,7 @@ export interface Notification {
 }
 
 export interface ContactMessage {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   subject: string;
@@ -191,15 +203,15 @@ export interface ContactMessage {
 }
 
 export interface PurchaseOrderItem {
-  id: number;
-  purchaseOrderId: number;
-  productId: number;
-  quantity: number;
+  id: string;
+  purchaseOrderId: string;
+  productId: string;
+  qty: number;
   product?: Product;
 }
 
 export interface PurchaseOrder {
-  id: number;
+  id: string;
   receiptUrl: string;
   totalItemsOnReceipt: number;
   notes: string | null;
@@ -255,7 +267,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 // ============================================
 
 export async function fetchPublicProducts(params?: {
-  brand?: string;
+  brandId?: string;
   category?: string;
   search?: string;
   minPrice?: number;
@@ -265,7 +277,7 @@ export async function fetchPublicProducts(params?: {
   sortBy?: "price_asc" | "price_desc" | "newest";
 }): Promise<{ products: Product[]; total: number }> {
   const queryParams = new URLSearchParams();
-  if (params?.brand) queryParams.append("brand", params.brand);
+  if (params?.brandId) queryParams.append("brandId", params.brandId);
   if (params?.category) queryParams.append("category", params.category);
   if (params?.search) queryParams.append("search", params.search);
   if (params?.minPrice) queryParams.append("minPrice", params.minPrice.toString());
@@ -284,7 +296,7 @@ export async function fetchTopSellingProducts(limit: number = 4): Promise<Produc
   return handleResponse<Product[]>(response);
 }
 
-export async function fetchProductById(id: number): Promise<Product> {
+export async function fetchProductById(id: string): Promise<Product> {
   const response = await fetch(`${API_URL}/products/public/${id}`);
   return handleResponse<Product>(response);
 }
@@ -339,7 +351,7 @@ export async function fetchAdminProducts(params?: {
   };
 }
 
-export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt">): Promise<Product> {
+export async function createProduct(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "deletedAt" | "brand" | "condition">): Promise<Product> {
   const response = await fetch(`${API_URL}/products`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -348,7 +360,7 @@ export async function createProduct(data: Omit<Product, "id" | "createdAt" | "up
   return handleResponse<Product>(response);
 }
 
-export async function updateProduct(id: number, data: Partial<Product>): Promise<Product> {
+export async function updateProduct(id: string, data: Partial<Product>): Promise<Product> {
   const response = await fetch(`${API_URL}/products/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -357,8 +369,78 @@ export async function updateProduct(id: number, data: Partial<Product>): Promise
   return handleResponse<Product>(response);
 }
 
-export async function deleteProduct(id: number): Promise<void> {
+export async function deleteProduct(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/products/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  await handleResponse<void>(response);
+}
+
+// ============================================
+// BRAND & CONDITION API
+// ============================================
+
+export async function fetchBrands(): Promise<Brand[]> {
+  const response = await fetch(`${API_URL}/brands`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Brand[]>(response);
+}
+
+export async function createBrand(data: { name: string }): Promise<Brand> {
+  const response = await fetch(`${API_URL}/brands`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Brand>(response);
+}
+
+export async function updateBrand(id: string, data: { name: string }): Promise<Brand> {
+  const response = await fetch(`${API_URL}/brands/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Brand>(response);
+}
+
+export async function deleteBrand(id: string): Promise<void> {
+  const response = await fetch(`${API_URL}/brands/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  await handleResponse<void>(response);
+}
+
+export async function fetchConditions(): Promise<Condition[]> {
+  const response = await fetch(`${API_URL}/conditions`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse<Condition[]>(response);
+}
+
+export async function createCondition(data: { name: string }): Promise<Condition> {
+  const response = await fetch(`${API_URL}/conditions`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Condition>(response);
+}
+
+export async function updateCondition(id: string, data: { name: string }): Promise<Condition> {
+  const response = await fetch(`${API_URL}/conditions/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse<Condition>(response);
+}
+
+export async function deleteCondition(id: string): Promise<void> {
+  const response = await fetch(`${API_URL}/conditions/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -369,14 +451,14 @@ export async function deleteProduct(id: number): Promise<void> {
 // REVIEW API
 // ============================================
 
-export async function fetchProductReviews(productId: number): Promise<Review[]> {
+export async function fetchProductReviews(productId: string): Promise<Review[]> {
   const response = await fetch(`${API_URL}/reviews/product/${productId}`);
   return handleResponse<Review[]>(response);
 }
 
 export async function createReview(data: {
-  orderId: number;
-  productId: number;
+  orderId: string;
+  productId: string;
   rating: number;
   comment?: string;
 }): Promise<Review> {
@@ -393,7 +475,7 @@ export async function createReview(data: {
 // ============================================
 
 export async function createOrder(data: {
-  items: Array<{ productId: number; quantity: number }>;
+  items: Array<{ productId: string; quantity: number }>;
   shippingAddr: any;
   phone: string;
   shippingCost: number;
@@ -429,7 +511,7 @@ export async function fetchUserOrders(params?: {
   return { orders: data.orders || [], total: data.total || 0 };
 }
 
-export async function fetchOrderById(id: number): Promise<Order> {
+export async function fetchOrderById(id: string): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${id}`, {
     headers: getAuthHeaders(),
     cache: "no-store",
@@ -437,7 +519,7 @@ export async function fetchOrderById(id: number): Promise<Order> {
   return handleResponse<Order>(response);
 }
 
-export async function cancelOrder(id: number): Promise<Order> {
+export async function cancelOrder(id: string): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${id}/cancel`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -449,7 +531,7 @@ export async function cancelOrder(id: number): Promise<Order> {
 // PAYMENT API
 // ============================================
 
-export async function createPayment(orderId: number): Promise<Payment> {
+export async function createPayment(orderId: string): Promise<Payment> {
   const response = await fetch(`${API_URL}/payments/${orderId}/create`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -457,7 +539,7 @@ export async function createPayment(orderId: number): Promise<Payment> {
   return handleResponse<Payment>(response);
 }
 
-export async function fetchPaymentStatus(orderId: number): Promise<Payment> {
+export async function fetchPaymentStatus(orderId: string): Promise<Payment> {
   const response = await fetch(`${API_URL}/payments/${orderId}/status`, {
     headers: getAuthHeaders(),
   });
@@ -503,7 +585,7 @@ export async function fetchAllCustomers(): Promise<Customer[]> {
   return handleResponse<Customer[]>(response);
 }
 
-export async function fetchCustomerById(id: number): Promise<Customer> {
+export async function fetchCustomerById(id: string): Promise<Customer> {
   const response = await fetch(`${API_URL}/customers/${id}`, {
     headers: getAuthHeaders(),
   });
@@ -517,7 +599,7 @@ export async function fetchAllOrders(): Promise<Order[]> {
   return handleResponse<Order[]>(response);
 }
 
-export async function updateOrderStatus(orderId: number, status: string, trackingNo?: string): Promise<Order> {
+export async function updateOrderStatus(orderId: string, status: string, trackingNo?: string): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -591,7 +673,7 @@ export async function fetchNotifications(): Promise<Notification[]> {
   return handleResponse<Notification[]>(response);
 }
 
-export async function markNotificationAsRead(id: number): Promise<Notification> {
+export async function markNotificationAsRead(id: string): Promise<Notification> {
   const response = await fetch(`${API_URL}/notifications/${id}/read`, {
     method: "PATCH",
     headers: getAuthHeaders(),
@@ -607,7 +689,7 @@ export async function markAllNotificationsAsRead(): Promise<void> {
   await handleResponse<void>(response);
 }
 
-export async function deleteNotification(id: number): Promise<void> {
+export async function deleteNotification(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/notifications/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
@@ -615,7 +697,7 @@ export async function deleteNotification(id: number): Promise<void> {
   await handleResponse<void>(response);
 }
 
-export async function confirmOrderReceived(orderId: number): Promise<Order> {
+export async function confirmOrderReceived(orderId: string): Promise<Order> {
   const response = await fetch(`${API_URL}/orders/${orderId}/confirm-received`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -651,7 +733,7 @@ export async function createPurchaseOrder(data: {
   receiptUrl: string;
   totalItemsOnReceipt: number;
   notes?: string;
-  items: Array<{ productId: number; quantity: number }>;
+  items: Array<{ productId: string; qty: number }>;
 }): Promise<PurchaseOrder> {
   const response = await fetch(`${API_URL}/purchase-order`, {
     method: "POST",

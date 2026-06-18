@@ -70,7 +70,7 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
     }
   }, [user]);
 
-  const handleMarkAsRead = async (id: number) => {
+  const handleMarkAsRead = async (id: string) => {
     try {
       const { markNotificationAsRead } = await import("@/lib/api-service");
       await markNotificationAsRead(id);

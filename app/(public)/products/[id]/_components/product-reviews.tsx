@@ -4,7 +4,7 @@ import { Star } from "lucide-react";
 import type { Review } from "@/lib/api-service";
 
 interface ProductReviewsProps {
-  productId: number;
+  productId: string;
   reviews: Review[];
 }
 

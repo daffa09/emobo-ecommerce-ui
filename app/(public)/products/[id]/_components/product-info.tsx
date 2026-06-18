@@ -124,14 +124,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {product.stock > 10 ? "In Stock" : product.stock > 0 ? `Only ${product.stock} left` : "Out of Stock"}
           </Badge>
           <Badge variant="outline" className="text-xs border-primary text-primary font-black uppercase tracking-widest bg-primary/5">
-            {product.condition === "SECOND" ? "Second" : "New"}
+            {product.condition?.name === "SECOND" ? "Second" : "New"}
           </Badge>
           {product.warranty && (
             <Badge variant="outline" className="text-xs">
               {product.warranty}
             </Badge>
           )}
-          <span className="text-sm text-muted-foreground ml-2">Brand: {product.brand}</span>
+          <span className="text-sm text-muted-foreground ml-2">Brand: {product.brand?.name}</span>
         </div>
         <p className="text-sm text-muted-foreground">
           Tax included. Shipping calculated at checkout.
