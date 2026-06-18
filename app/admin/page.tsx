@@ -145,7 +145,7 @@ export default function AdminDashboardPage() {
                   { name: "Manage Products", href: "/admin/catalog" },
                   { name: "Manage Orders", href: "/admin/transactions" },
                   { name: "View Customers", href: "/admin/customers" },
-                  { name: "Sales Reports", href: "/admin/reports" }
+                  { name: "Reports", href: "/admin/reports" }
                 ].map((action, i) => (
                   <Link key={i} href={action.href} className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-white/10 transition-smooth group border border-transparent hover:border-primary/30 text-left">
                     <span className="text-sm font-bold text-slate-400 group-hover:text-white">{action.name}</span>

@@ -133,8 +133,8 @@ export default function PrintReportPage() {
     type === "sales"
       ? "Sales Report"
       : type === "inbound"
-      ? "Incoming Goods Report"
-      : "Outgoing Goods Report";
+      ? "Inbound Report"
+      : "Outbound Report";
 
   const periodStr = `${startDate ? new Date(startDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "-"} – ${
     endDate ? new Date(endDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "-"

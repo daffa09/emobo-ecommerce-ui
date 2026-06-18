@@ -8,7 +8,7 @@ const adminNavItems: any[] = [
   { name: "Manage Products", href: "/admin/catalog", iconName: "Catalog" },
   { name: "Purchase Order", href: "/admin/purchase-order", iconName: "PurchaseOrder" },
   { name: "Manage Customers", href: "/admin/customers", iconName: "Customers" },
-  { name: "Sales Reports", href: "/admin/reports", iconName: "Reports" },
+  { name: "Reports", href: "/admin/reports", iconName: "Reports" },
   { name: "Manage Orders", href: "/admin/transactions", iconName: "Transactions" },
   { name: "Manage Brands", href: "/admin/brands", iconName: "Catalog" },
   { name: "Manage Conditions", href: "/admin/conditions", iconName: "Catalog" },

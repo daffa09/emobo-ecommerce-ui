@@ -35,8 +35,8 @@ export default function AdminReportsPage() {
         <div className="overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
           <TabsList className="bg-zinc-900/50 border border-zinc-800 h-auto p-1 rounded-xl w-fit sm:w-auto flex min-w-max sm:min-w-0">
             <TabsTrigger value="financial" className="rounded-lg px-4 py-2 text-xs sm:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-black transition-all">Sales</TabsTrigger>
-            <TabsTrigger value="inbound" className="rounded-lg px-4 py-2 text-xs sm:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-black transition-all">Incoming Goods</TabsTrigger>
-            <TabsTrigger value="outbound" className="rounded-lg px-4 py-2 text-xs sm:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-black transition-all">Outgoing Goods</TabsTrigger>
+            <TabsTrigger value="inbound" className="rounded-lg px-4 py-2 text-xs sm:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-black transition-all">Inbound Report</TabsTrigger>
+            <TabsTrigger value="outbound" className="rounded-lg px-4 py-2 text-xs sm:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-black transition-all">Outbound Report</TabsTrigger>
           </TabsList>
         </div>
 
@@ -91,7 +91,7 @@ export default function AdminReportsPage() {
             <CardHeader className="border-b border-zinc-800 pb-4">
               <CardTitle className="flex items-center gap-2 text-lg font-bold text-white">
                 <Download className="w-5 h-5 text-emerald-500" />
-                Incoming Goods Report (PDF)
+                Inbound Report (PDF)
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -120,7 +120,7 @@ export default function AdminReportsPage() {
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black h-11 rounded-xl shadow-lg shadow-emerald-600/10 transition-all active:scale-[0.98]"
                   >
                     <FileText className="w-4 h-4 mr-2" />
-                    PRINT INCOMING GOODS REPORT
+                    PRINT INBOUND REPORT
                   </Button>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export default function AdminReportsPage() {
             <CardHeader className="border-b border-zinc-800 pb-4">
               <CardTitle className="flex items-center gap-2 text-lg font-bold text-white">
                 <FileText className="w-5 h-5 text-blue-500" />
-                Outgoing Goods Report (PDF)
+                Outbound Report (PDF)
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -166,7 +166,7 @@ export default function AdminReportsPage() {
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black h-11 rounded-xl shadow-lg shadow-blue-600/10 transition-all active:scale-[0.98]"
                   >
                     <FileText className="w-4 h-4 mr-2" />
-                    PRINT OUTGOING GOODS REPORT
+                    PRINT OUTBOUND REPORT
                   </Button>
                 </div>
               </div>
