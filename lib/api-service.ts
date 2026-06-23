@@ -476,20 +476,26 @@ export async function createReview(data: {
 // ORDER API
 // ============================================
 
-export async function createOrder(data: {
-  items: Array<{ productId: string; quantity: number }>;
-  shippingAddr: any;
-  phone: string;
-  shippingCost: number;
-  shippingService: string;
-}): Promise<Order> {
+export async function createOrder(data: any): Promise<Order> {
   const response = await fetch(`${API_URL}/orders`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
-  return handleResponse<Order>(response);
+  const res = await handleResponse<any>(response);
+  return normalizeOrder(res);
 }
+
+const normalizeOrder = (o: any): Order => {
+  if (!o) return o;
+  return {
+    ...o,
+    totalAmount: Number(o.total_grand ?? o.totalAmount ?? 0),
+    shippingCost: Number(o.shippingCost ?? 0),
+    taxAmount: Number(o.taxAmount ?? 0),
+    appFee: Number(o.appFee ?? 0)
+  };
+};
 
 export async function fetchUserOrders(params?: {
   search?: string;
@@ -508,9 +514,9 @@ export async function fetchUserOrders(params?: {
   
   const data = await handleResponse<any>(response);
   if (Array.isArray(data)) {
-    return { orders: data, total: data.length };
+    return { orders: data.map(normalizeOrder), total: data.length };
   }
-  return { orders: data.orders || [], total: data.total || 0 };
+  return { orders: (data.orders || []).map(normalizeOrder), total: data.total || 0 };
 }
 
 export async function fetchOrderById(id: string): Promise<Order> {
@@ -518,7 +524,8 @@ export async function fetchOrderById(id: string): Promise<Order> {
     headers: getAuthHeaders(),
     cache: "no-store",
   });
-  return handleResponse<Order>(response);
+  const data = await handleResponse<any>(response);
+  return normalizeOrder(data);
 }
 
 export async function cancelOrder(id: string): Promise<Order> {
@@ -598,7 +605,8 @@ export async function fetchAllOrders(): Promise<Order[]> {
   const response = await fetch(`${API_URL}/orders/all`, {
     headers: getAuthHeaders(),
   });
-  return handleResponse<Order[]>(response);
+  const data = await handleResponse<any[]>(response);
+  return data.map(normalizeOrder);
 }
 
 export async function updateOrderStatus(orderId: string, status: string, trackingNo?: string): Promise<Order> {
