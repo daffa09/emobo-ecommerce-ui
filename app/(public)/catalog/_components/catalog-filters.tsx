@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,6 +17,7 @@ const conditions = ["NEW", "SECOND"];
 export function CatalogFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   // Internal state for inputs
@@ -45,7 +46,7 @@ export function CatalogFilters() {
     params.delete("offset");
 
     startTransition(() => {
-      router.push(`/catalog?${params.toString()}`, { scroll: false });
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     });
   };
 
@@ -75,7 +76,7 @@ export function CatalogFilters() {
     setSearch("");
     setMinPrice("");
     setMaxPrice("");
-    router.push("/catalog", { scroll: false });
+    router.push(pathname, { scroll: false });
   };
 
   return (
