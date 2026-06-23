@@ -40,19 +40,31 @@ export function ProductSpecs({ product }: ProductSpecsProps) {
                   dangerouslySetInnerHTML={{ __html: product.specifications }}
                 />
               ) : typeof product.specifications === 'object' && product.specifications !== null && Object.keys(product.specifications).length > 0 ? (
-                Object.entries(product.specifications).map(([category, specs]: [string, any], index: number) => (
-                  <div key={index} className="space-y-4">
-                    <h3 className="font-semibold text-lg capitalize">{category.replace(/([A-Z])/g, " $1").trim()}</h3>
-                    <div className="space-y-3 text-sm">
-                      {Object.entries(specs).map(([key, value]: [string, any]) => (
-                        <div key={key} className="flex justify-between">
-                          <span className="text-muted-foreground capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</span>
-                          <span className="font-medium text-right">{value}</span>
+                <div className="col-span-2 space-y-4">
+                  {Object.entries(product.specifications).map(([key, value]: [string, any], index: number) => {
+                    if (typeof value === 'object' && value !== null) {
+                      return (
+                        <div key={index} className="space-y-4 mb-6">
+                          <h3 className="font-semibold text-lg capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</h3>
+                          <div className="space-y-3 text-sm">
+                            {Object.entries(value).map(([k, v]: [string, any]) => (
+                              <div key={k} className="flex justify-between border-b pb-2 border-border/50 last:border-0">
+                                <span className="text-muted-foreground capitalize">{k.replace(/([A-Z])/g, " $1").trim()}</span>
+                                <span className="font-medium text-right">{String(v)}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
+                      );
+                    }
+                    return (
+                      <div key={index} className="flex justify-between border-b pb-3 border-border/50 last:border-0">
+                        <span className="text-muted-foreground capitalize font-medium">{key.replace(/([A-Z])/g, " $1").trim()}</span>
+                        <span className="text-right">{String(value)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 <div className="col-span-2 text-center text-muted-foreground py-8">
                   No specifications available for this product.
