@@ -45,7 +45,7 @@ export function CatalogFilters() {
     params.delete("offset");
 
     startTransition(() => {
-      router.push(`/catalog?${params.toString()}`);
+      router.push(`/catalog?${params.toString()}`, { scroll: false });
     });
   };
 
@@ -75,7 +75,7 @@ export function CatalogFilters() {
     setSearch("");
     setMinPrice("");
     setMaxPrice("");
-    router.push("/catalog");
+    router.push("/catalog", { scroll: false });
   };
 
   return (

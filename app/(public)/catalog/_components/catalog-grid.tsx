@@ -196,17 +196,7 @@ export function CatalogGrid() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-initial">
-              <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-                <SelectTrigger className="w-full sm:w-[160px] h-10 rounded-xl bg-background border-border/50">
-                  <SelectValue placeholder="Sort" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="featured">Featured</SelectItem>
-                  <SelectItem value="price-low">Price: Low-High</SelectItem>
-                  <SelectItem value="price-high">Price: High-Low</SelectItem>
-                  <SelectItem value="newest">Newest</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* Sort dropdown removed */}
             </div>
           </div>
         </div>
@@ -283,7 +273,7 @@ export function CatalogGrid() {
                   <div className="flex-1 flex flex-col pt-2">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <Link href={`/product/${product.id}`} className="text-2xl font-bold hover:text-primary transition-colors line-clamp-1">{product.name}</Link>
+                        <Link href={`/products/${product.id}`} className="text-2xl font-bold hover:text-primary transition-colors line-clamp-1">{product.name}</Link>
                          {(product.rating ?? 0) > 0 && (
                            <div className="flex items-center gap-4 mt-2">
                              <div className="flex items-center gap-1 text-yellow-500">
@@ -319,7 +309,7 @@ export function CatalogGrid() {
                   <div className="flex flex-col justify-center gap-3 w-full md:w-48 md:pt-0 pt-6 border-t md:border-t-0 md:border-l border-border/50 md:pl-8">
                     <p className="text-2xl font-black text-primary block sm:hidden mb-2">{formatPrice(product.price)}</p>
                     <Button asChild className="w-full rounded-xl bg-primary hover:bg-primary-dark shadow-lg shadow-primary/20">
-                      <Link href={`/product/${product.id}`}>View Details</Link>
+                      <Link href={`/products/${product.id}`}>View Details</Link>
                     </Button>
                     <Button 
                       variant="outline" 

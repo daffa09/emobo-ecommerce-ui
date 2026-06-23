@@ -289,17 +289,17 @@ export async function fetchPublicProducts(params?: {
   if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
 
   const url = `${API_URL}/products/public${queryParams.toString() ? `?${queryParams}` : ""}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: "no-store" });
   return handleResponse<{ products: Product[]; total: number }>(response);
 }
 
 export async function fetchTopSellingProducts(limit: number = 4): Promise<Product[]> {
-  const response = await fetch(`${API_URL}/products/top-selling?limit=${limit}`);
+  const response = await fetch(`${API_URL}/products/top-selling?limit=${limit}`, { cache: "no-store" });
   return handleResponse<Product[]>(response);
 }
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`${API_URL}/products/public/${id}`);
+  const response = await fetch(`${API_URL}/products/public/${id}`, { cache: "no-store" });
   return handleResponse<Product>(response);
 }
 

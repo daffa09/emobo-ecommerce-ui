@@ -157,10 +157,6 @@ export function DashboardShell({ children, navItems, roleName, roleDescription, 
                 <p className="text-xs font-black text-slate-100 leading-none">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                 </p>
-                <p className="text-[10px] font-bold text-emerald-500 mt-1 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Status: Operational
-                </p>
               </div>
 
               {/* Notification Popover (Tokopedia Style) */}
