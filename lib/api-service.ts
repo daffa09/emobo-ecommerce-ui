@@ -268,6 +268,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export async function fetchPublicProducts(params?: {
   brandId?: string;
+  brand?: string;
   category?: string;
   search?: string;
   minPrice?: number;
@@ -278,6 +279,7 @@ export async function fetchPublicProducts(params?: {
 }): Promise<{ products: Product[]; total: number }> {
   const queryParams = new URLSearchParams();
   if (params?.brandId) queryParams.append("brandId", params.brandId);
+  if (params?.brand) queryParams.append("brand", params.brand);
   if (params?.category) queryParams.append("category", params.category);
   if (params?.search) queryParams.append("search", params.search);
   if (params?.minPrice) queryParams.append("minPrice", params.minPrice.toString());

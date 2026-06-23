@@ -143,7 +143,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
             onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4" />
-            Add to Bag
+            Add to Cart
           </Button>
         </div>
       </CardContent>
