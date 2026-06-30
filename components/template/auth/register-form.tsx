@@ -142,11 +142,11 @@ export function RegisterForm() {
         />
         <span className="text-sm text-foreground">
           I agree to the{" "}
-          <Link href="/terms-of-service" className="text-primary hover:text-primary-dark underline-offset-4 hover:underline">
+          <Link href="/terms-of-service" onClick={closeModal} className="text-primary hover:text-primary-dark underline-offset-4 hover:underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy-policy" className="text-primary hover:text-primary-dark underline-offset-4 hover:underline">
+          <Link href="/privacy-policy" onClick={closeModal} className="text-primary hover:text-primary-dark underline-offset-4 hover:underline">
             Privacy Policy
           </Link>
         </span>
