@@ -320,7 +320,7 @@ export function CatalogGrid() {
                       onClick={() => handleAddToCart(product)}
                       disabled={product.stock === 0}
                     >
-                      {product.stock > 0 ? "Add to Cart" : "Stok Kosong"}
+                      {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
                     </Button>
                   </div>
                 </div>

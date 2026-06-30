@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Edit, Trash2, Plus, LayoutGrid, LayoutList, PackageCheck, PackageX } from "lucide-react";
 import { fetchAdminProducts, deleteProduct, type Product } from "@/lib/api-service";
-import { formatIDR, cn } from "@/lib/utils";
+import { formatIDR, cn, getImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
@@ -60,11 +60,7 @@ export default function AdminCatalogPage() {
     }
   }, [isMobile]);
 
-  const getImageUrl = (url?: string) => {
-    if (!url) return "/no-image.svg";
-    if (url.startsWith("http")) return url;
-    return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}${url}`;
-  };
+
 
   useEffect(() => {
     loadProducts(1, false);

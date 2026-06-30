@@ -139,7 +139,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
               disabled
               className="w-full h-10 rounded-xl bg-muted text-muted-foreground font-black text-xs gap-2"
             >
-              Stok Kosong
+              Out of Stock
             </Button>
           ) : (
             <Button 

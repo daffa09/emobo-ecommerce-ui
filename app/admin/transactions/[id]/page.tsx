@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Truck, Package, MapPin, CreditCard, ArrowLeft, Loader2, Send, Download } from "lucide-react";
 import { fetchOrderById, updateOrderStatus, type Order } from "@/lib/api-service";
-import { formatIDR, cn } from "@/lib/utils";
+import { formatIDR, cn, getImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/cookie-utils";
 import { API_URL } from "@/lib/auth-service";
@@ -237,25 +237,23 @@ export default function OrderDetailPage() {
               {order.items?.map((item) => (
                 <div key={item.id} className="flex gap-6 p-6 hover:bg-slate-800/20 transition-colors">
                   <div className="h-24 w-24 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
-                    {item.product?.images[0] && (
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${item.product.images[0]}`}
-                        alt={item.product.name}
-                        className="h-full w-full object-cover"
-                      />
-                    )}
+                    <img
+                      src={getImageUrl(item.product?.images?.[0])}
+                      alt={item.product?.name || "Product"}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <h3 className="font-bold text-white text-lg leading-tight truncate">{item.product?.name}</h3>
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">SKU: {item.product?.sku}</p>
                     <div className="flex items-center gap-4 mt-3">
-                      <p className="text-sm font-black text-primary">{formatIDR(item.price || item.unitPrice)}</p>
+                      <p className="text-sm font-black text-primary">{formatIDR(Number(item.price || item.unitPrice || 0))}</p>
                       <span className="h-1 w-1 rounded-full bg-slate-700" />
-                      <p className="text-xs text-white font-bold">Qty: {item.quantity}</p>
+                      <p className="text-xs text-white font-bold">Qty: {item.qty || item.quantity || 0}</p>
                     </div>
                   </div>
                   <div className="text-right flex flex-col justify-center">
-                    <p className="font-black text-white">{formatIDR((item.price || item.unitPrice) * item.quantity)}</p>
+                    <p className="font-black text-white">{formatIDR(Number(item.price || item.unitPrice || 0) * Number(item.qty || item.quantity || 0))}</p>
                   </div>
                 </div>
               ))}

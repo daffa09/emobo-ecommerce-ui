@@ -51,7 +51,7 @@ export default function CustomerDashboardPage() {
   }, []);
 
   const totalItems = orders.reduce((sum, order) => {
-    return sum + (order.items?.reduce((itemSum, item) => itemSum + item.quantity, 0) || 0);
+    return sum + (order.items?.reduce((itemSum, item) => itemSum + (item.qty || item.quantity || 0), 0) || 0);
   }, 0);
 
   const getStatusCount = (status: Order["status"]) => {

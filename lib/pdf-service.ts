@@ -160,13 +160,17 @@ export async function generateOrderReceipt(order: Order): Promise<void> {
   doc.text("ORDER ITEMS", margin, y);
   y += 4;
 
-  const tableRows = (order.items || []).map((item) => [
-    item.product?.sku || "-",
-    item.product?.name || `Product #${item.productId}`,
-    String(item.quantity),
-    formatIDR(item.price || item.unitPrice),
-    formatIDR((item.price || item.unitPrice) * item.quantity),
-  ]);
+  const tableRows = (order.items || []).map((item) => {
+    const qty = item.qty || item.quantity || 0;
+    const price = Number(item.price || item.unitPrice || 0);
+    return [
+      item.product?.sku || "-",
+      item.product?.name || `Product #${item.productId}`,
+      String(qty),
+      formatIDR(price),
+      formatIDR(price * qty),
+    ];
+  });
 
   autoTable(doc, {
     startY: y,

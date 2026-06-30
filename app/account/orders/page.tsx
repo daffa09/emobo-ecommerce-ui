@@ -160,9 +160,9 @@ export default function OrdersPage() {
                       <div key={item.id} className="flex justify-between items-center text-sm">
                         <div>
                           <p className="font-medium text-foreground">{item.product.name}</p>
-                          <p className="text-foreground">Qty: {item.quantity}</p>
+                          <p className="text-foreground">Qty: {item.qty || item.quantity || 0}</p>
                         </div>
-                        <p className="font-semibold">{formatIDR(item.unitPrice)}</p>
+                        <p className="font-semibold">{formatIDR(Number(item.price || item.unitPrice || 0))}</p>
                       </div>
                     ))}
                   </div>

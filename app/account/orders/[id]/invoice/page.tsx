@@ -99,9 +99,9 @@ export default function InvoicePage() {
             <tr key={item.id} className="border-b border-gray-100">
               <td className="py-4 px-2 text-sm text-gray-800">{index + 1}</td>
               <td className="py-4 px-2 text-sm font-medium text-gray-800">{item.product?.name || "Produk Laptop"}</td>
-              <td className="py-4 px-2 text-sm text-gray-800 text-center">{item.quantity}</td>
-              <td className="py-4 px-2 text-sm text-gray-800 text-right">{formatIDR(item.unitPrice)}</td>
-              <td className="py-4 px-2 text-sm text-gray-800 text-right font-medium">{formatIDR(item.unitPrice * item.quantity)}</td>
+              <td className="py-4 px-2 text-sm text-gray-800 text-center">{item.qty || item.quantity || 0}</td>
+              <td className="py-4 px-2 text-sm text-gray-800 text-right">{formatIDR(Number(item.price || item.unitPrice || 0))}</td>
+              <td className="py-4 px-2 text-sm text-gray-800 text-right font-medium">{formatIDR(Number(item.price || item.unitPrice || 0) * Number(item.qty || item.quantity || 0))}</td>
             </tr>
           ))}
         </tbody>

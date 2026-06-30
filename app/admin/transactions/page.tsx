@@ -175,8 +175,8 @@ export default function AdminTransactionsPage() {
                       </TableCell>
                       <TableCell className="text-white">
                         <div className="flex flex-col">
-                          <span className="font-medium">{order.user?.name || 'N/A'}</span>
-                          <span className="text-sm text-muted-foreground">{order.user?.email || 'N/A'}</span>
+                          <span className="font-medium">{order.profile?.name || order.user?.name || 'N/A'}</span>
+                          <span className="text-sm text-muted-foreground">{order.profile?.user?.email || order.user?.email || 'N/A'}</span>
                         </div>
                       </TableCell>
                       <TableCell className="font-medium text-white">

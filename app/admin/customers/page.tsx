@@ -93,7 +93,6 @@ export default function AdminCustomersPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableHead className="text-zinc-400">ID</TableHead>
                     <TableHead className="text-zinc-400">Name</TableHead>
                     <TableHead className="text-zinc-400">Email</TableHead>
                     <TableHead className="text-zinc-400">Phone</TableHead>
@@ -109,9 +108,6 @@ export default function AdminCustomersPage() {
 
                     return (
                       <TableRow key={customer.id} className="border-white/5 hover:bg-white/5 transition-smooth">
-                        <TableCell className="font-mono text-sm text-zinc-300">
-                          #{customer.id}
-                        </TableCell>
                         <TableCell className="font-medium text-white">
                           {customer.name || "N/A"}
                         </TableCell>

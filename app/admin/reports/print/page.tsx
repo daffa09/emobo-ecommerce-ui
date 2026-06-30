@@ -76,9 +76,9 @@ export default function PrintReportPage() {
                 id: po.id,
                 productName: item.product?.name || "Unknown Product",
                 sku: item.product?.sku || "-",
-                quantity: item.quantity,
+                quantity: item.qty || item.quantity || 0,
               });
-              totalQty += item.quantity;
+              totalQty += item.qty || item.quantity || 0;
             });
           });
 
@@ -103,10 +103,10 @@ export default function PrintReportPage() {
                 id: o.id,
                 productName: item.product?.name || "Unknown Product",
                 sku: item.product?.sku || "-",
-                quantity: item.quantity,
+                quantity: item.qty || item.quantity || 0,
                 status: o.status,
               });
-              totalQty += item.quantity;
+              totalQty += item.qty || item.quantity || 0;
             });
           });
 

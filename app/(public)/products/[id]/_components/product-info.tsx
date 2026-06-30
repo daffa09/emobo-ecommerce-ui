@@ -182,7 +182,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             disabled={product.stock === 0}
           >
             <ShoppingCart className="h-5 w-5" />
-            {product.stock > 0 ? "Add to Cart" : "Stok Kosong"}
+            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
           </Button>
           <Button size="lg" variant="outline" className="h-12" onClick={handleShare}>
             <Share2 className="h-5 w-5" />
