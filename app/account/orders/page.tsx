@@ -173,7 +173,7 @@ export default function OrdersPage() {
                   <div className="border-t border-border pt-4 flex justify-between items-center">
                     <div>
                       <p className="text-xs text-muted">Total Payment</p>
-                      <span className="text-xl font-bold text-primary">{formatIDR(order.totalAmount)}</span>
+                      <span className="text-xl font-bold text-primary">{formatIDR(order.total_grand || order.totalAmount)}</span>
                     </div>
                     <div className="flex gap-2">
                       {order.status === "COMPLETED" && (
