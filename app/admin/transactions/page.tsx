@@ -216,12 +216,9 @@ export default function AdminTransactionsPage() {
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            {["PENDING", "PROCESSING", "CANCELLED"].map(status => (
+                            {["PENDING", "CANCELLED"].map(status => (
                               <SelectItem key={status} value={status}>{status}</SelectItem>
                             ))}
-                            {["SHIPPED", "COMPLETED"].includes(order.status) && (
-                              <SelectItem value={order.status}>{order.status}</SelectItem>
-                            )}
                           </SelectContent>
                         </Select>
                       </TableCell>
