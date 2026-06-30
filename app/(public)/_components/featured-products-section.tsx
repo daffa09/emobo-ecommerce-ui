@@ -88,6 +88,7 @@ export function FeaturedProductsSection({
                   reviews={0}
                   specs={[product.brand?.name]}
                   isNew={sortBy === "newest"}
+                  stock={product.stock}
                 />
               </div>
             ))}

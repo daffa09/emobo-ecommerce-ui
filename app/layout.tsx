@@ -8,6 +8,9 @@ import { CartProvider } from "@/lib/cart-context"
 import { Toaster } from "sonner"
 import Script from "next/script"
 
+import { AuthModalProvider } from "@/lib/auth-modal-context"
+import { AuthModal } from "@/components/template/auth/auth-modal"
+
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _inter = Inter({ subsets: ["latin"] })
@@ -20,8 +23,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon.ico",
-        type: "image/x-icon",
+        url: "/ic_logo.svg",
+        type: "image/svg+xml",
       },
     ],
   },
@@ -54,12 +57,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${_inter.className} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <CartProvider>
-            <div className="relative flex min-h-screen flex-col">
-              <main className="flex-1">{children}</main>
-            </div>
-            <Toaster position="top-right" />
-          </CartProvider>
+          <AuthModalProvider>
+            <CartProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <main className="flex-1">{children}</main>
+              </div>
+              <Toaster position="top-right" />
+              <AuthModal />
+            </CartProvider>
+          </AuthModalProvider>
         </ThemeProvider>
         <Analytics />
       </body>

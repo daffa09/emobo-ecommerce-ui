@@ -11,6 +11,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { loginUser } from "@/lib/auth-service"
 import { setCookie } from "@/lib/cookie-utils"
+import { useAuthModal } from "@/lib/auth-modal-context"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -18,6 +19,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { setView, closeModal } = useAuthModal()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,6 +38,7 @@ export function LoginForm() {
       // Redirect based on role
       router.push(result.data.user.role === "ADMIN" ? "/admin" : "/customer")
       router.refresh()
+      closeModal()
     } catch (err: any) {
       setError(err.message || "Invalid credentials")
     } finally {
@@ -110,9 +113,13 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Don't have an account?{" "}
-        <Link href="/register" className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline">
+        <button 
+          type="button"
+          onClick={() => setView("register")}
+          className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline"
+        >
           Register
-        </Link>
+        </button>
       </p>
     </form>
   )

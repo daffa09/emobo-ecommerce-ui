@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { formatIDR, getImageUrl } from "@/lib/utils";
 import { fetchProductById, fetchAdminContact, type Product } from "@/lib/api-service";
 import { getCookie } from "@/lib/cookie-utils";
-import { useRouter } from "next/navigation";
+import { useAuthModal } from "@/lib/auth-modal-context";
 import { useEffect } from "react";
 
 interface ProductInfoProps {
@@ -22,7 +22,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [adminPhone, setAdminPhone] = useState<string | null>(null);
   const { addItem } = useCart();
-  const router = useRouter();
+  const { openModal } = useAuthModal();
 
   useEffect(() => {
     fetchAdminContact()
@@ -37,7 +37,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
   };
 
   const waLink = adminPhone 
-    ? `https://wa.me/${formatWA(adminPhone)}?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop ${product.name} (SKU: ${product.sku})`)}`
+    ? `https://wa.me/${formatWA(adminPhone)}?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop ${product.name}`)}`
     : "#";
 
   const handleAddToCart = () => {
@@ -47,7 +47,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       toast.error("Please login first", {
         description: "You need to be logged in to add items to your cart.",
       });
-      router.push("/login");
+      openModal("login");
       return;
     }
 
@@ -117,7 +117,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
       <div className="space-y-2 min-w-0 overflow-hidden">
         <div className="flex flex-wrap items-baseline gap-3">
           <span className="text-3xl lg:text-4xl font-bold text-primary truncate max-w-full">{formatIDR(product.price)}</span>
-          <Badge variant="secondary" className="text-xs">SKU: {product.sku}</Badge>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={product.stock > 10 ? "default" : product.stock > 0 ? "secondary" : "destructive"}>
@@ -183,7 +182,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             disabled={product.stock === 0}
           >
             <ShoppingCart className="h-5 w-5" />
-            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+            {product.stock > 0 ? "Add to Cart" : "Stok Kosong"}
           </Button>
           <Button size="lg" variant="outline" className="h-12" onClick={handleShare}>
             <Share2 className="h-5 w-5" />

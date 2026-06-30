@@ -15,11 +15,13 @@ import { useCart } from "@/lib/cart-context";
 import { toast } from "sonner";
 import { getImageUrl } from "@/lib/utils";
 import { getCookie } from "@/lib/cookie-utils";
+import { useAuthModal } from "@/lib/auth-modal-context";
 
 export function CatalogGrid() {
   const searchParams = useSearchParams();
   const { addItem } = useCart();
   const router = useRouter();
+  const { openModal } = useAuthModal();
 
   // URL Params
   const brandParam = searchParams.get("brand");
@@ -145,7 +147,7 @@ export function CatalogGrid() {
       toast.error("Please login first", {
         description: "You need to be logged in to add items to your cart.",
       });
-      router.push("/login");
+      openModal("login");
       return;
     }
 
@@ -250,6 +252,7 @@ export function CatalogGrid() {
                      reviews={product.reviewsCount || 0}
                      specs={[product.brand?.name, product.category, product.condition?.name]}
                      isNew={sortBy === "newest"}
+                     stock={product.stock}
                    />
                  </div>
                ))}
@@ -317,7 +320,7 @@ export function CatalogGrid() {
                       onClick={() => handleAddToCart(product)}
                       disabled={product.stock === 0}
                     >
-                      {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                      {product.stock > 0 ? "Add to Cart" : "Stok Kosong"}
                     </Button>
                   </div>
                 </div>

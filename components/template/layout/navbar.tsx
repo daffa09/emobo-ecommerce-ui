@@ -25,10 +25,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCookie } from "@/lib/cookie-utils";
+import { useAuthModal } from "@/lib/auth-modal-context";
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const { openModal } = useAuthModal();
 
   useEffect(() => {
     const storedUser = getCookie("emobo-user");
@@ -108,11 +110,9 @@ export function Navbar() {
                       </Button>
                     </div>
                   ) : (
-                    <Link href="/login">
-                      <Button className="w-full h-12 rounded-lg font-bold shadow-lg shadow-primary/20">
-                        Login Account
-                      </Button>
-                    </Link>
+                    <Button onClick={() => openModal("login")} className="w-full h-12 rounded-lg font-bold shadow-lg shadow-primary/20">
+                      Login Account
+                    </Button>
                   )}
                 </nav>
               </SheetContent>
@@ -185,11 +185,9 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link href="/login" className="hidden sm:block">
-              <Button variant="outline" className="rounded-lg px-6 font-medium transition-smooth hover:bg-primary hover:text-white">
-                Login
-              </Button>
-            </Link>
+            <Button onClick={() => openModal("login")} variant="outline" className="hidden sm:block rounded-lg px-6 font-medium transition-smooth hover:bg-primary hover:text-white">
+              Login
+            </Button>
           )}
         </div>
       </div>

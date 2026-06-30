@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import Link from "next/link"
 import { registerUser } from "@/lib/auth-service"
+import { useAuthModal } from "@/lib/auth-modal-context"
 
 export function RegisterForm() {
   const [fullName, setFullName] = useState("")
@@ -17,6 +18,7 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { setView, closeModal } = useAuthModal()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,8 +55,8 @@ export function RegisterForm() {
             Please click the link to activate your account before logging in.
           </p>
         </div>
-        <Button asChild className="w-full bg-primary hover:bg-primary-dark transition-smooth text-white">
-          <Link href="/login">Back to Login</Link>
+        <Button onClick={() => setView("login")} className="w-full bg-primary hover:bg-primary-dark transition-smooth text-white">
+          Back to Login
         </Button>
       </div>
     )
@@ -167,9 +169,13 @@ export function RegisterForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline transition-colors">
+        <button
+          type="button"
+          onClick={() => setView("login")}
+          className="text-primary hover:text-primary-dark font-bold underline-offset-4 hover:underline transition-colors"
+        >
           Login
-        </Link>
+        </button>
       </p>
     </form>
   )

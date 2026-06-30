@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { formatIDR, getImageUrl } from "@/lib/utils";
 import { useState } from "react";
 import { getCookie } from "@/lib/cookie-utils";
-import { useRouter } from "next/navigation";
+import { useAuthModal } from "@/lib/auth-modal-context";
 
 interface ProductCardProps {
   id: string;
@@ -25,11 +25,12 @@ interface ProductCardProps {
   sku?: string;
   weight?: number;
   isNew?: boolean;
+  stock?: number;
 }
 
-export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight, isNew }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, rating, reviews, discount, specs, sku, weight, isNew, stock }: ProductCardProps) {
   const { addItem } = useCart();
-  const router = useRouter();
+  const { openModal } = useAuthModal();
   const [imgSrc, setImgSrc] = useState(getImageUrl(image));
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -42,7 +43,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
       toast.error("Please login first", {
         description: "You need to be logged in to add items to your cart.",
       });
-      router.push("/login");
+      openModal("login");
       return;
     }
 
@@ -73,12 +74,7 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
           </Badge>
         )}
         
-        {/* SKU/Brand Mini Tag - Top Right */}
-        <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-           <Badge variant="outline" className="bg-black/40 backdrop-blur-md text-white border-0 text-[9px] px-1.5 h-4 font-mono">
-             #{id}
-           </Badge>
-        </div>
+
 
         <div className="relative aspect-4/3 bg-slate-900/40 overflow-hidden shrink-0">
           <Image
@@ -137,14 +133,24 @@ export function ProductCard({ id, name, price, image, rating, reviews, discount,
             </span>
           </div>
           
-          <Button 
-            size="sm" 
-            className="w-full h-10 rounded-xl bg-primary hover:bg-primary-dark text-white font-black text-xs gap-2 shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]" 
-            onClick={handleAddToCart}
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Add to Cart
-          </Button>
+          {stock === 0 ? (
+            <Button 
+              size="sm" 
+              disabled
+              className="w-full h-10 rounded-xl bg-muted text-muted-foreground font-black text-xs gap-2"
+            >
+              Stok Kosong
+            </Button>
+          ) : (
+            <Button 
+              size="sm" 
+              className="w-full h-10 rounded-xl bg-primary hover:bg-primary-dark text-white font-black text-xs gap-2 shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]" 
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Add to Cart
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
