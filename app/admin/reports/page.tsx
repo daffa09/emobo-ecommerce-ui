@@ -10,8 +10,18 @@ import { API_URL } from "@/lib/auth-service";
 import { toast } from "sonner";
 
 export default function AdminReportsPage() {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const getToday = () => {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+  };
+  const getOneWeekAgo = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  };
+
+  const [startDate, setStartDate] = useState(getOneWeekAgo());
+  const [endDate, setEndDate] = useState(getToday());
   const [loading, setLoading] = useState(false);
 
   const printReport = (type: "sales" | "inbound" | "outbound" = "sales") => {

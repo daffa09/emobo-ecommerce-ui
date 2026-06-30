@@ -355,25 +355,25 @@ export default function OrderDetailPage() {
             </div>
           </CardContent>
           <div className="p-6 bg-slate-900/50 border-t border-slate-800 space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-400 font-medium">Subtotal</span>
-              <span className="text-white font-bold">{formatIDR(order.totalAmount - order.shippingCost - (order.appFee || 0))}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-400 font-medium">Shipping Cost</span>
-              <span className="text-white font-bold">{formatIDR(order.shippingCost)}</span>
-            </div>
-            {(order.appFee ?? 0) > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-400 font-medium">App Fee</span>
-                <span className="text-white font-bold">{formatIDR(order.appFee!)}</span>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Subtotal</span>
+                <span className="text-white font-bold">{formatIDR((order.total_grand || order.totalAmount) - order.shippingCost - (order.appFee || 0))}</span>
               </div>
-            )}
-            <Separator className="bg-slate-800" />
-            <div className="flex justify-between items-center pt-2">
-              <span className="text-white font-black uppercase tracking-tighter">Grand Total</span>
-              <span className="text-2xl font-black text-primary">{formatIDR(order.totalAmount)}</span>
-            </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-400 font-medium">Shipping Cost</span>
+                <span className="text-white font-bold">{formatIDR(order.shippingCost)}</span>
+              </div>
+              {(order.appFee ?? 0) > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400 font-medium">App Fee</span>
+                  <span className="text-white font-bold">{formatIDR(order.appFee!)}</span>
+                </div>
+              )}
+              <Separator className="bg-slate-800" />
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-white font-black uppercase tracking-tighter">Grand Total</span>
+                <span className="text-2xl font-black text-primary">{formatIDR(order.total_grand || order.totalAmount)}</span>
+              </div>
           </div>
         </Card>
 

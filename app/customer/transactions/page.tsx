@@ -196,7 +196,7 @@ export default function CustomerTransactionsPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Total Amount</p>
                       <p className="text-xl font-bold">
-                        {formatIDR(order.totalAmount + order.shippingCost)}
+                        {formatIDR(order.total_grand || (order.totalAmount + order.shippingCost))}
                       </p>
                     </div>
                     <div className="text-right flex flex-col items-end justify-end space-y-1">
