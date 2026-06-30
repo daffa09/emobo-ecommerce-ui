@@ -196,31 +196,46 @@ export default function AdminTransactionsPage() {
                         {new Date(order.createdAt).toLocaleDateString('en-US')}
                       </TableCell>
                       <TableCell>
-                        <Select
-                          value={order.status}
-                          onValueChange={(value) => handleStatusChange(order.id, value)}
-                          disabled={updatingOrder === order.id}
-                        >
-                          <SelectTrigger className="w-36 bg-zinc-800/50 border-zinc-700">
-                            <SelectValue>
-                              {updatingOrder === order.id ? (
-                                <span className="flex items-center gap-2">
-                                  <Loader2 className="h-3 w-3 animate-spin" />
-                                  Updating...
-                                </span>
-                              ) : (
-                                <Badge variant={STATUS_COLORS[order.status] || "secondary"}>
-                                  {order.status}
-                                </Badge>
-                              )}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {["PENDING", "CANCELLED"].map(status => (
-                              <SelectItem key={status} value={status}>{status}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        {order.status === "PENDING" ? (
+                          <Select
+                            value={order.status}
+                            onValueChange={(value) => handleStatusChange(order.id, value)}
+                            disabled={updatingOrder === order.id}
+                          >
+                            <SelectTrigger className="w-36 bg-zinc-800/50 border-zinc-700">
+                              <SelectValue>
+                                {updatingOrder === order.id ? (
+                                  <span className="flex items-center gap-2">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    Updating...
+                                  </span>
+                                ) : (
+                                  <Badge variant={STATUS_COLORS[order.status] || "secondary"}>
+                                    {order.status}
+                                  </Badge>
+                                )}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {["PENDING", "CANCELLED"].map(status => (
+                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="w-36 py-2">
+                            {updatingOrder === order.id ? (
+                               <span className="flex items-center gap-2 text-sm text-zinc-400">
+                                 <Loader2 className="h-3 w-3 animate-spin" />
+                                 Updating...
+                               </span>
+                            ) : (
+                              <Badge variant={STATUS_COLORS[order.status] || "secondary"}>
+                                {order.status}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Button
